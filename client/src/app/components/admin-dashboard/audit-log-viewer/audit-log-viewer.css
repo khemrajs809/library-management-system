@@ -1,0 +1,147 @@
+.list-card {
+  background: var(--pure-white);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  border: 1px solid #f1f5f9;
+  min-height: 700px;
+}
+
+.lib-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 1rem;
+}
+
+.lib-table th {
+  background: #f8fafc;
+  color: #1e293b;
+  font-weight: 600;
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 2px solid #e2e8f0;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.lib-table td {
+  padding: 16px;
+  border-bottom: 1px solid #e2e8f0;
+  color: #1e293b;
+  font-size: 0.95rem;
+  vertical-align: middle;
+}
+
+.lib-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.bg-purple {
+  background: #f3e8ff;
+  color: #7e22ce;
+}
+
+.bg-blue {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+
+.method-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-right: 8px;
+  color: white;
+}
+
+.method-badge.POST { background: #10b981; }
+.method-badge.PUT { background: #f59e0b; }
+.method-badge.DELETE { background: #ef4444; }
+.method-badge.GET { background: #3b82f6; }
+
+.empty-state {
+  text-align: center;
+  padding: 3rem !important;
+  color: #1e293b;
+  font-style: italic;
+}
+
+.ds-style-355518da {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.ds-style-30254e95 {
+  margin:0;
+  padding:0;
+  border:none;
+}
+
+.ds-style-55e93b0d {
+  font-size: 0.9rem;
+  color: #1e293b;
+}
+
+.ds-style-0ca50382 {
+  white-space: nowrap;
+}
+
+.ds-style-23bcb564 {
+  background:#e0f2fe;
+  color:#0369a1;
+}
+
+.ds-style-e2e35b48 {
+  font-size:0.8rem;
+  background:#f1f5f9;
+  padding:2px 6px;
+  border-radius:4px;
+  color: #1e293b;
+}
+
+.ds-style-6d9255b4 {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.ds-style-9fa48f17 {
+  background:transparent;
+  border:none;
+  color: #1e40af;
+  font-size:1rem;
+}
+
+.ds-style-5fe6eb3a {
+  display:flex;
+  gap: 0.25rem;
+  align-items:center;
+}
+
+.ds-style-0baddba8 {
+  background:transparent;
+  border:none;
+  padding: 4px 8px;
+  font-size:1rem;
+  cursor:pointer;
+}
+
+

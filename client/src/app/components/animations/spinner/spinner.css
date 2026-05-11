@@ -1,0 +1,24 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+.spinner-circle {
+  display: block;
+  width: var(--spinner-size, 40px);
+  height: var(--spinner-size, 40px);
+  border-width: var(--spinner-thick, 4px);
+  border-style: solid;
+  border-color: rgba(255,255,255,0.25);
+  border-top-color: var(--spinner-color, #ef4444);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+

@@ -1,0 +1,19 @@
+.route-loader-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(251, 250, 246, 0.88);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10500;
+  animation: routeLoaderFadeIn 0.2s ease;
+}
+
+@keyframes routeLoaderFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+

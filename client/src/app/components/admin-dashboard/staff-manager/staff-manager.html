@@ -1,0 +1,122 @@
+<div class="dashboard-content pt-0">
+  <div class="form-card">
+    <div class="form-header">
+        <h2>Create Librarian Account</h2>
+        <p>Register a new librarian to manage library operations.</p>
+    </div>
+
+    @if (message()) {
+        <div [class]="'alert ' + message()?.type">
+            {{ message()?.text }}
+        </div>
+    }
+
+    <form [formGroup]="libForm" (ngSubmit)="onSubmit()" class="librarian-form">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="lib_id">Librarian ID</label>
+                <div class="member-id-auto">
+                  @if (libForm.get('lib_id')?.value) {
+                    <span class="id-value-badge">
+                      <span class="auto-icon">🪪</span> {{ libForm.get('lib_id')?.value }}
+                    </span>
+                  } @else {
+                    <span class="id-auto-badge"><span class="auto-icon">⚡</span> Auto-assigned by system</span>
+                  }
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" formControlName="name" placeholder="Enter librarian name">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" formControlName="email" placeholder="librarian@lms.com">
+                @if (libForm.get('email')?.touched && libForm.get('email')?.invalid) {
+                    <small class="error-text">Please enter a valid email address.</small>
+                }
+            </div>
+            <div class="form-group">
+                <label for="password">Initial Password</label>
+                <input type="password" id="password" formControlName="password" placeholder="Min 6 characters">
+                @if (libForm.get('password')?.touched && libForm.get('password')?.invalid) {
+                    <small class="error-text">Password must be at least 6 characters.</small>
+                }
+            </div>
+        </div>
+
+        <div class="form-actions ds-style-120b253d" >
+          <button type="submit" class="btn btn-red ds-style-da5cd676" [disabled]="libForm.invalid || loading()" >
+              {{ loading() ? 'Processing...' : 'Create Librarian Account' }}
+          </button>
+          <button type="button" class="btn btn-red-outline ds-style-db8a217b" (click)="clearForm()" [disabled]="loading()" >
+              Clear Form
+          </button>
+        </div>
+    </form>
+  </div>
+
+  <div class="list-card">
+    <div class="section-header">
+        <h2>Librarian Directory</h2>
+        <p>Manage all registered librarian accounts.</p>
+    </div>
+
+    <div class="table-container">
+        <table class="lib-table">
+            <thead>
+                <tr>
+                    <th>Librarian ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Joined Date</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (lib of librarians(); track lib.lib_id) {
+                    <tr>
+                        <td><span class="id-badge">{{ lib.lib_id }}</span></td>
+                        <td>{{ lib.name }}</td>
+                        <td>{{ lib.email }}</td>
+                        <td>
+                            <span class="status-badge" [class]="lib.status">
+                                {{ lib.status | titlecase }}
+                            </span>
+                        </td>
+                        <td>{{ lib.created_at | date:'dd/MM/yyyy' }}</td>
+                        <td class="text-right">
+                            <div class="action-buttons">
+                                @if (editingLibId() === lib.lib_id) {
+                                    <div class="inline-edit">
+                                        <input #passInput type="password" placeholder="New Password" class="small-input">
+                                        <button class="btn btn-green btn-icon" (click)="onUpdatePassword(lib.lib_id, passInput.value)" [disabled]="passwordUpdateLoading()">✔</button>
+                                        <button class="btn btn-gray btn-icon" (click)="toggleEdit(null)">✖</button>
+                                    </div>
+                                } @else {
+                                    <button class="btn btn-sm" [class]="lib.status === 'active' ? 'btn-warn-outline' : 'btn-green-outline'" (click)="toggleStatus(lib.lib_id, lib.status)">
+                                        {{ lib.status === 'active' ? 'Deactivate' : 'Activate' }}
+                                    </button>
+                                    <button class="btn btn-outline btn-sm" (click)="toggleEdit(lib.lib_id)">Change Pass</button>
+                                    <button class="btn btn-icon-delete btn-sm" (click)="deleteLibrarian(lib.lib_id)">🗑️ Delete</button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+
+                }
+                @if (librarians().length === 0) {
+                    <tr>
+                        <td colspan="5" class="empty-msg">No librarian accounts found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+  </div>
+</div>

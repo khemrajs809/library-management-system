@@ -1,0 +1,54 @@
+{
+  "name": "client",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "overrides": [
+      {
+        "files": "*.html",
+        "options": {
+          "parser": "angular"
+        }
+      }
+    ]
+  },
+  "private": true,
+  "packageManager": "npm@11.6.2",
+  "dependencies": {
+    "@angular/common": "^21.1.0",
+    "@angular/compiler": "^21.1.0",
+    "@angular/core": "^21.1.0",
+    "@angular/forms": "^21.1.0",
+    "@angular/platform-browser": "^21.1.0",
+    "@angular/router": "^21.1.0",
+    "@zxing/browser": "^0.2.0",
+    "@zxing/library": "^0.22.0",
+    "angularx-qrcode": "^21.0.5",
+    "chart.js": "^4.5.1",
+    "html2canvas": "^1.4.1",
+    "html5-qrcode": "^2.3.8",
+    "jsbarcode": "^3.11.6",
+    "jspdf": "^4.2.1",
+    "puppeteer": "^24.42.0",
+    "rxjs": "~7.8.0",
+    "socket.io-client": "^4.7.5",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^21.1.0",
+    "@angular/cli": "^21.1.0",
+    "@angular/compiler-cli": "^21.1.0",
+    "@types/jsbarcode": "^3.11.4",
+    "jsdom": "^27.1.0",
+    "typescript": "~5.9.2",
+    "vitest": "^4.0.8"
+  }
+}

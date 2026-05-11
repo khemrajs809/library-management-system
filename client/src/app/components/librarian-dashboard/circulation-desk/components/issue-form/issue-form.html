@@ -1,0 +1,45 @@
+<div class="sidebar-section">
+  <h2 class="sidebar-title">Issue a Book</h2>
+
+  <div class="form-group-custom">
+    <label class="form-label-custom">Member ID (Search or scan)</label>
+    <div class="input-with-action">
+      <input type="text" class="custom-input" placeholder="Type or scan..." 
+        [value]="memberId" (input)="onMemberIdEnter($any($event.target).value)" #memberInput>
+      <button class="btn-scan-outline" (click)="toggleMemberScanner()">Scan</button>
+    </div>
+    @if (isScanningMember) {
+      <div class="mini-scanner-inline">
+        <video id="member-reader"></video>
+        <button class="btn-close-mini" (click)="toggleMemberScanner()">Cancel</button>
+      </div>
+    }
+  </div>
+
+  <div class="form-group-custom">
+    <label class="form-label-custom">Book ID (Search or scan)</label>
+    <div class="input-with-action">
+      <input type="text" class="custom-input" placeholder="Type or scan..." 
+        [value]="bookId" (input)="onBookIdEnter($any($event.target).value)" #bookInput>
+      <button class="btn-scan-outline" (click)="toggleBookScanner()">Scan</button>
+    </div>
+    @if (isScanningBook) {
+      <div class="mini-scanner-inline">
+        <video id="book-reader"></video>
+        <button class="btn-close-mini" (click)="toggleBookScanner()">Cancel</button>
+      </div>
+    }
+  </div>
+
+  <button class="btn-issue-solid" (click)="onIssueSubmit()">
+    Issue Book
+  </button>
+
+  <div class="activity-feed">
+    <h4>Recent Activity</h4>
+    <div class="status-placeholder">
+      Ready to scan...
+    </div>
+  </div>
+</div>
+

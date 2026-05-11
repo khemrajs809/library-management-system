@@ -1,0 +1,29 @@
+<nav class="navbar">
+    <div class="container nav-content">
+        <div class="logo">
+            <img src="logolms.png" alt="Library Logo" class="logo-img" width="180" height="45">
+        </div>
+        <ul class="nav-links">
+            @if (!authService.isLoggedIn()) {
+                <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a></li>
+            } @else {
+                <li class="timer-section">
+                    <div class="session-timer" title="Total Session Remaining">
+                        <span class="timer-icon"></span>
+                        <span class="timer-label">Session:</span>
+                        <span class="timer-value">{{ authService.sessionRemaining() }}</span>
+                    </div>
+                    @if (idleService.isThresholdReached()) {
+                        <div class="idle-timer" title="Time until auto-lock due to inactivity">
+                            <span class="timer-icon"></span>
+                            <span class="timer-label">Auto-lock:</span>
+                            <span class="timer-value">{{ (idleService.idleRemaining() / 60 | number:'1.0-0') }}:{{ (idleService.idleRemaining() % 60 | number:'2.0-0') }}</span>
+                        </div>
+                    }
+                </li>
+                <li><a [routerLink]="authService.userRole() === 'librarian' ? '/librarian/dashboard' : '/admin/dashboard'" routerLinkActive="active">Dashboard</a></li>
+                <li><a (click)="logout()" class="logout-link">Logout</a></li>
+            }
+        </ul>
+    </div>
+</nav>

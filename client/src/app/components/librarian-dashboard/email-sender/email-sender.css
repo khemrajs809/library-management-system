@@ -1,0 +1,83 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content.email-modal {
+  background: var(--pure-white);
+  width: 90%;
+  max-width: 550px;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8fafc;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #000080; /* Navy Blue focus */
+  box-shadow: 0 0 0 3px rgba(0, 0, 128, 0.1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* Extracted Inline Styles */
+.ds-style-3606b3db { margin: 0; color: #1e293b; display: flex; align-items: center; gap: 8px; }
+.ds-style-74b15169 { padding: 4px 8px; font-size: 0.8rem; display: flex; align-items: center; gap: 4px; }
+.ds-style-18ed1741 { margin-bottom: 15px; }
+.ds-style-49bd0cf8 { display: block; font-weight: 600; color: #1e293b; margin-bottom: 6px; font-size: 0.9rem; }
+.ds-style-4a6446ac { background-color: #f8fafc; color: #1e293b; }
+.ds-style-18e1459b { margin-bottom: 20px; }
+.ds-style-6defaa15 { resize: vertical; }
+.ds-style-74defc00 { display: flex; justify-content: flex-end; gap: 10px; }
+.ds-style-3f6a67db { display: flex; align-items: center; gap: 6px; background-color: #000080; border-color: #000080; }
+.ds-style-212e2e36 { animation: spin 1s linear infinite; }
+
+
+
+
+
+
+

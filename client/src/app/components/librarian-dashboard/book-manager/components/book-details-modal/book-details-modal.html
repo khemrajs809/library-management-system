@@ -1,0 +1,247 @@
+@if (isOpen && book) {
+<div class="modal-overlay ds-style-6969a969" (click)="onClose.emit()">
+  <div class="modal-card ds-style-33462b80" (click)="stopPropagation($event)">
+
+    <!-- Content Wrapper -->
+    <div class="ds-style-2cf1cb9b">
+
+      <!-- Global Top Header Bar -->
+      <div class="ds-style-135a0e65">
+        <div class="ds-style-42790ee8">
+          <div class="ds-style-14d7af77">LMS</div>
+          <div class="ds-style-3d0f8c1">
+            <span class="ds-style-caaf2ad">Dashboard</span>
+            <span class="ds-style-caaf30a">/</span>
+            <span class="ds-style-caaf2ad">Inventory</span>
+            <span class="ds-style-caaf30a">/</span>
+            <span class="ds-style-3a591924">Book Profile</span>
+          </div>
+        </div>
+        <div class="ds-style-11c5f36f">
+          <button (click)="onClose.emit()" class="ds-style-872aafb btn-close-profile-hover">
+            CLOSE PROFILE
+          </button>
+        </div>
+      </div>
+
+      <div class="ds-style-26d2a7f6">
+
+        <!-- Left Sidebar (30%): Book Image & Primary Info -->
+        <div class="ds-style-518067f9">
+          <!-- Large Cover Image -->
+          <div class="ds-style-121c25b3">
+            @if (book.cover_url) {
+            <img [src]="book.cover_url" class="ds-style-363d597c" crossorigin="anonymous">
+            } @else {
+            <div class="ds-style-f8af320">Book Profile</div>
+            }
+          </div>
+
+          <!-- Book Title & Basic Info -->
+          <div class="ds-style-5b86a960">
+            <div class="ds-style-1d9bd0a8">
+              <span class="ds-style-69f7b4d">ID: {{ book.book_id }}</span>
+              <span class="ds-style-11cee849">{{ book.stream || 'GENERAL' }}</span>
+            </div>
+            <h1 class="ds-style-211ea408">{{ book.title }}</h1>
+            <p class="ds-style-5a66b154">By {{ book.author || 'Unknown Author' }}</p>
+          </div>
+        </div>
+
+        <!-- Right Content (70%): Hub, Inventory & History -->
+        <div class="ds-style-3651dd42">
+
+          <!-- Stats Header -->
+          <div class="ds-style-68f50402">
+            <h2 class="ds-style-7feea750">Inventory Management Hub</h2>
+            <div class="ds-style-4bd115fd">
+              <div class="ds-style-55738656">
+                <div class="ds-style-12ebe74">Total Stock</div>
+                <div class="ds-style-7466aaea">{{ book.total_copies }}</div>
+              </div>
+              <div class="ds-style-55738656">
+                <div class="ds-style-12ebe74">Available</div>
+                <div class="ds-style-26c67fd0">{{ book.available_copies }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scrollable Content -->
+          <div class="ds-style-5f0c9bf4">
+            <div class="ds-style-4f9b52c3">
+
+              <!-- Technical Specs -->
+              <div class="ds-style-38bff0a8">
+                <div class="ds-style-52a7157b">
+                  <h4 class="ds-style-1dd1ba62">
+                    <span class="ds-style-48c0b6a9">ℹ</span>
+                    Book Details
+                  </h4>
+                  <div class="ds-style-5d03416f">
+                    <!-- ISBN Row -->
+                    <div class="ds-style-72e7daaa row-info-hover">
+                      <span class="ds-style-1cffff41">ISBN Number</span>
+                      @if (book.isbn) {
+                        <span class="ds-style-6e01d1c7">{{ book.isbn }}</span>
+                      } @else {
+                        <span class="ds-style-4078fb84">Not Available</span>
+                      }
+                    </div>
+
+                    <!-- Publisher Row -->
+                    <div class="ds-style-72e7daaa row-info-hover">
+                      <span class="ds-style-1cffff41">Publisher</span>
+                      @if (book.publisher) {
+                        <span class="ds-style-36af9337">{{ book.publisher }}</span>
+                      } @else {
+                        <span class="ds-style-4078fb84">Not Available</span>
+                      }
+                    </div>
+
+                    <!-- Edition Row -->
+                    <div class="ds-style-72e7daaa row-info-hover">
+                      <span class="ds-style-1cffff41">Edition</span>
+                      @if (book.edition) {
+                        <span class="ds-style-483af045">{{ book.edition }}</span>
+                      } @else {
+                        <span class="ds-style-4078fb84">Not Available</span>
+                      }
+                    </div>
+
+                    <!-- Shelf Row -->
+                    <div class="ds-style-23cb3755 row-danger-hover">
+                      <span class="ds-style-1be5e0b9">
+                        <span class="ds-style-316f55e4"></span> Shelf Location
+                      </span>
+                      @if (book.shelf_location) {
+                        <span class="ds-style-6a909415">{{ book.shelf_location }}</span>
+                      } @else {
+                        <span class="ds-style-27cc65db">Unassigned</span>
+                      }
+                    </div>
+
+                    <!-- Price Row -->
+                    <div class="ds-style-2041b99f">
+                      <div class="ds-style-244d1a4e">
+                        <span class="ds-style-7fd514b7">Retail Price</span>
+                        <span class="ds-style-3fffbbda">(Estimated Replacement Value)</span>
+                      </div>
+                      <span class="ds-style-195f22ba">₹{{ book.price || '0.00' }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Physical Inventory Grid -->
+              <div class="ds-style-38bff0a8">
+                <h4 class="ds-style-47ba3246">Physical Stock Status</h4>
+                <div class="ds-style-3fdf9bd6">
+                  <div class="ds-style-4bddcbbf">
+                    @for (copy of getPaginatedCopies(); track copy.copy_id) {
+                    <div [class.copy-status-available]="copy.status === 'available'" [class.copy-status-issued]="copy.status !== 'available'" class="ds-style-745b0118">
+                      <!-- Actual Barcode Strip -->
+                      <div class="ds-style-ec19048">
+                        <img [src]="copy.barcodeBase64" alt="Barcode" class="ds-style-6de93184">
+                      </div>
+                      <div class="ds-style-26beee05">{{ copy.status }}</div>
+                      <div class="ds-style-41bfd566">{{ copy.copy_id }}</div>
+                      <!-- Status Dot -->
+                      <div [class]="'status-dot ' + copy.status" class="ds-style-33c87ad7"></div>
+                    </div>
+                    }
+                  </div>
+
+                  <!-- Internal Pagination Controls -->
+                  <div class="pagination-controls ds-style-103aec31">
+                    <button class="btn btn-sm ds-style-1cba68ff" (click)="onPrevCopyPage.emit()" [disabled]="copyPage === 1">Previous</button>
+                    
+                    <div class="ds-style-aa3bc8c">
+                      @for (p of getCopyPaginationArray(); track p) {
+                        <button class="btn btn-sm ds-style-dc7c101" 
+                          [class.text-black]="p === copyPage" [class.text-blue]="p !== copyPage" 
+                          [class.fw-bold]="p === copyPage" [class.fw-normal]="p !== copyPage" 
+                          (click)="onSetCopyPage.emit(p)">
+                          {{ p }}
+                        </button>
+                      }
+                    </div>
+
+                    <button class="btn btn-sm ds-style-1cba68ff" (click)="onNextCopyPage.emit()" [disabled]="copyPage === getCopyTotalPages()">Next</button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Borrowing History Section -->
+            <div class="ds-style-59fe5ac9">
+              <h4 class="ds-style-4295b01b">Borrowing History</h4>
+              <div class="ds-style-7f5ad404">
+                @if (history.length === 0) {
+                <div class="ds-style-435483b2">
+                  <div class="ds-style-3b412192">HISTORY</div>
+                  <p class="ds-style-4aef887d">No history recorded.</p>
+                </div>
+                } @else {
+                <table class="lib-table compact-table ds-style-a0b7a9c">
+                  <thead>
+                    <tr class="ds-style-111ad682">
+                      <th class="ds-style-6c935400">Member</th>
+                      <th class="ds-style-6c935400">Copy</th>
+                      <th class="ds-style-6c935400">Timeline (Iss / Due / Ret)</th>
+                      <th class="ds-style-6c935400">Status & Dues</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (row of history; track row.issue_id) {
+                    <tr class="ds-style-5099fc0b">
+                      <td class="ds-style-43d506b9">
+                        <div class="ds-style-244d1a4e">
+                          <span class="ds-style-211eb661">{{ row.member_name }}</span>
+                          <span class="ds-style-7a033ae3">ID: {{ row.member_id }}</span>
+                        </div>
+                      </td>
+                      <td class="ds-style-43d506b9">
+                        <span class="ds-style-3826b3cc">#{{ row.copy_id.split('-').pop() }}</span>
+                      </td>
+                      <td class="ds-style-43d506b9">
+                        <div class="ds-style-6984da57">
+                          <div class="ds-style-7f932121">
+                            <span class="ds-style-779bbb19">Iss:</span> 
+                            <span>{{ row.issue_date | date:'dd/MM/yyyy' }}</span>
+                          </div>
+                          <div class="ds-style-4767995a">
+                            <span class="ds-style-779bbb19">Due:</span> 
+                            <span>{{ row.due_date | date:'dd/MM/yyyy' }}</span>
+                          </div>
+                          @if (row.return_date) {
+                            <div class="ds-style-506e5899">
+                              <span class="ds-style-779bbb19">Ret:</span> 
+                              <span>{{ row.return_date | date:'dd/MM/yyyy' }}</span>
+                            </div>
+                          }
+                        </div>
+                      </td>
+                      <td class="ds-style-43d506b9">
+                        <div class="ds-style-655c7fc8">
+                          <span class="status-badge ds-style-68fad683" [class]="row.status">{{ row.status }}</span>
+                          @if (row.fine_amount > 0) {
+                            <span class="ds-style-122b39c">Fine: ₹{{ row.fine_amount }}</span>
+                          }
+                        </div>
+                      </td>
+                    </tr>
+                    }
+                  </tbody>
+                </table>
+                }
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+}

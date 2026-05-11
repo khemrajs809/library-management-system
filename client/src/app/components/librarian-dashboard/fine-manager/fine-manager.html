@@ -1,0 +1,144 @@
+<div class="list-card ds-premium-shadow">
+  <div class="list-header">
+    <div class="header-main">
+      <h3 style="color: #b91c1c; font-size: 1.5rem; font-weight: 800;">Fines & Lost Books</h3>
+      <p>Monitor penalties, lost items, and overdue fines</p>
+    </div>
+    <div class="header-stats">
+       <div class="stat-pill danger ds-lift-hover">
+          <span class="label">Total Unpaid</span>
+          <span class="value">₹{{ totalUnpaid() }}</span>
+       </div>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <div class="search-box">
+      <input type="text" class="search-input ds-input-focus" placeholder="Search by member or book..." (input)="onSearch($event)">
+    </div>
+    <div class="filter-options">
+      <select class="form-select ds-input-focus" (change)="onFilterChange($event)">
+        <option value="all">All Records</option>
+        <option value="lost">Lost Books</option>
+        <option value="fine">Has Fines</option>
+        <option value="unpaid">Unpaid Only</option>
+        <option value="paid">Paid Only</option>
+      </select>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading fine records...</p>
+    </div>
+  } @else {
+    <div class="table-container">
+      <table class="ds-admin-table">
+        <thead>
+          <tr>
+            <th>Member & Guardian</th>
+            <th>Book Details</th>
+            <th>Status</th>
+            <th>Fine Amount</th>
+            <th>Timeline</th>
+            <th style="text-align: center;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of paginatedRecords(); track row.issue_id) {
+            <tr class="ds-lift-hover">
+              <td>
+                <div class="ds-member-cell">
+                  @if (row.member_photo) {
+                    <img [src]="uploadsBase + row.member_photo" class="ds-member-photo">
+                  } @else {
+                    <div class="ds-member-placeholder">{{ row.member_name.charAt(0) }}</div>
+                  }
+                  <div class="ds-member-info">
+                    <span class="name">{{ row.member_name }}</span>
+                    <span class="meta">#{{ row.member_id }} | {{ row.member_dept || 'Gen' }}</span>
+                    @if (row.guardian_name) {
+                      <div class="ds-contact-item mt-1">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        <span class="meta" style="color: #b91c1c;">G: {{ row.guardian_name }} ({{ row.guardian_phone }})</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="ds-member-info">
+                  <span class="name">{{ row.book_title }}</span>
+                  <span class="meta">ISBN: {{ row.isbn || 'N/A' }}</span>
+                  <span class="meta">ID: <span class="badge badge-amber">#{{ row.book_id }}</span></span>
+                </div>
+              </td>
+              <td>
+                <span class="ds-status-pill" [class]="'ds-status-' + row.status.toLowerCase()">{{ row.status }}</span>
+              </td>
+              <td>
+                <div class="ds-fine-box">
+                  <span class="ds-fine-amount" style="color: #b91c1c;">₹{{ row.dynamic_fine }}</span>
+                  <span class="ds-fine-status" [class.ds-fine-paid]="row.fine_paid" [class.ds-fine-unpaid]="!row.fine_paid">
+                    {{ row.fine_paid ? 'Paid' : 'Unpaid' }}
+                  </span>
+                </div>
+              </td>
+              <td>
+                <div class="ds-timeline">
+                  <div class="ds-timeline-point">
+                    <span class="ds-timeline-label">Due</span>
+                    <span class="ds-timeline-date">{{ row.due_date | date:'dd/MM/yyyy' }}</span>
+                  </div>
+                  @if (row.return_date) {
+                    <div class="ds-timeline-point">
+                      <span class="ds-timeline-label">Returned</span>
+                      <span class="ds-timeline-date">{{ row.return_date | date:'dd/MM/yyyy' }}</span>
+                    </div>
+                  }
+                </div>
+              </td>
+              <td style="text-align: center;">
+                <div class="btn-group">
+                  @if (!row.fine_paid && row.dynamic_fine > 0) {
+                    <button class="btn btn-red btn-sm ds-lift-hover" (click)="payFine(row.issue_id, row.dynamic_fine)">Pay Fine</button>
+                    <button class="btn btn-red-outline btn-sm ds-lift-hover" (click)="sendReminder(row.issue_id)">Reminder</button>
+                  } @else {
+                    <span class="text-success fw-bold">Cleared</span>
+                  }
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="empty-state-cell">
+                <div class="empty-state">
+                  <div class="icon">💰</div>
+                  <p>No fine or lost book records found.</p>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="ds-pagination">
+      <button class="ds-page-btn ds-page-arrow ds-lift-hover" (click)="prevPage()" [disabled]="currentPage() === 1">
+        &larr; Previous
+      </button>
+      
+      @for (p of pagination().pages; track p) {
+        <button class="ds-page-btn ds-lift-hover" [class.active]="p === currentPage()" (click)="currentPage.set(p)">
+          {{ p }}
+        </button>
+      }
+      
+      <button class="ds-page-btn ds-page-arrow ds-lift-hover" (click)="nextPage()" [disabled]="currentPage() === pagination().totalPages">
+        Next &rarr;
+      </button>
+    </div>
+  }
+</div>

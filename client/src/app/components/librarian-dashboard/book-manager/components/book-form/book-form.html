@@ -1,0 +1,104 @@
+<div class="form-card ds-style-2da428f4">
+  <h3 class="ds-style-3ffe908c">
+    {{ isEditing ? 'Edit Book Details' : 'Register New Book' }}
+  </h3>
+  <form [formGroup]="form" (ngSubmit)="submit()" class="ds-style-3e0535cf">
+
+    <!-- Row 1: ID & ISBN -->
+    <div class="ds-style-5a881bca">
+      <div class="ds-style-232047d2">
+        <label class="ds-style-604acad7">Book ID</label>
+        <div class="ds-style-ebb7825">
+          @if (form.get('book_id')?.value; as bookId) {
+          <span class="ds-style-619cae7d">
+            BK-{{ bookId.toString().split('-').pop() }}
+          </span>
+          } @else { <span class="ds-style-25b6ee53">Auto</span> }
+        </div>
+      </div>
+      <div class="ds-style-232047d2">
+        <label class="ds-style-113527d1">ISBN</label>
+        <input type="text" formControlName="isbn" placeholder="ISBN..." class="ds-style-63628e6b">
+      </div>
+    </div>
+
+    <!-- Row 2: Price & Quantity -->
+    <div class="ds-style-1617197a">
+      <div class="ds-style-232047d2">
+        <label class="ds-style-604acad7">Price (₹)<span class="ds-style-33f35e13">*</span></label>
+        <input type="number" formControlName="price" placeholder="0.00" class="ds-style-5dd10ee0"
+          [class.input-error]="form.get('price')?.invalid && form.get('price')?.touched">
+      </div>
+      <div class="ds-style-232047d2">
+        <label class="ds-style-113527d1">Qty<span class="ds-style-33f35e13">*</span></label>
+        <input type="number" formControlName="quantity" placeholder="0" class="ds-style-63628e6b"
+          [class.input-error]="form.get('quantity')?.invalid && form.get('quantity')?.touched">
+      </div>
+    </div>
+
+    <!-- Row 3: Title -->
+    <div class="ds-style-232047d2">
+      <label class="ds-style-604acad7">Title<span class="ds-style-33f35e13">*</span></label>
+      <input type="text" formControlName="title" placeholder="Book name" class="ds-style-653f8dcb"
+        [class.input-error]="form.get('title')?.invalid && form.get('title')?.touched">
+    </div>
+
+    <!-- Row 4: Author -->
+    <div class="ds-style-232047d2">
+      <label class="ds-style-604acad7">Author<span class="ds-style-33f35e13">*</span></label>
+      <input type="text" formControlName="author" placeholder="Author" class="ds-style-63628e6b"
+        [class.input-error]="form.get('author')?.invalid && form.get('author')?.touched">
+    </div>
+
+    <!-- Row 5: Stream & Year -->
+    <div class="ds-style-1617197a">
+      <div class="ds-style-232047d2">
+        <label class="ds-style-604acad7">Stream<span class="ds-style-33f35e13">*</span></label>
+        <input type="text" formControlName="stream" placeholder="Category" class="ds-style-63628e6b"
+          [class.input-error]="form.get('stream')?.invalid && form.get('stream')?.touched">
+      </div>
+      <div class="ds-style-232047d2">
+        <label class="ds-style-113527d1">Year<span class="ds-style-33f35e13">*</span></label>
+        <input type="number" formControlName="publication_year" placeholder="YYYY" class="ds-style-63628e6b"
+          [class.input-error]="form.get('publication_year')?.invalid && form.get('publication_year')?.touched">
+      </div>
+    </div>
+
+    <!-- Row 6: Publisher -->
+    <div class="ds-style-232047d2">
+      <label class="ds-style-604acad7">Pub.<span class="ds-style-33f35e13">*</span></label>
+      <input type="text" formControlName="publisher" placeholder="House name" class="ds-style-63628e6b"
+        [class.input-error]="form.get('publisher')?.invalid && form.get('publisher')?.touched">
+    </div>
+
+    <!-- Row 7: Edition & Shelf -->
+    <div class="ds-style-1617197a">
+      <div class="ds-style-232047d2">
+        <label class="ds-style-604acad7">Ed.<span class="ds-style-33f35e13">*</span></label>
+        <input type="text" formControlName="edition" placeholder="e.g. 1st" class="ds-style-63628e6b"
+          [class.input-error]="form.get('edition')?.invalid && form.get('edition')?.touched">
+      </div>
+      <div class="ds-style-232047d2">
+        <label class="ds-style-113527d1">Shelf<span class="ds-style-33f35e13">*</span></label>
+        <input type="text" formControlName="shelf_location" placeholder="Rack" class="ds-style-6752eb66"
+          [class.input-error]="form.get('shelf_location')?.invalid && form.get('shelf_location')?.touched">
+      </div>
+    </div>
+
+    <!-- Row 8: Cover -->
+    <div class="ds-style-232047d2">
+      <label class="ds-style-604acad7">Cover</label>
+      <input type="file" (change)="onCoverSelected($event)" accept="image/*" class="ds-style-54fdc33b">
+    </div>
+
+    <!-- Actions -->
+    <div class="ds-style-33aa3ed3">
+      <button type="button" class="btn btn-red-outline ds-style-73e22111" (click)="reset()">
+        {{ isEditing ? 'Cancel Edit' : 'Clear Form' }}
+      </button>
+      <button type="submit" class="btn btn-red ds-style-58837bb7" [disabled]="form.invalid">
+        {{ isEditing ? 'Update Book' : 'Add Book' }}
+      </button>
+    </div>
+  </form>
+</div>

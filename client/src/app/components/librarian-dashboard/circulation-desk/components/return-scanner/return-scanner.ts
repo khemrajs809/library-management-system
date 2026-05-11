@@ -1,0 +1,73 @@
+import { Component, Input, Output, EventEmitter, signal, ViewChild, ElementRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType } from '@zxing/library';
+import { Member } from '../../../../../models/member.model';
+
+@Component({
+  selector: 'app-return-scanner',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './return-scanner.html',
+  styleUrl: './return-scanner.css'
+})
+export class ReturnScannerComponent {
+  @Input() scannedIssue: any | null = null;
+  @Input() uploadsBase = '';
+  @Input() isProcessing = false;
+  @Input() scanFeedback: { type: 'success' | 'error', active: boolean } = { type: 'success', active: false };
+  @Input() recentActivity: any[] = [];
+
+  @Output() onBookScan = new EventEmitter<string>();
+  @Output() onConfirmReturn = new EventEmitter<void>();
+  @Output() onConfirmRenew = new EventEmitter<void>();
+  @Output() onCancelLookup = new EventEmitter<void>();
+  @Output() onFinishSession = new EventEmitter<void>();
+
+  @ViewChild('memberIdInput') memberIdInput!: ElementRef;
+  @ViewChild('bookIdInput') bookIdInput!: ElementRef;
+
+  isMemberCameraActive = false;
+  isBookCameraActive = false;
+  private codeReader = new BrowserMultiFormatReader();
+
+  isOverdue(issue: any): boolean {
+    if (!issue) return false;
+    const due = new Date(issue.due_date);
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    return due < today;
+  }
+
+  toggleBookCamera() {
+    this.isBookCameraActive = !this.isBookCameraActive;
+    if (this.isBookCameraActive) {
+      setTimeout(() => this.startCamera('reader-book', (text) => {
+        this.onBookScan.emit(text);
+        this.toggleBookCamera();
+      }), 100);
+    } else {
+      this.codeReader.reset();
+    }
+  }
+
+  private startCamera(videoId: string, onScan: (text: string) => void) {
+    const hints = new Map();
+    hints.set(DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.CODE_128, BarcodeFormat.QR_CODE]);
+    this.codeReader = new BrowserMultiFormatReader(hints);
+    this.codeReader.decodeFromConstraints({ video: { facingMode: 'environment' } }, videoId, (result) => {
+      if (result) onScan(result.getText());
+    });
+  }
+
+  emitBookScan(event: any) {
+    const val = event.target ? event.target.value.trim() : event.value.trim();
+    if (val) {
+      this.onBookScan.emit(val);
+      if (event.target) event.target.value = '';
+    }
+  }
+
+  ngOnDestroy() {
+    this.codeReader.reset();
+  }
+}

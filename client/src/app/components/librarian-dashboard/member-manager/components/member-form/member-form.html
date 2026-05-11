@@ -1,0 +1,378 @@
+<div class="form-card ds-style-67a309e4">
+  <h3>{{ isEditing ? 'Edit Member Profile' : 'Register New Member' }}</h3>
+  <p class="req-note"><span class="req-star">*</span> Required fields</p>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+
+    <!-- ── PERSONAL INFORMATION ────────────────────────────── -->
+    <div class="form-section-card">
+      <div class="form-section-legend">Personal Information</div>
+      <div class="form-grid ds-style-398de1e2">
+
+        <div class="form-group">
+          <label>Member ID</label>
+          <div class="member-id-auto">
+            @if (form.get('member_id')?.value) {
+              <span class="id-value-badge">
+                 {{ form.get('member_id')?.value }}
+              </span>
+            } @else {
+              <span class="id-auto-badge">Auto-assigned by system</span>
+            }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>University Roll Number <span class="req-star">*</span></label>
+          <input type="text" formControlName="roll_number" placeholder="e.g. 21BCE1001"
+            [class.input-error]="form.get('roll_number')?.invalid && form.get('roll_number')?.touched">
+          @if (form.get('roll_number')?.touched && form.get('roll_number')?.hasError('required')) {
+            <small class="err-msg">Roll number is required</small>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Full Name <span class="req-star">*</span></label>
+          <input type="text" formControlName="name" placeholder="Full Name"
+            [class.input-error]="form.get('name')?.invalid && form.get('name')?.touched">
+          @if (form.get('name')?.touched && form.get('name')?.hasError('required')) {
+            <small class="err-msg">Full name is required</small>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Gender <span class="req-star">*</span></label>
+          <select formControlName="gender" class="form-select">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Date of Birth <span class="req-star">*</span></label>
+          <input type="date" formControlName="dob"
+            [class.input-error]="form.get('dob')?.invalid && form.get('dob')?.touched">
+          @if (form.get('dob')?.touched && form.get('dob')?.hasError('required')) {
+            <small class="err-msg">Date of birth is required</small>
+          }
+          @if (form.get('dob')?.touched && form.get('dob')?.hasError('minAge')) {
+            <small class="err-msg">Age must be at least 5 years</small>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Blood Group <span class="req-star">*</span></label>
+          <select formControlName="blood_group" class="form-select"
+            [class.input-error]="form.get('blood_group')?.invalid && form.get('blood_group')?.touched">
+            <option value="">-- Select --</option>
+            <option value="A+">A+</option><option value="A-">A-</option>
+            <option value="B+">B+</option><option value="B-">B-</option>
+            <option value="O+">O+</option><option value="O-">O-</option>
+            <option value="AB+">AB+</option><option value="AB-">AB-</option>
+          </select>
+          @if (form.get('blood_group')?.touched && form.get('blood_group')?.hasError('required')) {
+            <small class="err-msg">Blood group is required</small>
+          }
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── CONTACT & GUARDIAN INFO ─────────────────────────── -->
+    <div class="form-section-card">
+      <div class="form-section-legend">Contact &amp; Guardian Info</div>
+      <div class="form-grid ds-style-398de1e2">
+
+        <div class="form-group">
+          <label>Mobile Number <span class="req-star">*</span></label>
+          <input type="text" formControlName="phone" placeholder="e.g. 9876543210" maxlength="10"
+            [class.input-error]="form.get('phone')?.invalid && form.get('phone')?.touched">
+          @if (form.get('phone')?.touched && form.get('phone')?.hasError('required')) {
+            <small class="err-msg">Mobile number is required</small>
+          }
+          @if (form.get('phone')?.touched && form.get('phone')?.hasError('pattern')) {
+            <small class="err-msg">Enter a valid 10-digit number</small>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Email ID <span class="req-star">*</span></label>
+          <input type="email" formControlName="email" placeholder="e.g. name@university.edu"
+            [class.input-error]="form.get('email')?.invalid && form.get('email')?.touched">
+          @if (form.get('email')?.touched && form.get('email')?.hasError('required')) {
+            <small class="err-msg">Email is required</small>
+          }
+          @if (form.get('email')?.touched && form.get('email')?.hasError('email')) {
+            <small class="err-msg">Enter a valid email address</small>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Guardian Name <span class="req-star">*</span></label>
+          <input type="text" formControlName="guardian_name" placeholder="Father/Mother Name"
+            [class.input-error]="form.get('guardian_name')?.invalid && form.get('guardian_name')?.touched">
+          @if (form.get('guardian_name')?.touched && form.get('guardian_name')?.hasError('required')) {
+            <small class="err-msg">Guardian name is required</small>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Guardian Phone <span class="req-star">*</span></label>
+          <input type="text" formControlName="guardian_phone" placeholder="Emergency Contact" maxlength="10"
+            [class.input-error]="form.get('guardian_phone')?.invalid && form.get('guardian_phone')?.touched">
+          @if (form.get('guardian_phone')?.touched && form.get('guardian_phone')?.hasError('required')) {
+            <small class="err-msg">Guardian phone is required</small>
+          }
+          @if (form.get('guardian_phone')?.touched && form.get('guardian_phone')?.hasError('pattern')) {
+            <small class="err-msg">Enter a valid 10-digit number</small>
+          }
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── ACADEMIC CONTEXT ────────────────────────────────── -->
+    <div class="form-section-card">
+      <div class="form-section-legend">Academic Context</div>
+      <div class="form-grid ds-style-398de1e2">
+
+        <div class="form-group">
+          <label>Membership Type <span class="req-star">*</span></label>
+          <select formControlName="membership_type" class="form-select">
+            <option value="Student">Student</option>
+            <option value="Faculty">Faculty</option>
+            <option value="Research Scholar">Research Scholar</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Academic Session <span class="req-star">*</span></label>
+          <input type="text" formControlName="academic_session" placeholder="e.g. 2024-2028"
+            [class.input-error]="form.get('academic_session')?.invalid && form.get('academic_session')?.touched">
+          @if (form.get('academic_session')?.touched && form.get('academic_session')?.hasError('required')) {
+            <small class="err-msg">Academic session is required</small>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Department <span class="req-star">*</span></label>
+          <input type="text" formControlName="department" placeholder="e.g. Computer Science"
+            [class.input-error]="form.get('department')?.invalid && form.get('department')?.touched">
+          @if (form.get('department')?.touched && form.get('department')?.hasError('required')) {
+            <small class="err-msg">Department is required</small>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Course / Degree <span class="req-star">*</span></label>
+          <input type="text" formControlName="course" placeholder="e.g. B.Tech / M.Sc"
+            [class.input-error]="form.get('course')?.invalid && form.get('course')?.touched">
+          @if (form.get('course')?.touched && form.get('course')?.hasError('required')) {
+            <small class="err-msg">Course is required</small>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Year / Semester <span class="req-star">*</span></label>
+          <input type="text" formControlName="year_semester" placeholder="e.g. 3rd Year / 6th Sem"
+            [class.input-error]="form.get('year_semester')?.invalid && form.get('year_semester')?.touched">
+          @if (form.get('year_semester')?.touched && form.get('year_semester')?.hasError('required')) {
+            <small class="err-msg">Year / Semester is required</small>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>HOD / Dean Name</label>
+          <input type="text" formControlName="hod_name" placeholder="Head of Department">
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── MEMBERSHIP DATA & STATUS ───────────────────────── -->
+    <div class="form-section-card">
+      <div class="form-section-legend">Membership Data &amp; Status</div>
+      <div class="form-grid ds-style-398de1e2">
+
+        <div class="form-group">
+          <label>Account Status</label>
+          <select formControlName="account_status" class="form-select"
+            [class.border-success-v2]="form.get('account_status')?.value === 'Active'"
+            [class.border-danger-v2]="form.get('account_status')?.value !== 'Active'">
+             <option value="Active">Active</option>
+            <option value="Suspended">Suspended</option>
+            <option value="Blacklisted">Blacklisted</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Membership Expiry <span class="req-star">*</span></label>
+          <input type="date" formControlName="membership_expiry"
+            [class.input-error]="form.get('membership_expiry')?.invalid && form.get('membership_expiry')?.touched">
+          @if (form.get('membership_expiry')?.touched && form.get('membership_expiry')?.hasError('required')) {
+            <small class="err-msg">Membership expiry date is required</small>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Book Issue Limit</label>
+          <input type="number" formControlName="max_book_limit" placeholder="Default: 3">
+        </div>
+
+        <div class="form-group">
+          <label>Clearance Status</label>
+          <div class="ds-style-50670a00">
+            <input type="checkbox" formControlName="no_dues_status" class="ds-style-3d29c63f">
+            <span class="ds-style-3c54a937">No Pending Fines (No Dues)</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── ADDRESS DETAILS ────────────────────────────────── -->
+    <div class="form-section-card">
+      <div class="form-section-legend">Address Details</div>
+      
+      <!-- Current Address Sub-Section -->
+      <div class="addr-sub-section">
+        <div class="addr-header">
+          <span class="addr-indicator"></span>
+          <h4 class="addr-title">Current Address</h4>
+        </div>
+        
+        <div class="address-grid">
+          <div class="form-group">
+            <label>House/Flat No. <span class="req-star">*</span></label>
+            <input type="text" formControlName="curr_house" placeholder="e.g., 42-B, Flat 301">
+          </div>
+          <div class="form-group">
+            <label>Street/Road <span class="req-star">*</span></label>
+            <input type="text" formControlName="curr_street" placeholder="e.g., MG Road, 2nd Cross">
+          </div>
+          <div class="form-group">
+            <label>Area/Locality <span class="req-star">*</span></label>
+            <input type="text" formControlName="curr_area" placeholder="e.g., Koramangala, Sector 15">
+          </div>
+          <div class="form-group">
+            <label>City/Town <span class="req-star">*</span></label>
+            <input type="text" formControlName="curr_city" placeholder="e.g., Bengaluru, Mumbai">
+          </div>
+          <div class="form-group">
+            <label>State/UT <span class="req-star">*</span></label>
+            <select formControlName="curr_state">
+              <option value="">Select State</option>
+              @for (state of states; track state) {
+                <option [value]="state">{{ state }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-group">
+            <label>PIN Code <span class="req-star">*</span></label>
+            <input type="text" formControlName="curr_pincode" placeholder="e.g., 560001">
+          </div>
+        </div>
+      </div>
+
+      <div class="addr-divider"></div>
+
+      <!-- Permanent Address Sub-Section -->
+      <div>
+        <div class="addr-header between">
+          <div class="addr-header ds-style-472d385b"> <!-- nested helper -->
+            <span class="addr-indicator"></span>
+            <h4 class="addr-title">Permanent Address</h4>
+          </div>
+          <label class="addr-sync-badge">
+            <input type="checkbox" formControlName="same_as_current" class="ds-style-462f0763">
+            Same as Current
+          </label>
+        </div>
+        
+        <div class="address-grid">
+          <div class="form-group">
+            <label>House/Flat No. <span class="req-star">*</span></label>
+            <input type="text" formControlName="perm_house" placeholder="e.g., 42-B, Flat 301" [class.input-sync-disabled]="form.get('same_as_current')?.value">
+          </div>
+          <div class="form-group">
+            <label>Street/Road <span class="req-star">*</span></label>
+            <input type="text" formControlName="perm_street" placeholder="e.g., MG Road, 2nd Cross" [class.input-sync-disabled]="form.get('same_as_current')?.value">
+          </div>
+          <div class="form-group">
+            <label>Area/Locality <span class="req-star">*</span></label>
+            <input type="text" formControlName="perm_area" placeholder="e.g., Koramangala, Sector 15" [class.input-sync-disabled]="form.get('same_as_current')?.value">
+          </div>
+          <div class="form-group">
+            <label>City/Town <span class="req-star">*</span></label>
+            <input type="text" formControlName="perm_city" placeholder="e.g., Bengaluru, Mumbai" [class.input-sync-disabled]="form.get('same_as_current')?.value">
+          </div>
+          <div class="form-group">
+            <label>State/UT <span class="req-star">*</span></label>
+            <select formControlName="perm_state" [class.input-sync-disabled]="form.get('same_as_current')?.value">
+              <option value="">Select State</option>
+              @for (state of states; track state) {
+                <option [value]="state">{{ state }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-group">
+            <label>PIN Code <span class="req-star">*</span></label>
+            <input type="text" formControlName="perm_pincode" placeholder="e.g., 560001" [class.input-sync-disabled]="form.get('same_as_current')?.value">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── DOCUMENTS UPLOAD ───────────────────────────────── -->
+    <div class="form-section-card">
+      <div class="form-section-legend">Documents Upload</div>
+      <div class="form-grid ds-style-2e534afd">
+
+        <div class="form-group">
+          <label>Member Photo</label>
+          <input type="file" (change)="onFileSelect.emit({event: $event, type: 'photo'})" accept="image/*">
+        </div>
+
+        <div class="form-group">
+          <label>Govt ID / Aadhar</label>
+          <input type="file" (change)="onFileSelect.emit({event: $event, type: 'govt_id'})" accept="image/*,application/pdf">
+        </div>
+
+        <div class="form-group">
+          <label>Admission Receipt</label>
+          <input type="file" (change)="onFileSelect.emit({event: $event, type: 'admission_receipt'})" accept="image/*,application/pdf">
+        </div>
+
+        <div class="form-group">
+          <label>Security Deposit</label>
+          <input type="file" (change)="onFileSelect.emit({event: $event, type: 'security_deposit'})" accept="image/*,application/pdf">
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── AGREEMENT ────────────────────────────────────── -->
+    <div class="terms-agreement-section">
+      <label class="ds-style-50670a00">
+        <input type="checkbox" formControlName="terms_accepted" class="ds-style-3d29c63f">
+        <span class="ds-style-3c54a937">I agree to the <strong class="terms-link">Library Rules &amp; Membership Terms</strong></span>
+      </label>
+      @if (form.get('terms_accepted')?.touched && form.get('terms_accepted')?.hasError('required')) {
+        <small class="err-msg terms-error">You must agree to the terms to proceed</small>
+      }
+    </div>
+
+    <!-- ── SUBMIT ─────────────────────────────────────────── -->
+    <div class="ds-style-b4c1512">
+      @if (isEditing) {
+        <button type="button" class="btn btn-clear-action ds-style-421c1a6e" (click)="onCancel.emit()">Cancel Edit</button>
+        <button type="submit" class="btn btn-red ds-style-67e83749">Update Member Profile</button>
+      } @else {
+        <button type="button" class="btn btn-clear-action ds-style-421c1a6e" (click)="onCancel.emit()">Clear Form</button>
+        <button type="submit" class="btn btn-red ds-style-67e83749">Register & Generate ID</button>
+      }
+    </div>
+
+  </form>
+</div>

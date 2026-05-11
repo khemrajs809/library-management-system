@@ -1,0 +1,138 @@
+<div class="scanner-container">
+  <div class="scanner-grid">
+    
+    <!-- Main Scanner Card -->
+    <div class="main-card">
+      <div class="scan-wrapper">
+        
+        @if (!scannedIssue) {
+          <div class="dashed-box">
+             <div class="status-indicator">
+                <span class="dot pulse"></span>
+                AWAITING BOOK BARCODE...
+             </div>
+             <div class="input-row">
+                <input type="text" #bookIdInput placeholder="Enter Book ID or Scan Barcode..." 
+                  class="simple-input" (keyup.enter)="emitBookScan($event)">
+                <button class="simple-camera-btn" (click)="toggleBookCamera()">
+                   📷 Camera
+                </button>
+             </div>
+          </div>
+          
+          <button class="simple-submit-btn" (click)="emitBookScan({target: bookIdInput})">
+            Find Issue Record
+          </button>
+
+          @if (isBookCameraActive) {
+            <div class="video-box"><video id="reader-book"></video></div>
+          }
+        } @else {
+          <!-- Detailed Review Page (Match Screenshot) -->
+          <div class="review-details-page">
+            <div class="review-header">
+               <span class="review-icon">📋</span>
+               <h2 class="review-title">Review Return Details</h2>
+            </div>
+
+            <div class="review-grid">
+               <!-- Member Identity Card -->
+               <div class="review-card member-card">
+                  <div class="card-tag">MEMBER IDENTITY</div>
+                  <div class="card-main">
+                     <img [src]="scannedIssue.member_photo ? (uploadsBase + scannedIssue.member_photo) : 'assets/placeholder-user.png'" class="review-avatar">
+                     <div class="review-info">
+                        <h3 class="name">{{ scannedIssue.member_name }}</h3>
+                        <span class="id-pill">ID: {{ scannedIssue.member_id }}</span>
+                     </div>
+                  </div>
+                  <div class="card-footer-grid">
+                     <div class="footer-item">
+                        <span class="label">DEPARTMENT</span>
+                        <span class="val">{{ scannedIssue.department || 'N/A' }}</span>
+                     </div>
+                     <div class="footer-item">
+                        <span class="label">CONTACT</span>
+                        <span class="val">{{ scannedIssue.member_phone || 'N/A' }}</span>
+                     </div>
+                     <div class="footer-item full">
+                        <span class="label">EMAIL ADDRESS</span>
+                        <span class="val">{{ scannedIssue.member_email || 'N/A' }}</span>
+                     </div>
+                  </div>
+               </div>
+
+               <!-- Book Metadata Card -->
+               <div class="review-card book-card">
+                  <div class="card-tag">BOOK METADATA</div>
+                  <div class="card-main">
+                     <img [src]="scannedIssue.book_cover ? (uploadsBase + scannedIssue.book_cover) : 'assets/cover-placeholder.png'" class="review-cover">
+                     <div class="review-info">
+                        <h3 class="name">{{ scannedIssue.book_title }}</h3>
+                        <div class="id-row">
+                           <span class="copy-pill">COPY ID: {{ scannedIssue.copy_id }}</span>
+                           <span class="stream-pill">{{ scannedIssue.book_stream || 'CS' }}</span>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="card-footer-grid">
+                     <div class="footer-item">
+                        <span class="label">AUTHOR</span>
+                        <span class="val">{{ scannedIssue.book_author || 'Unknown' }}</span>
+                     </div>
+                     <div class="footer-item">
+                        <span class="label">ISBN</span>
+                        <span class="val">{{ scannedIssue.book_isbn || 'N/A' }}</span>
+                     </div>
+                     <div class="footer-item">
+                        <span class="label">ISSUE DATE</span>
+                        <span class="val">{{ scannedIssue.issue_date | date:'MMMM d, y' }}</span>
+                     </div>
+                     <div class="footer-item">
+                        <span class="label">DUE DATE</span>
+                        <span class="val due" [class.overdue]="isOverdue(scannedIssue)">{{ scannedIssue.due_date | date:'MMMM d, y' }}</span>
+                     </div>
+                  </div>
+               </div>
+            </div>
+
+            @if (scannedIssue.fine_amount > 0) {
+              <div class="fine-alert-banner">
+                 ⚠️ Penalty Detected: ₹{{ scannedIssue.fine_amount }} must be collected
+              </div>
+            }
+
+            <div class="review-actions">
+               <button class="btn-review btn-cancel" (click)="onCancelLookup.emit()">
+                  <span class="icon">✕</span> Cancel
+               </button>
+               <button class="btn-review btn-renew" (click)="onConfirmRenew.emit()">
+                  <span class="icon">🔄</span> Renew Book
+               </button>
+               <button class="btn-review btn-confirm" (click)="onConfirmReturn.emit()">
+                  <span class="icon">✓</span> Confirm Return
+               </button>
+            </div>
+          </div>
+        }
+
+      </div>
+    </div>
+
+    <!-- Right Side: Activity Log -->
+    <div class="side-card">
+      <h3 class="side-title">RECENT ACTIVITY</h3>
+      <div class="side-list">
+        @for (act of recentActivity; track act.time) {
+          <div class="side-line" [class]="act.type">
+            <span class="time">{{ act.time }}</span>
+            <span class="msg">{{ act.msg }}</span>
+          </div>
+        } @empty {
+          <div class="side-empty">Ready for returns...</div>
+        }
+      </div>
+    </div>
+
+  </div>
+</div>

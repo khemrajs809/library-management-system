@@ -1,0 +1,7 @@
+@import "../../../librarian-dashboard.css";
+@import "../../circulation-desk.css";
+
+:host {
+  display: block;
+  width: 100%;
+}

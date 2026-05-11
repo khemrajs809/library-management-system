@@ -1,0 +1,32 @@
+export interface Issue {
+  issue_id: number;
+  book_id: string;
+  member_id: string;
+  book_title: string;
+  member_name: string;
+  member_email?: string;
+  member_phone?: string;
+  member_dept?: string;
+  member_course?: string;
+  membership_type?: string;
+  member_photo?: string;
+  academic_session?: string;
+  guardian_name?: string;
+  guardian_phone?: string;
+  book_price?: number;
+  isbn?: string;
+  book_author?: string;
+  book_stream?: string;
+  book_publisher?: string;
+  publication_year?: number;
+  publisher?: string;
+  shelf_location?: string;
+  issue_date: string;
+  due_date: string;
+  return_date?: string;
+  status: 'issued' | 'returned' | 'lost';
+  fine_amount: number;
+  fine_paid: number;
+  created_at?: string;
+  dynamic_fine?: number;
+}

@@ -1,0 +1,108 @@
+<div class="list-card">
+
+  @if (isLoading) {
+    <div class="loading-state" style="padding: 5rem; text-align: center;">
+      <div class="spinner"></div>
+      <p style="color: #64748b; font-weight: 600; margin-top: 1rem;">Retrieving circulation data...</p>
+    </div>
+  } @else {
+    <div class="table-container">
+      <table class="ds-admin-table">
+        <thead>
+          <tr>
+            <th>MEMBER DETAILS</th>
+            <th>CONTACT & DEPT</th>
+            <th>BOOK DETAILS</th>
+            <th>CAT. & PRICE</th>
+            <th>TIMELINE</th>
+            <th style="text-align: center;">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (issue of paginatedIssues(); track issue.issue_id) {
+            <tr class="ds-lift-hover">
+              <td>
+                <div class="ds-v-stack">
+                  <span class="ds-data-value" style="font-size: 1rem; font-weight: 800; color: #1e293b;">{{ issue.member_name }}</span>
+                  <span class="ds-id-pill" style="background: #f1f5f9; color: #475569; border-color: #cbd5e1; font-size: 0.7rem; width: fit-content;">{{ issue.member_id }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="ds-v-stack">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    <span style="font-weight: 800; font-size: 0.95rem; color: #1e293b;">{{ issue.member_phone || 'N/A' }}</span>
+                  </div>
+                  <div style="display: flex; gap: 6px; margin-top: 8px;">
+                    <span class="ds-id-pill" style="font-size: 0.65rem; padding: 2px 6px;">{{ issue.member_dept || 'Gen' }}</span>
+                    <span class="ds-id-pill" style="background: #eff6ff; color: #1e40af; border-color: #bfdbfe; font-size: 0.6rem; padding: 2px 6px;">{{ issue.membership_type || 'Student' }}</span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="ds-v-stack">
+                  <span class="ds-data-value" style="font-size: 1rem; font-weight: 800; color: #1e293b;">{{ issue.book_title }}</span>
+                  <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+                    <span class="ds-id-pill" style="background: #fffbeb; color: #92400e; border-color: #fde68a; font-size: 0.7rem;">{{ issue.book_id }}</span>
+                    <span style="font-size: 0.85rem; color: #64748b; font-weight: 600;">{{ issue.book_author || 'Unknown' }}</span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="ds-v-stack">
+                  <span style="font-size: 0.65rem; font-weight: 900; color: #94a3b8; text-transform: uppercase;">{{ issue.book_stream || 'N/A' }}</span>
+                  <span style="font-size: 1.1rem; font-weight: 900; color: #1e293b;">₹{{ issue.book_price || 0 | number:'1.2-2' }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="timeline-compact">
+                  <div class="time-item">
+                    <span class="t-label">ISSUED:</span>
+                    <span class="t-val">{{ issue.issue_date | date:'M/d/yy' }}</span>
+                  </div>
+                  <div class="time-item danger">
+                    <span class="t-label">DUE:</span>
+                    <span class="t-val">{{ issue.due_date | date:'M/d/yy' }}</span>
+                  </div>
+                </div>
+              </td>
+              <td style="text-align: center;">
+                <div class="action-stack">
+                  <div class="action-row">
+                    <button class="ds-btn-mini btn-outline" (click)="onReturn.emit(issue.issue_id)">Return</button>
+                    <button class="ds-btn-mini btn-outline" (click)="onRenew.emit(issue.issue_id)">Renew</button>
+                  </div>
+                  <button class="ds-btn-mini btn-solid" (click)="onMarkLost.emit(issue.issue_id)">Mark Lost</button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="empty-state-cell" style="padding: 5rem; text-align: center;">
+                <div class="empty-state">
+                  <div class="icon" style="font-size: 3rem; margin-bottom: 1rem;">📋</div>
+                  <p style="color: #94a3b8; font-weight: 600;">No active issues found matching your criteria.</p>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="ds-pagination" style="margin-top: 2rem; display: flex; justify-content: center; gap: 8px;">
+      <button class="ds-page-btn ds-page-arrow" (click)="onPageChange.emit(page - 1)" [disabled]="page === 1">
+        &larr; Previous
+      </button>
+      @for (p of pagination().pages; track p) {
+        <button class="ds-page-btn" [class.active]="p === page" (click)="onPageChange.emit(p)">
+          {{ p }}
+        </button>
+      }
+      <button class="ds-page-btn ds-page-arrow" (click)="onPageChange.emit(page + 1)" [disabled]="page === pagination().totalPages">
+        Next &rarr;
+      </button>
+    </div>
+  }
+</div>

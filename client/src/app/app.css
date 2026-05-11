@@ -1,0 +1,327 @@
+.app-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #fff9f8; /* Very light tint for global consistency */
+}
+
+.app-main {
+    flex: 1;
+}
+
+/* Toast Notifications */
+.toasts-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toast {
+    padding: 12px 24px;
+    border-radius: 6px;
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    animation: slideIn 0.3s ease, fadeOut 0.3s ease 4.7s forwards;
+    transition: transform 0.2s;
+}
+
+.toast:hover {
+    transform: translateY(-2px);
+}
+
+.toast.success { background-color: #166534; }
+.toast.error { background-color: #dc2626; }
+.toast.info { background-color: #1e40af; }
+.toast.warning { background-color: #f59e0b; }
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+    to { opacity: 0; visibility: hidden; }
+}
+
+/* Modal Overlay & Card Styles */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    backdrop-filter: blur(8px);
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+.modal-card {
+    background: #ffffff;
+    padding: 0;
+    border-radius: 24px;
+    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.25);
+    width: 95%;
+    max-width: 550px; /* Increased for metadata grid */
+    overflow: hidden;
+    animation: modalPopPremium 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    position: relative;
+}
+
+.modal-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    z-index: 10;
+}
+
+.modal-card.danger::before { background: #ef4444; }
+.modal-card.warning::before { background: #f59e0b; }
+.modal-card.success::before { background: #10b981; }
+.modal-card.info::before { background: #3b82f6; }
+
+.modal-header-icon {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    background: #ffffff;
+    padding-top: 10px;
+}
+
+.modal-card.danger .modal-header-icon { color: #dc2626; }
+.modal-card.warning .modal-header-icon { color: #92400e; }
+.modal-card.success .modal-header-icon { color: #166534; }
+.modal-card.info .modal-header-icon { color: #1e40af; }
+
+.modal-content-wrap {
+    padding: 0 32px 32px;
+    text-align: center;
+}
+
+.modal-card h3 {
+    margin: 0 0 4px 0;
+    color: #1e293b;
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+}
+
+.modal-subtitle {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #1e293b;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 16px;
+    display: block;
+}
+
+.modal-card .modal-main-msg {
+    color: #1e293b;
+    margin-bottom: 24px;
+    font-size: 1rem;
+    line-height: 1.6;
+    font-weight: 500;
+}
+
+/* Rich Metadata Grid */
+.modal-metadata-container {
+    display: flex;
+    gap: 20px;
+    background: #f8fafc;
+    border: 1px solid #f1f5f9;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+.modal-thumb {
+    width: 100px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 2px solid #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    flex-shrink: 0;
+}
+
+.modal-metadata-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px 24px;
+    width: 100%;
+}
+
+.metadata-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.metadata-item.full-width {
+    grid-column: span 2;
+}
+
+.metadata-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #1e293b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.metadata-value {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #1e293b;
+    word-break: break-all;
+}
+
+/* Legacy Details Box */
+.modal-details-box {
+    background: #f8fafc;
+    border: 1px solid #f1f5f9;
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 0.9rem;
+    color: #1e293b;
+    margin-bottom: 24px;
+    text-align: left;
+    font-family: inherit;
+    line-height: 1.5;
+    white-space: pre-line;
+    font-weight: 500;
+}
+
+
+.modal-footer {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.modal-footer .btn {
+    padding: 12px 24px;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.2s;
+    min-width: 120px;
+}
+
+.modal-footer .btn:active {
+    transform: scale(0.95);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes modalPopPremium {
+    from { transform: scale(0.9) translateY(20px); opacity: 0; }
+    to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* ─── Global Route Loader ─── */
+.route-loader-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(251, 250, 246, 0.92);
+    backdrop-filter: blur(3px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10001;
+    animation: fadeIn 0.15s ease;
+}
+
+.route-spinner {
+    width: 48px;
+    height: 48px;
+    border: 5px solid rgba(239, 68, 68, 0.2);
+    border-radius: 50%;
+    border-top-color: #ef4444;
+    animation: lms-route-spin 0.7s linear infinite;
+}
+
+@keyframes lms-route-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ─── Idle Security Blur Overlay ─── */
+.idle-blur-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 20000; /* Highest level */
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px); /* Deep blur as requested */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.idle-lock-card {
+    background: rgba(26, 26, 26, 0.95);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: modalPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.lock-icon {
+    font-size: 50px;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.idle-lock-card h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #ffffff;
+    letter-spacing: 1px;
+}
+
+.idle-lock-card p {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 20px;
+    font-size: 15px;
+}
+
+.idle-countdown-large {
+    font-size: 60px;
+    font-weight: 800;
+    color: #ffb703; /* Glowing Amber */
+    text-shadow: 0 0 20px rgba(255, 183, 3, 0.3);
+    margin: 20px 0;
+    font-family: 'Inter', monospace;
+}
+
+.idle-hint {
+    font-style: italic;
+    font-size: 0.85rem !important;
+    color: #e63946 !important; /* Crimson Hint */
+}
+
+/* --- MODAL OVERLAY (LEGACY REMOVED) --- */
+.dynamic-color { color: var(--dynamic-color) !important; }
+
+

@@ -1,0 +1,35 @@
+@if (isOpen) {
+<div class="modal-overlay" (click)="onClose.emit()">
+  <div class="modal-card ds-style-5a1da65e" (click)="stopPropagation($event)">
+    <div class="ds-style-57b30d25">
+      <h3 class="ds-style-3e46aca9">Physical Copies</h3>
+      <button class="btn btn-xs btn-red-outline" (click)="onClose.emit()">✕</button>
+    </div>
+
+    <div class="ds-style-19c89017">
+      <table class="lib-table">
+        <thead>
+          <tr>
+            <th>Barcode / Copy ID</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (copy of copies; track copy.copy_id) {
+          <tr>
+            <td><span class="id-badge">{{ copy.copy_id }}</span></td>
+            <td>
+              <span class="status-badge" [class]="copy.status">{{ copy.status | uppercase }}</span>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="ds-style-3e90e6c9">
+      <button class="btn btn-red" (click)="onClose.emit()">Close</button>
+    </div>
+  </div>
+</div>
+}

@@ -1,0 +1,87 @@
+/* Establish the 3D camera */
+.scene {
+  width: 250px;
+  height: 160px;
+  perspective: 1200px;
+  margin: 20px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Rotating wrapper with premium spring bounce effect */
+.carousel {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 1.2s cubic-bezier(0.34, 1.65, 0.45, 1.15); /* Overshooting elastic bounce */
+}
+
+/* Individual 3D cells */
+.carousel__cell {
+  position: absolute;
+  width: 230px;
+  height: 140px;
+  left: 10px;
+  top: 10px;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(8px);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Floating bounce animation inside the cards for organic movement */
+.card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 10px;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  animation: bouncyFloat 3s ease-in-out infinite alternate;
+}
+
+@keyframes bouncyFloat {
+  0% {
+    transform: translateY(2px);
+  }
+  100% {
+    transform: translateY(-8px);
+  }
+}
+
+/* Wave staggered floating effects */
+.carousel__cell:nth-child(1) .card-content { animation-delay: 0s; }
+.carousel__cell:nth-child(2) .card-content { animation-delay: 0.3s; }
+.carousel__cell:nth-child(3) .card-content { animation-delay: 0.6s; }
+.carousel__cell:nth-child(4) .card-content { animation-delay: 0.9s; }
+.carousel__cell:nth-child(5) .card-content { animation-delay: 1.2s; }
+.carousel__cell:nth-child(6) .card-content { animation-delay: 1.5s; }
+
+/* Distinct color variations for premium feel */
+.cell-1 { background: linear-gradient(135deg, rgba(255,245,238,0.95), rgba(254,226,226,0.95)); }
+.cell-2 { background: linear-gradient(135deg, rgba(255,245,238,0.95), rgba(255,237,213,0.95)); }
+.cell-3 { background: linear-gradient(135deg, rgba(255,245,238,0.95), rgba(254,249,195,0.95)); }
+.cell-4 { background: linear-gradient(135deg, rgba(255,245,238,0.95), rgba(220,252,231,0.95)); }
+.cell-5 { background: linear-gradient(135deg, rgba(255,245,238,0.95), rgba(224,242,254,0.95)); }
+.cell-6 { background: linear-gradient(135deg, rgba(255,245,238,0.95), rgba(243,232,255,0.95)); }
+
+/* Ring positioning - 60deg increments, translateZ(260px) */
+.carousel__cell:nth-child(1) { transform: rotateY(0deg) translateZ(260px); }
+.carousel__cell:nth-child(2) { transform: rotateY(60deg) translateZ(260px); }
+.carousel__cell:nth-child(3) { transform: rotateY(120deg) translateZ(260px); }
+.carousel__cell:nth-child(4) { transform: rotateY(180deg) translateZ(260px); }
+.carousel__cell:nth-child(5) { transform: rotateY(240deg) translateZ(260px); }
+.carousel__cell:nth-child(6) { transform: rotateY(300deg) translateZ(260px); }
+.carousel { transform: var(--carousel-transform, translateZ(-200px) rotateY(0deg)); transition: transform 1s ease-in-out; }
+
+

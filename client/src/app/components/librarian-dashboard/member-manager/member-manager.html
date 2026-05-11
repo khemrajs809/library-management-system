@@ -1,0 +1,284 @@
+<!-- Member Manager - Modular Version -->
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--  REGISTER MEMBER TAB                                    -->
+<!-- ═══════════════════════════════════════════════════════ -->
+@if (activeTab === 'register_member') {
+  <div class="ds-style-25465226">
+    
+    <!-- Registration / Edit Form Component -->
+    <app-member-form 
+      #memberForm
+      [isEditing]="isEditing()"
+      [initialData]="selectedMember()"
+      [nextMemberId]="nextMemberId()"
+      (onSave)="saveMember($event)"
+      (onCancel)="resetForm()"
+      (onFileSelect)="onFileSelected($event)">
+    </app-member-form>
+
+    <!-- Bottom Section: Split 50/50 -->
+    <div class="ds-style-4c54f546">
+      
+      <!-- Recent Activity (50% Left) -->
+      <div class="list-card ds-style-7dee73f7">
+        <h3 class="ds-style-64f518b1">Recent Activity</h3>
+        <div class="activity-feed">
+          @if (recentActivities().length === 0) {
+            <p class="ds-style-331f7af5">No recent activity found.</p>
+          } @else {
+            @for (act of recentActivities(); track act.id) {
+              <div class="activity-item ds-style-6473e69">
+                <div class="activity-icon ds-style-4f283206">
+                  {{ act.action.includes('Register') ? 'Add' : (act.action.includes('Update') ? 'Edit' : 'Del') }}
+                </div>
+                <div>
+                  <div class="ds-style-6d2580ad">{{ act.action }}</div>
+                  <div class="ds-style-5416046e">{{ act.performed_by }} • {{ act.created_at | date:'shortTime' }}</div>
+                </div>
+              </div>
+            }
+          }
+        </div>
+      </div>
+
+      <!-- ID Card Preview Component (50% Right) -->
+      <div class="ds-style-1a0f214f">
+        <app-member-card 
+          [member]="previewMember()"
+          [showDownload]="true">
+        </app-member-card>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--  MEMBER DIRECTORY TAB                                   -->
+<!-- ═══════════════════════════════════════════════════════ -->
+@if (activeTab === 'member_directory') {
+  <div class="ds-style-e4e0832">
+
+    <!-- Member List Table Component -->
+    <app-member-table [members]="members()" [pagination]="pagination()" [isLoading]="isLoading()" [isImporting]="isImporting()" [isScannerActive]="isScannerActive()" [searchedMemberInfo]="searchedMemberInfo()" [memberSearch]="memberSearch()" [uploadsBase]="uploadsBase" (onSearch)="onMemberSearch($event)" (onPageChange)="onPageChange($event)" (onEdit)="editMember($event)" (onDelete)="deleteMember($event)" (onView)="viewDetails($event)" (onDownloadCard)="downloadCard($event)" (onEmail)="openEmailSender($event || '')" (onOpenProfile)="openProfile.emit($event)" (onToggleScanner)="toggleScanner()" (onImport)="onCsvSelected($event)" class="ds-style-64d4cb3f">
+    </app-member-table>
+
+    <!-- Hidden card template for bulk downloads -->
+    <div class="ds-style-4975c694">
+      <app-member-card 
+        #directoryCard
+        [member]="previewMember()" 
+        [showDownload]="false"
+        barcodeId="memberBarcodeSvgHidden">
+      </app-member-card>
+    </div>
+  </div>
+  
+  <!-- Reusable Email Sender -->
+  <app-email-sender 
+    [email]="selectedEmail()" 
+    (close)="onEmailClose()">
+  </app-email-sender>
+
+  <!-- Member Profile Modal Overlay -->
+  @if (selectedMember()) {
+    <div class="modal-overlay ds-style-b72de35" (click)="closeMemberDetails()">
+      <div class="modal-content profile-overlay-content ds-style-4121cf81" (click)="stopPropagation($event)">
+        
+        <!-- Left Sidebar: Photo & Core Actions (30%) -->
+        <div class="ds-style-17828592">
+          
+          <button class="btn-close ds-style-7312348e" (click)="closeMemberDetails()">&times;</button>
+
+          <!-- Photo Container -->
+          <div class="ds-style-6b5ecc08">
+            @if (selectedMember()?.photo_url) {
+              <img [src]="uploadsBase + selectedMember()?.photo_url" crossorigin="anonymous" class="ds-style-363d597c">
+            } @else {
+              <div class="ds-style-5e79cbc2">
+                <svg width="100" height="100" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+              </div>
+            }
+          </div>
+
+          <div class="ds-style-5b86a960">
+            <div class="ds-style-7de8c3ac">
+              <span class="ds-style-69f7b4d">ID: {{ selectedMember()?.member_id }}</span>
+              <span class="ds-style-715cc050">{{ selectedMember()?.membership_type }}</span>
+            </div>
+            <h1 class="ds-style-7f9280d9">{{ selectedMember()?.name }}</h1>
+            <p class="ds-style-3187f0b1">{{ selectedMember()?.course }} - {{ selectedMember()?.department }}</p>
+
+          </div>
+        </div>
+
+        <!-- Right Content (70%): Details -->
+        <div class="ds-style-2e1de126">
+          
+          <div class="ds-style-2476c98f">
+            <h2 class="ds-style-73a0dcf1">Member Profile File</h2>
+            <div class="ds-style-4bd115fd">
+              <div class="ds-style-55738656">
+                <div class="ds-style-46f25021">Status</div>
+                <div [class.text-success]="selectedMember()?.account_status === 'Active'" [class.text-danger]="selectedMember()?.account_status !== 'Active'" class="ds-style-2c1dfd51">
+                  {{ selectedMember()?.account_status || 'Active' }}
+                  @if (selectedMember()?.account_status === 'Suspended') {
+                    <span class="ds-style-3d4ef03a">(MEMBERSHIP EXPIRED)</span>
+                  }
+                </div>
+              </div>
+              <div class="ds-style-55738656">
+                <div class="ds-style-46f25021">Book Limit</div>
+                <div class="ds-style-4a9d2ce9">{{ selectedMember()?.max_book_limit || 3 }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ds-style-55716408">
+            <div class="ds-style-1060f655">
+              <h3 class="ds-style-744692a7">Personal Information</h3>
+              <div class="ds-style-38bff0a8">
+                <div class="ds-style-14f4a9ff">
+                  <span class="ds-style-59c780a4">{{ selectedMember()?.dob | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <div class="ds-style-14f4a9ff">
+                  <span class="ds-style-453e7c60">Gender</span>
+                  <span class="ds-style-59c780a4">{{ selectedMember()?.gender }}</span>
+                </div>
+                <div class="ds-style-14f4a9ff">
+                  <span class="ds-style-453e7c60">Blood Group</span>
+                  <span class="ds-style-78222686">{{ selectedMember()?.blood_group || 'N/A' }}</span>
+                </div>
+                <div class="ds-style-14f4a9ff">
+                  <span class="ds-style-453e7c60">Phone</span>
+                  <span class="ds-style-59c780a4">{{ selectedMember()?.phone }}</span>
+                </div>
+                <div class="ds-style-7e6e37a4">
+                  <span class="ds-style-453e7c60">Email</span>
+                  <span class="ds-style-50fb25d3">{{ selectedMember()?.email }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="ds-style-1060f655">
+              <h3 class="ds-style-744692a7">Academic Credentials</h3>
+              <div class="ds-style-38bff0a8">
+                <div class="ds-style-14f4a9ff">
+                  <span class="ds-style-453e7c60">Roll Number</span>
+                  <span class="ds-style-1fb2c4bd">{{ selectedMember()?.roll_number || 'N/A' }}</span>
+                </div>
+                <div class="ds-style-14f4a9ff">
+                  <span class="ds-style-453e7c60">Year / Semester</span>
+                  <span class="ds-style-59c780a4">{{ selectedMember()?.year_semester || 'N/A' }}</span>
+                </div>
+                <div class="ds-style-14f4a9ff">
+                  <span class="ds-style-453e7c60">Session</span>
+                  <span class="ds-style-59c780a4">{{ selectedMember()?.academic_session || 'N/A' }}</span>
+                </div>
+                <div class="ds-style-14f4a9ff">
+                  <span class="ds-style-637d1cbf">{{ selectedMember()?.membership_expiry | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <div class="ds-style-7e6e37a4">
+                  <span class="ds-style-453e7c60">HOD Name</span>
+                  <span class="ds-style-59c780a4">{{ selectedMember()?.hod_name || 'N/A' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="ds-style-57aef6df">
+              <h3 class="ds-style-744692a7">Address & Guardian Info</h3>
+              <div class="ds-style-62bda2ce">
+                <div>
+                  <h4 class="ds-style-2a3aeff5">Current Address</h4>
+                  <p class="ds-style-2ac14912">{{ selectedMember()?.current_address || 'N/A' }}</p>
+                  <h4 class="ds-style-2f6b3bdd">Permanent Address</h4>
+                  <p class="ds-style-2ac14912">{{ selectedMember()?.permanent_address || 'N/A' }}</p>
+                </div>
+                <div class="ds-style-7baa9f15">
+                  <h4 class="ds-style-10d7ff10">Guardian Details</h4>
+                  <div class="ds-style-679ea923">
+                    <div class="ds-style-43566f4e">
+                      <span class="ds-style-453e7c60">Name</span>
+                      <span class="ds-style-59c780a4">{{ selectedMember()?.guardian_name || 'N/A' }}</span>
+                    </div>
+                    <div class="ds-style-43566f4e">
+                      <span class="ds-style-453e7c60">Phone</span>
+                      <span class="ds-style-59c780a4">{{ selectedMember()?.guardian_phone || 'N/A' }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- CSV Import Results Overlay -->
+  @if (importResult()) {
+    <div class="modal-overlay ds-style-e3e9236" (click)="closeImportReport()">
+      <div class="modal-content ds-style-37bdd3a2" (click)="stopPropagation($event)">
+        <h2 class="ds-style-387d2e6a">
+          <div class="ds-style-425c21c8">
+            <span class="ds-style-1e03608d">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-stroke-gray"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            </span>
+            Member Import Results
+          </div>
+          <button class="btn btn-red-outline btn-sm ds-style-14d7ee64" (click)="closeImportReport()">Close Report</button>
+        </h2>
+        
+        <div class="ds-style-5c491dc0">
+          <div class="ds-style-3a14fd8c">
+            <div class="ds-style-6cd848ff">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <h4 class="ds-style-618edabf">Successfully Imported</h4>
+              <p class="ds-style-6b188b1f">{{ importResult().added }}</p>
+            </div>
+          </div>
+          <div class="ds-style-7f0d8020">
+            <div class="ds-style-590b16be">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div>
+              <h4 class="ds-style-263085c4">Failed to Import</h4>
+              <p class="ds-style-25d623d1">{{ importResult().failed?.length || 0 }}</p>
+            </div>
+          </div>
+        </div>
+
+        @if (importResult().failed && importResult().failed.length > 0) {
+          <div class="ds-style-353a01ff">
+            <h3 class="ds-style-baa2fa9">Failure Details</h3>
+            <span class="ds-style-7a1e7144">Review errors below</span>
+          </div>
+          <div class="ds-style-366c6c37">
+            <table class="lib-table compact-table ds-style-a0b7a9c">
+              <thead class="ds-style-7fc8f072">
+                <tr class="ds-style-111ad682">
+                  <th class="ds-style-20a65a6f">Row / Member ID</th>
+                  <th class="ds-style-20a65a6f">Reason for Failure</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (res of importResult().failed; track res.id) {
+                  <tr class="ds-style-533debb4 row-error-hover">
+                    <td class="ds-style-7f13ec53">
+                      <strong class="ds-style-776f6aa7">{{ res.id || 'Unknown' }}</strong>
+                    </td>
+                    <td class="ds-style-2211f19d">
+                      {{ res.reason }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </div>
+  }
+}

@@ -1,0 +1,141 @@
+@if (isLoading()) {
+    <div class="fullscreen-overlay">
+        <app-spinner [size]="60" [thick]="5" color="var(--primary-red)" />
+        <h3 class="loading-text">Authenticating...</h3>
+    </div>
+}
+
+<div class="login-container">
+    <div class="login-layout">
+        <!-- Left 3D Carousel -->
+        <div class="carousel-column hide-mobile">
+            <app-carousel-3d />
+        </div>
+
+        <!-- Center Login Form -->
+        <div class="login-card">
+            <div class="login-header">
+                <img src="logolms.png" alt="Library Logo" class="login-logo">
+                @if (!isMfaRequired()) {
+                    <h2>Login</h2>
+                    <p>Enter your credentials to access your dashboard</p>
+                }
+            </div>
+
+            @if (generalError()) {
+                <div class="error-alert">
+                    {{ generalError() }}
+                </div>
+            }
+            
+            @if (!isMfaRequired()) {
+                <form class="login-form" (submit)="onLogin()">
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <div class="input-wrapper">
+                            <span class="icon"></span>
+                            <input type="email" id="email" name="email" [(ngModel)]="credentials.email" placeholder="staff@lms.com" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="input-wrapper">
+                            <span class="icon"></span>
+                            <input [type]="showPassword() ? 'text' : 'password'" id="password" name="password" [(ngModel)]="credentials.password" placeholder="••••••••" required>
+                            <button type="button" class="toggle-btn" (click)="togglePassword()">
+                                {{ showPassword() ? 'Hide' : 'Show' }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group captcha-group">
+                        <label>Verification</label>
+                        <div class="captcha-row">
+                            <div class="captcha-container">
+                                @if (captchaSvg()) {
+                                    <img [src]="captchaSvg()" alt="captcha" class="captcha-img" (click)="loadCaptcha()" title="Click to reload">
+                                } @else {
+                                    <div class="captcha-placeholder">Loading...</div>
+                                }
+                            </div>
+                            <button type="button" class="captcha-refresh-btn" (click)="loadCaptcha()" title="Refresh Captcha">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                            </button>
+                            <div  class="ds-style-915467f0">
+                                @if (captchaError()) {
+                                    <div  class="ds-style-4532199c">
+                                        {{ captchaError() }}
+                                    </div>
+                                }
+                            <div class="input-wrapper">
+                                    <input type="text" id="captchaText" name="captchaText" [(ngModel)]="credentials.captchaText" placeholder="Enter captcha" required minlength="6" maxlength="6" (input)="clearCaptchaError()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-footer">
+                        <div class="remember-me">
+                            <input type="checkbox" id="remember">
+                            <label for="remember">Remember me</label>
+                        </div>
+                        <a routerLink="/forgot-password" class="forgot-link">Forgot password?</a>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-red btn-block" 
+                      [disabled]="isLoading() || lockoutTimer() > 0 || captchaError() || credentials.captchaText.length !== 6" 
+                      [class.dimmed]="isLoading() || lockoutTimer() > 0 || captchaError() || credentials.captchaText.length !== 6">
+                        @if (lockoutTimer() > 0) {
+                            Try again in {{ lockoutTimer() }}s
+                        } @else {
+                            Sign In
+                        }
+                    </button>
+                </form>
+            } @else {
+                <!-- MFA OTP Form -->
+                <div class="mfa-section">
+                    <div class="mfa-header">
+                        <h3>Verify Your Identity</h3>
+                        <p>We've sent a 6-digit security code to your email: <b>{{ maskedEmail() }}</b></p>
+                    </div>
+
+                    <form class="login-form" (submit)="onVerifyOTP()">
+                        <div class="form-group">
+                            <label for="otp">Security Code</label>
+                            <div class="otp-input-wrapper">
+                                <input type="text" id="otp" name="otp" [(ngModel)]="otpCode" placeholder="000000" required maxlength="6" minlength="6" autocomplete="one-time-code">
+                            </div>
+                            <p class="mfa-hint">Check your spam folder if you don't see it.</p>
+                        </div>
+
+                        <button type="submit" class="btn btn-red btn-block" [disabled]="isLoading() || otpCode.length !== 6">
+                            Verify & Login
+                        </button>
+
+                        <div class="mfa-footer">
+                            <p>Didn't receive the code?</p>
+                            @if (resendTimer() > 0) {
+                                <span class="resend-countdown">Resend in {{ resendTimer() }}s</span>
+                            } @else {
+                                <button type="button" class="btn-link-otp" (click)="onResendOTP()" [disabled]="isLoading()">
+                                    Resend Code
+                                </button>
+                            }
+                        </div>
+
+                        <button type="button" class="btn btn-link btn-block mt-10" (click)="resetMFA()">
+                            Back to login
+                        </button>
+                    </form>
+                </div>
+            }
+            
+            <div class="login-info">
+                 <p>Back to <a routerLink="/">Home Page</a></p>
+            </div>
+        </div>
+
+    </div>
+</div>

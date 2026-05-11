@@ -1,0 +1,30 @@
+<section class="hero">
+  <div class="container hero-content">
+
+    <!-- Left: Text -->
+    <app-fade-in [delay]="0">
+      <div class="hero-text">
+        <h1>
+          "A Library Is Not A Luxury But One Of The
+          <span class="text-red">Necessities</span> Of Life."
+        </h1>
+        <p>Empowering minds through seamless access to knowledge and state-of-the-art management tools.</p>
+        <div class="hero-btns">
+          <a routerLink="/login" class="btn btn-red animated-btn">
+            <span class="btn-text-slider text-getstarted" [class.slide-left]="buttonText === 'Login'">Get Started</span>
+            <span class="btn-text-slider text-login"      [class.slide-in]="buttonText === 'Login'">Login</span>
+          </a>
+          <a routerLink="/learn-more" class="btn btn-outline">Learn More</a>
+        </div>
+      </div>
+    </app-fade-in>
+
+    <!-- Right: Logo image -->
+    <app-fade-in [delay]="150">
+      <div class="hero-image">
+        <img src="logolms.png" alt="LMS Logo" class="hero-logo" width="420" height="229">
+      </div>
+    </app-fade-in>
+
+  </div>
+</section>

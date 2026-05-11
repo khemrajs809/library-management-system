@@ -1,0 +1,56 @@
+<div class="list-card">
+  <div  class="ds-style-355518da">
+    <h3  class="ds-style-30254e95">System Audit Logs</h3>
+    <span  class="ds-style-55e93b0d">Tracking high-value operations</span>
+  </div>
+
+  <table class="lib-table">
+    <thead>
+      <tr>
+        <th>Timestamp</th>
+        <th>User ID</th>
+        <th>Role</th>
+        <th>Action</th>
+        <th>Method & Target</th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (logs().length === 0) {
+        <tr>
+          <td colspan="5" class="empty-state">No audit logs available.</td>
+        </tr>
+      } @else {
+        @for (log of logs(); track log.log_id) {
+          <tr>
+            <td  class="ds-style-0ca50382">{{ log.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td><span class="badge ds-style-23bcb564" >{{ log.user_id }}</span></td>
+            <td><span class="badge" [ngClass]="{'bg-purple': log.user_role === 'admin', 'bg-blue': log.user_role === 'librarian'}">{{ log.user_role | uppercase }}</span></td>
+            <td><strong>{{ log.action }}</strong></td>
+            <td>
+              <span class="method-badge" [ngClass]="parseDetails(log.details).method">{{ parseDetails(log.details).method }}</span>
+              <code  class="ds-style-e2e35b48">{{ parseDetails(log.details).url }}</code>
+            </td>
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
+
+  <!-- Pagination Controls -->
+  <div class="pagination-controls ds-style-6d9255b4" >
+    <button class="btn btn-sm ds-style-9fa48f17"  (click)="prevPage()" [disabled]="pagination().page === 1">Previous</button>
+    
+    <div  class="ds-style-5fe6eb3a">
+      @for (p of paginationArray(); track p) {
+        <button class="btn btn-sm ds-style-0baddba8" 
+          [class.text-black]="p === pagination().page" [class.text-blue]="p !== pagination().page" 
+          [class.fw-bold]="p === pagination().page" [class.fw-normal]="p !== pagination().page" 
+          (click)="goToPage(p)">
+          {{ p }}
+        </button>
+      }
+    </div>
+
+    <button class="btn btn-sm ds-style-9fa48f17"  (click)="nextPage()" [disabled]="pagination().page === pagination().totalPages">Next</button>
+  </div>
+</div>

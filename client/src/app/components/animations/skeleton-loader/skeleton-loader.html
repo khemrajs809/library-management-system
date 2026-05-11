@@ -1,0 +1,16 @@
+@if (loading) {
+  <div class="skeleton-wrapper ds-style-3f9f7eaf" >
+    <app-spinner [size]="36" [thick]="4" />
+    @if (message) {
+      <p class="skeleton-msg">{{ message }}</p>
+    }
+    <!-- Skeleton shimmer rows -->
+    <div class="skeleton-rows">
+      @for (row of rows; track row) {
+        <div class="skeleton-row" [style.--row-width]="row"></div>
+      }
+    </div>
+  </div>
+} @else {
+  <ng-content />
+}

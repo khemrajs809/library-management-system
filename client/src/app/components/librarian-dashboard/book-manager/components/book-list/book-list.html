@@ -1,0 +1,165 @@
+<div class="list-card ds-style-4212e8b5" [class.main-blur]="isEditing">
+  <div class="ds-style-21792244">
+    <h3 class="ds-style-57ff610">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="book-header-icon"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+      Book Inventory
+    </h3>
+    <div class="ds-style-366d5d22">
+      <button class="btn btn-red-outline btn-sm" (click)="onToggleView.emit()">
+        {{ viewMode === 'grid' ? 'List View' : 'Grid View' }}
+      </button>
+      <input type="search" class="search-input" placeholder="Search title, ISBN..." [value]="bookSearch"
+        (input)="handleSearch($event)">
+      <label for="csvInput" class="btn btn-red-outline btn-sm ds-style-71f5b607">
+        @if (isImporting) { Importing... } @else { Import CSV }
+      </label>
+      <input id="csvInput" type="file" accept=".csv" (change)="handleCsv($event)" [disabled]="isImporting" class="ds-style-69274b4b">
+    </div>
+  </div>
+  <app-skeleton-loader [loading]="isLoading" message="Fetching book inventory...">
+    @if (viewMode === 'grid') {
+    <app-fade-in>
+      <div class="book-grid ds-style-2e4df57a">
+        @if (books.length === 0) {
+        <div class="empty-state ds-style-4523fa21">No books found. Add books using the form or import a CSV.</div>
+        } @else {
+        @for (book of books; track book.book_id) {
+        <div class="book-card">
+          @if (book.cover_url) {
+          <img [src]="book.cover_url" alt="Book Cover" class="gallery-cover ds-style-4f7b02be" crossorigin="anonymous" (click)="onViewDetails.emit(book)">
+          } @else {
+          <img src="assets/cover-placeholder.png" alt="No Cover" class="gallery-cover ds-style-346e4bf" (click)="onViewDetails.emit(book)">
+          }
+          <h3 (click)="onViewDetails.emit(book)" class="ds-style-1fc2fc62">{{ book.title }}</h3>
+          <p class="author">{{ book.author || 'Unknown Author' }}</p>
+          <div class="book-meta ds-style-198ffc35">
+            @if (book.stream) { <span class="badge stream-badge">{{ book.stream }}</span> }
+            @if (book.publication_year) { <span class="badge year-badge">{{ book.publication_year }}</span> }
+            @if (book.edition) { <span class="badge ds-style-169981d2">{{ book.edition }}</span> }
+          </div>
+          @if (book.publisher) {
+          <p class="ds-style-66365d53">Publisher: {{ book.publisher }}</p>
+          }
+          @if (book.shelf_location) {
+          <p class="ds-style-359efd4c">Shelf: {{ book.shelf_location }}</p>
+          }
+
+          <div class="book-status ds-style-3ec755b2">
+            <span class="ds-style-3851cc97">ID: {{ book.book_id }}</span>
+            <span [class.text-success]="book.available_copies > 0" [class.text-danger]="book.available_copies <= 0" class="ds-style-552e3a43">
+              {{ book.available_copies }} / {{ book.total_copies }}
+            </span>
+          </div>
+          <div class="book-actions ds-style-5a295f6a">
+            <button class="btn btn-icon-edit btn-sm" (click)="onEdit.emit(book)">Edit</button>
+            <button class="btn btn-icon-box btn-sm" (click)="onViewCopies.emit(book)">Copies</button>
+            <button class="btn btn-icon-barcode btn-sm" (click)="onPrintBarcode.emit(book)" title="Print All Barcodes">Barcode</button>
+            <button class="btn btn-icon-delete btn-sm" (click)="onDelete.emit(book)">Delete</button>
+          </div>
+        </div>
+        }
+        }
+      </div>
+    </app-fade-in>
+    } @else {
+    <div class="ds-style-43d1d7e1">
+      <table class="lib-table ds-style-55f44ed8">
+        <thead class="ds-style-6cfe9bc7">
+          <tr>
+            <th class="ds-style-cab7b03">Cover & ID</th>
+            <th class="ds-style-5e1e2d4f">Title & Author</th>
+            <th class="ds-style-5e1e2d4f">Category & Details</th>
+            <th class="ds-style-5e1e2d4f">Status</th>
+            <th class="ds-style-5e1e2d4f">Added On</th>
+            <th class="ds-style-2bbd1743">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (books.length === 0) {
+          <tr>
+            <td colspan="6" class="empty-state ds-style-35150210">No books found.</td>
+          </tr>
+          } @else {
+          @for (book of books; track book.book_id; let odd = $odd) {
+            <tr class="expandable-row ds-style-50f7c686">
+            <td class="ds-style-ce6317">
+              <div (click)="onViewDetails.emit(book)" class="ds-style-5c2c8820">
+                @if (book.cover_url) {
+                <img [src]="book.cover_url" class="hover-zoom-img ds-style-497a11d0" crossorigin="anonymous">
+                } @else {
+                <div class="ds-style-559103de">NO COVER</div>
+                }
+                <span class="id-badge ds-style-5e83fc93">BK-{{ book.book_id.toString().split('-').pop() }}</span>
+              </div>
+            </td>
+            <td (click)="onViewDetails.emit(book)" class="ds-style-2022e629">
+              <div class="ds-v-stack">
+                <strong class="ds-style-1ad64a56">{{ book.title }}</strong>
+                <span class="ds-style-4fcac1da">Author: {{ book.author || 'Unknown' }}</span>
+                <span class="ds-style-46db0c14">ISBN: {{ book.isbn || 'N/A' }}</span>
+              </div>
+            </td>
+            <td class="ds-style-3b0e85b5">
+              <div class="ds-v-stack">
+                <span class="badge ds-style-1d469a35">{{ book.stream || 'N/A' }}</span>
+                @if (book.publisher) { <span class="ds-style-2937b434">Pub: {{ book.publisher }}</span> }
+                @if (book.edition) { <span class="ds-style-117e3bb5">Ed: {{ book.edition }}</span> }
+                @if (book.shelf_location) { <span class="ds-style-3dc76201">Loc: {{ book.shelf_location }}</span> }
+                <div class="ds-style-2cc33f10">{{ book.price || 0 }}</div>
+              </div>
+            </td>
+            <td class="ds-style-3b0e85b5">
+              <div class="ds-style-6984da57">
+                <span class="ds-style-26a649c7">
+                  {{ book.available_copies }} / {{ book.total_copies }}
+                </span>
+                <span class="ds-style-7f1f8bb4" [ngClass]="{
+                  'status-available': book.available_copies > 5,
+                  'status-low': book.available_copies > 0 && book.available_copies <= 5,
+                  'status-out': book.available_copies === 0
+                }">
+                  {{ book.available_copies === 0 ? 'Out of Stock' : (book.available_copies <= 5 ? 'Low Stock' : 'Available') }}
+                </span>
+              </div>
+            </td>
+            <td (click)="onViewCopies.emit(book)" class="ds-style-2022e629">
+              <div class="ds-v-stack">
+                <div class="ds-style-5de3b6be">{{ book.created_at ? (book.created_at | date:'dd/MM/yyyy') : '-' }}</div>
+                <div class="ds-style-280ad8a9">{{ book.created_at ? (book.created_at | date:'shortTime') : '-' }}</div>
+              </div>
+            </td>
+            <td class="ds-style-1e433929">
+              <div class="ds-style-284f27b4">
+                <button class="btn btn-red-outline btn-sm ds-style-7acb4e2b" (click)="onEdit.emit(book)">Edit</button>
+                <button class="btn btn-red-outline btn-sm ds-style-7acb4e2b" (click)="onViewCopies.emit(book)">Stock</button>
+                <button class="btn btn-red-outline btn-sm ds-style-7acb4e2b" (click)="onPrintBarcode.emit(book)">Barcode</button>
+                <button class="btn btn-red btn-sm ds-style-7acb4e2b" (click)="onDelete.emit(book)">Delete</button>
+              </div>
+            </td>
+          </tr>
+          }
+          }
+        </tbody>
+      </table>
+    </div>
+    }
+  </app-skeleton-loader>
+
+  <!-- Pagination Controls -->
+  <div class="pagination-controls ds-style-36f9b7a9">
+    <button class="btn btn-sm ds-style-593c1773" (click)="onPageChange.emit(pagination.page - 1)" [disabled]="pagination.page === 1">Previous</button>
+    
+    <div class="ds-style-aa3bc8c">
+      @for (p of paginationArray(); track p) {
+        <button class="btn btn-sm ds-style-210136cf" 
+          [class.text-black]="p === pagination.page" [class.text-blue]="p !== pagination.page" 
+          [class.fw-bold]="p === pagination.page" [class.fw-normal]="p !== pagination.page" 
+          (click)="onPageChange.emit(p)">
+          {{ p }}
+        </button>
+      }
+    </div>
+
+    <button class="btn btn-sm ds-style-593c1773" (click)="onPageChange.emit(pagination.page + 1)" [disabled]="pagination.page === pagination.totalPages">Next</button>
+  </div>
+</div>

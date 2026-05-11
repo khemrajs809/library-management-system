@@ -1,0 +1,305 @@
+.notes-container {
+  padding: 2rem;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease-in;
+}
+
+/* Lock Screen */
+.lock-screen {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 3rem;
+  text-align: center;
+  box-shadow: var(--shadow-md);
+  max-width: 400px;
+  width: 100%;
+}
+
+.lock-header {
+  margin-bottom: 2rem;
+}
+
+.lock-icon {
+  font-size: 3rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.lock-header h2 {
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+}
+
+.lock-header p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Pattern Grid */
+.pattern-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin: 0 auto 2rem;
+  width: fit-content;
+  user-select: none;
+}
+
+.pattern-node {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--bg-main);
+  border: 2px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pattern-node:hover {
+  border-color: var(--primary-color);
+}
+
+.pattern-node.active {
+  border-color: var(--primary-color);
+  background: rgba(121, 82, 179, 0.1);
+}
+
+.pattern-node.active .inner-dot {
+  background: var(--primary-color);
+  transform: scale(1);
+}
+
+.inner-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: transparent;
+  transform: scale(0);
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-clear {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s;
+}
+
+.btn-clear:hover {
+  background: var(--bg-main);
+  color: var(--text-primary);
+}
+
+/* Unlocked Notes Content */
+.notes-content {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.title-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.title-group i {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+}
+
+.title-group h2 {
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.btn-lock {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+.btn-lock:hover {
+  background: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.info-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.card-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.card-header i {
+  color: var(--primary-color);
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.card-body p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.mt-4 {
+  margin-top: 1.5rem;
+}
+
+/* Feature List Styles */
+.component-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.feature-item {
+  background: #f9fafb;
+  border: 1px solid var(--border-color, #e5e7eb);
+  padding: 1.5rem;
+  border-radius: var(--radius-md, 8px);
+  transition: all 0.2s ease;
+}
+
+.feature-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+  border-color: var(--primary-color, #b91c1c);
+}
+
+.feature-item h4 {
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #111827;
+  font-size: 1.1rem;
+}
+
+.feature-item p {
+  margin: 0;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+/* Dark Mode Support for Notes */
+body.dark-theme .feature-item {
+  background: var(--bg-nested, #2C2C2C);
+  border-color: var(--border-subtle, #444);
+}
+
+body.dark-theme .feature-item h4 {
+  color: var(--text-main, #E0E0E0);
+}
+
+body.dark-theme .feature-item p {
+  color: var(--text-muted, #475569);
+}
+
+body.dark-theme .content-header h2,
+body.dark-theme .card-header h3,
+body.dark-theme .card-body p {
+  color: var(--text-main, #E0E0E0);
+}
+
+body.dark-theme .lock-screen,
+body.dark-theme .info-card {
+  background: var(--bg-elevated, #1E1E1E);
+  border-color: var(--border-subtle, #444);
+}
+
+body.dark-theme .pattern-node {
+  background: var(--bg-nested, #2C2C2C);
+  border-color: var(--border-subtle, #444);
+}
+
+.text-success {
+  color: #10b981;
+}
+
+/* Language Toggle Button */
+.btn-toggle-lang {
+  background: var(--bg-surface, var(--pure-white));
+  border: 1px solid var(--primary-color, #b91c1c);
+  color: var(--primary-color, #b91c1c);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md, 6px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.btn-toggle-lang:hover {
+  background: var(--primary-color, #b91c1c);
+  color: #fff;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ds-style-61860508 {
+  display:flex;
+  gap:10px;
+}
+
+.ds-style-2579959f {
+  margin-bottom: 2rem;
+}
+
+

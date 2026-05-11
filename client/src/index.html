@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>LMS - Library Management System</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="logolms.png">
+</head>
+<body>
+  <link rel="stylesheet" href="loader.css">
+
+  <app-root></app-root>
+
+  <!-- Standalone loader rendered outside app-root so Angular doesn't destroy it prematurely -->
+  <div id="appLoader">
+    <div class="lms-spinner"></div>
+    <div class="lms-loader-text">Loading LMS...</div>
+  </div>
+
+  <script src="loader.js"></script>
+</body>
+</html>

@@ -1,0 +1,348 @@
+/* Global Styles - Red and White Professional Theme */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary-red: #b91c1c; /* Deep Crimson */
+    --dark-red: #991b1b; /* Crimson Hover */
+    --light-red: #ef4444;
+    --pure-white: #FFF5EE; /* Seashell White */
+    --off-white: #FFE4E1; /* Misty Rose */
+    
+    /* New Blue/Cyan Palette */
+    --cyan-100: #E0FFFF;
+    --cyan-200: #AFEEEE;
+    --cyan-300: #B0E0E6;
+    --cyan-400: #ADD8E6;
+
+    --text-dark: #0f172a; /* Slate 900 */
+    --text-light: #1e293b; /* Slate 800 */
+    --border-color: #cbd5e1; /* Slate 300 */
+    --slate-gray: #1e293b; /* Slate 800 */
+    --amber: #92400e; /* Dark Amber */
+    --medium-gray: #475569; /* Slate 600 */
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    overscroll-behavior-y: none;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, var(--cyan-100) 0%, var(--cyan-200) 33%, var(--cyan-300) 66%, var(--cyan-400) 100%);
+    background-attachment: fixed;
+    color: var(--text-dark);
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+    transition: filter 0.3s ease, background 0.3s ease;
+}
+
+/* Global Dark Mode / Night Theme */
+:root {
+  /* Precise Token Mapping for Dark Mode */
+  --bg-main: #0f172a; /* Slate 900 */
+  --bg-header: #1e293b; /* Slate 800 */
+  --bg-nav: #020617; /* Slate 950 */
+  --bg-elevated: #1e293b;
+  --bg-nested: #334155; /* Slate 700 */
+  --bg-input: #0f172a;
+  
+  --text-main: #f8fafc; /* Slate 50 */
+  --text-muted: #cbd5e1; /* Slate 300 */
+  --text-success: #4ade80;
+  
+  --accent: #f87171; /* Brighter Red (Red 400) */
+  --accent-hover: #ef4444;
+  --border-subtle: #334155;
+  --shadow-dark: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-theme {
+    background: var(--bg-main) !important;
+    color: var(--text-main);
+}
+
+body.dark-theme .main-content {
+    background-color: var(--bg-main) !important;
+    background-image: none !important;
+}
+
+/* 1. Structural Backgrounds & Elevation */
+/* Top Header Navbar */
+body.dark-theme .top-bar {
+    background-color: var(--bg-header) !important;
+    border-bottom: 1px solid var(--border-subtle) !important;
+    box-shadow: none !important;
+}
+
+/* Secondary Navigation Bar (Tabs) */
+body.dark-theme .tabs-container {
+    background-color: var(--bg-nav) !important;
+    border-top: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border-subtle) !important;
+}
+body.dark-theme .tabs-list {
+    background-color: var(--bg-nav) !important;
+}
+
+/* Main Container Cards (The large currently white sections) */
+body.dark-theme .stat-box,
+body.dark-theme .chart-card,
+body.dark-theme .table-card,
+body.dark-theme .settings-section,
+body.dark-theme .placeholder-msg,
+body.dark-theme .control-panel,
+body.dark-theme .modal-card,
+body.dark-theme .scanner-box,
+body.dark-theme .action-panel,
+body.dark-theme .form-card,
+body.dark-theme .activity-log,
+body.dark-theme .list-card {
+    background-color: var(--bg-elevated) !important;
+    border: 1px solid var(--border-subtle) !important;
+    box-shadow: var(--shadow-dark) !important;
+}
+
+/* 2. Nested Components & Inputs */
+/* Nested Book Cards */
+body.dark-theme .book-card {
+    background-color: var(--bg-nested) !important;
+    border: 1px solid var(--border-subtle) !important;
+    box-shadow: none !important;
+}
+
+/* Form Input Fields */
+body.dark-theme input,
+body.dark-theme select,
+body.dark-theme textarea,
+body.dark-theme .search-input {
+    background-color: var(--bg-input) !important;
+    border: 1px solid var(--border-subtle) !important;
+    color: var(--text-main) !important;
+}
+
+body.dark-theme input:focus,
+body.dark-theme select:focus,
+body.dark-theme textarea:focus {
+    border-color: var(--accent) !important;
+    outline: none !important;
+}
+
+body.dark-theme .book-cover-placeholder {
+    background-color: var(--bg-input) !important;
+    border: 1px solid var(--border-subtle) !important;
+    color: var(--text-muted) !important;
+}
+
+/* Scrollbars for Dark Mode */
+body.dark-theme ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+body.dark-theme ::-webkit-scrollbar-track {
+    background: var(--bg-main);
+}
+body.dark-theme ::-webkit-scrollbar-thumb {
+    background: var(--border-subtle);
+    border-radius: 5px;
+}
+body.dark-theme ::-webkit-scrollbar-thumb:hover {
+    background: #555555;
+}
+
+/* Tab Items */
+body.dark-theme .tabs-list li {
+    color: var(--text-muted) !important;
+}
+body.dark-theme .tabs-list li.active,
+body.dark-theme .tabs-list li:hover {
+    color: var(--accent) !important;
+    border-bottom-color: var(--accent) !important;
+    background-color: transparent !important;
+}
+
+/* 3. Buttons & Brand Accents (Desaturating the Red) */
+/* Primary Solid Buttons */
+body.dark-theme .action-btn,
+body.dark-theme .btn-primary,
+body.dark-theme .btn-red {
+    background-color: var(--accent) !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    box-shadow: 0 4px 12px rgba(239, 83, 80, 0.2) !important;
+}
+
+body.dark-theme .action-btn:hover,
+body.dark-theme .btn-primary:hover,
+body.dark-theme .btn-red:hover {
+    background-color: var(--accent-hover) !important;
+    box-shadow: 0 6px 15px rgba(229, 57, 53, 0.4) !important;
+}
+
+/* Outlined Buttons */
+body.dark-theme .filter-btn,
+body.dark-theme .btn-secondary,
+body.dark-theme .btn-red-outline {
+    background-color: transparent !important;
+    color: var(--accent) !important;
+    border: 1px solid var(--accent) !important;
+}
+
+body.dark-theme .filter-btn:hover,
+body.dark-theme .btn-secondary:hover,
+body.dark-theme .btn-red-outline:hover {
+    background-color: rgba(239, 83, 80, 0.1) !important;
+}
+
+/* 4. Typography & Status Indicators */
+/* Primary Headings & Body Text */
+body.dark-theme .stat-value,
+body.dark-theme .stat-label,
+body.dark-theme .section-title,
+body.dark-theme .kpi-label,
+body.dark-theme th,
+body.dark-theme td,
+body.dark-theme .settings-title,
+body.dark-theme h1,
+body.dark-theme h2,
+body.dark-theme h3,
+body.dark-theme h4,
+body.dark-theme .header-info h1,
+body.dark-theme label,
+body.dark-theme .user-profile span {
+    color: var(--text-main) !important;
+}
+
+/* Secondary Text & Placeholders */
+body.dark-theme .header-info p,
+body.dark-theme .setting-info p,
+body.dark-theme .book-meta,
+body.dark-theme .stat-info p,
+body.dark-theme ::placeholder {
+    color: var(--text-muted) !important;
+}
+
+/* Success Status Text (Green) */
+body.dark-theme [style*="color: green"],
+body.dark-theme [style*="color:green"],
+body.dark-theme .status-available,
+body.dark-theme .success-text {
+    color: var(--text-success) !important;
+}
+
+/* Tables & Borders */
+body.dark-theme .dash-table th,
+body.dark-theme .dash-table td {
+    border-bottom-color: var(--border-subtle) !important;
+}
+body.dark-theme .modal-header,
+body.dark-theme .modal-footer {
+    border-color: var(--border-subtle) !important;
+}
+
+/* Night Mode (Eye Comfort Filter) */
+body.night-mode {
+    filter: sepia(0.3) hue-rotate(-15deg) brightness(0.9) contrast(0.95);
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: var(--transition);
+}
+
+ul {
+    list-style: none;
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+    display: inline-block;
+    user-select: none;
+}
+
+.btn-red {
+    background-color: var(--primary-red);
+    color: var(--pure-white);
+}
+
+.btn-red:hover {
+    background-color: var(--dark-red);
+    box-shadow: var(--shadow);
+}
+
+.btn-red-outline {
+    background-color: transparent;
+    color: var(--primary-red);
+    border: 1px solid var(--primary-red);
+    user-select: none;
+}
+
+.btn-red-outline:hover {
+    background-color: var(--primary-red);
+    color: var(--pure-white);
+}
+
+/* Custom Icon Buttons */
+.btn-icon-delete {
+    background-color: transparent;
+    color: var(--slate-gray);
+    border: 1px solid var(--slate-gray);
+}
+.btn-icon-delete:hover {
+    background-color: var(--primary-red);
+    color: var(--pure-white);
+    border-color: var(--primary-red);
+}
+
+.btn-icon-edit {
+    background-color: transparent;
+    color: var(--amber);
+    border: 1px solid var(--amber);
+}
+.btn-icon-edit:hover {
+    background-color: var(--amber);
+    color: var(--pure-white);
+}
+
+.btn-icon-box {
+    background-color: transparent;
+    color: var(--medium-gray);
+    border: 1px solid var(--medium-gray);
+}
+.btn-icon-box:hover {
+    background-color: var(--medium-gray);
+    color: var(--pure-white);
+}
+
+.btn-icon-barcode {
+    background-color: transparent;
+    color: #1e3a8a; /* Navy Blue */
+    border: 1px solid #1e3a8a;
+}
+.btn-icon-barcode:hover {
+    background-color: #1e3a8a;
+    color: var(--pure-white);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}

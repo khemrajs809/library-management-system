@@ -1,0 +1,159 @@
+import { Component, inject, signal, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { ToastService } from '../../../services/toast.service';
+import { ModalService } from '../../../services/modal.service';
+import { API_BASE } from '../../../core/api.config';
+
+@Component({
+  selector: 'app-staff-manager',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
+  templateUrl: './staff-manager.html',
+  styleUrl: './staff-manager.css',
+})
+export class StaffManagerComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private http = inject(HttpClient);
+  private toast = inject(ToastService);
+  private modal = inject(ModalService);
+
+  libForm: FormGroup;
+  message = signal<{ type: 'success' | 'error', text: string } | null>(null);
+  loading = signal<boolean>(false);
+  
+  // Librarian Directory State
+  librarians = signal<any[]>([]);
+  editingLibId = signal<string | null>(null);
+  passwordUpdateLoading = signal<boolean>(false);
+
+  ngOnInit() {
+    this.checkAndGenerateId();
+  }
+
+  private checkAndGenerateId() {
+    if (!this.editingLibId() && !this.libForm.get('lib_id')?.value) {
+      this.generateLibrarianId();
+    }
+  }
+
+  constructor() {
+    this.libForm = this.fb.group({
+      lib_id: [null as string | null],
+      name: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
+    });
+
+    this.loadLibrarians();
+  }
+
+  loadLibrarians() {
+    this.http.get<{success: boolean, data: any[]}>(`${API_BASE}/admin/librarians`).subscribe({
+      next: (res) => this.librarians.set(res.data),
+      error: (err) => this.toast.error(err.error?.message || 'Failed to load librarians')
+    });
+  }
+
+  generateLibrarianId() {
+    this.http.get<{success: boolean, id: string}>(`${API_BASE}/admin/librarians/generate-id`).subscribe({
+      next: (res) => this.libForm.patchValue({ lib_id: res.id }),
+      error: () => this.toast.error('Failed to generate Librarian ID')
+    });
+  }
+
+  onSubmit() {
+    if (this.libForm.valid) {
+      this.loading.set(true);
+      this.message.set(null);
+
+      this.http.post(`${API_BASE}/admin/librarians`, this.libForm.value)
+        .subscribe({
+          next: (res: any) => {
+            this.message.set({ type: 'success', text: res.message });
+            this.libForm.reset();
+            this.checkAndGenerateId(); // Fetch next ID
+            this.loading.set(false);
+            this.loadLibrarians(); // Refresh list
+          },
+          error: (err) => {
+            this.message.set({ 
+              type: 'error', 
+              text: err.error.message || 'Failed to create librarian account' 
+            });
+            this.loading.set(false);
+          }
+        });
+    }
+  }
+
+  clearForm() {
+    this.libForm.reset();
+    this.checkAndGenerateId();
+    this.message.set(null);
+  }
+
+  deleteLibrarian(id: string) {
+    this.modal.confirm({
+      title: 'Delete Account',
+      message: `Are you sure you want to permanently delete librarian ${id}? This action cannot be undone.`,
+      confirmText: 'Delete',
+      type: 'danger',
+      onConfirm: () => {
+        this.http.delete(`${API_BASE}/admin/librarians/${id}`).subscribe({
+          next: (res: any) => {
+            this.toast.success(res.message);
+            this.loadLibrarians();
+          },
+          error: (err) => this.toast.error('Deletion failed')
+        });
+      }
+    });
+  }
+
+  toggleEdit(libId: string | null) {
+    this.editingLibId.set(libId);
+  }
+
+  onUpdatePassword(libId: string, newPass: string) {
+    if (!newPass || newPass.length < 6) {
+      this.toast.warning('Password must be at least 6 characters');
+      return;
+    }
+
+    this.passwordUpdateLoading.set(true);
+    this.http.put(`${API_BASE}/admin/librarians/${libId}/password`, { password: newPass }).subscribe({
+      next: (res: any) => {
+        this.toast.success(res.message);
+        this.editingLibId.set(null);
+        this.passwordUpdateLoading.set(false);
+      },
+      error: (err) => {
+        this.toast.error(err.error.message || 'Update failed');
+        this.passwordUpdateLoading.set(false);
+      }
+    });
+  }
+
+  toggleStatus(libId: string, currentStatus: string) {
+    const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+    const actionText = newStatus === 'active' ? 'Activate' : 'Deactivate';
+    
+    this.modal.confirm({
+      title: `${actionText} Librarian`,
+      message: `Are you sure you want to ${actionText.toLowerCase()} librarian ${libId}?`,
+      confirmText: actionText,
+      type: newStatus === 'active' ? 'info' : 'warning',
+      onConfirm: () => {
+        this.http.patch(`${API_BASE}/admin/librarians/${libId}/status`, { status: newStatus }).subscribe({
+          next: (res: any) => {
+            this.toast.success(res.message);
+            this.loadLibrarians();
+          },
+          error: (err) => this.toast.error(err.error?.message || 'Status update failed')
+        });
+      }
+    });
+  }
+}

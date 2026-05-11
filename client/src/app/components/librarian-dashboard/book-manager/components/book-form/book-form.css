@@ -1,0 +1,8 @@
+@import "../../../librarian-dashboard.css";
+@import "../../book-manager.css";
+
+/* Component-specific overrides if any */
+:host {
+  display: block;
+  width: 100%;
+}
