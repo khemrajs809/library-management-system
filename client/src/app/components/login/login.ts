@@ -1,15 +1,15 @@
 import { Component, inject, OnInit, signal, OnDestroy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth';
 import { Router } from '@angular/router';
 import { SpinnerComponent } from '../animations/spinner/spinner';
-import { Carousel3DComponent } from '../animations/carousel/carousel';
 import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-login',
-  imports: [RouterLink, FormsModule, SpinnerComponent, Carousel3DComponent],
+  imports: [RouterLink, FormsModule, SpinnerComponent, CommonModule],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })

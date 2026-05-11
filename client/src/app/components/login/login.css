@@ -12,18 +12,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 120px;
     width: 100%;
     max-width: 1400px;
 }
 
-.carousel-column {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    max-width: 450px;
-}
 
 .login-card {
     background-color: var(--pure-white);

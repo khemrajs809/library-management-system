@@ -1,11 +1,10 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth';
-import { FadeInComponent } from '../animations/fade-in/fade-in';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, FadeInComponent],
+  imports: [RouterLink],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })

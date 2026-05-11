@@ -24,10 +24,9 @@ const auditLog = (actionDescription) => {
 
                 // Non-blocking log to DB
                 pool.query(
-                    'INSERT INTO audit_logs (user_id, user_role, action, details) VALUES (?, ?, ?, ?)',
+                    'INSERT INTO activity_log (performed_by, action, details) VALUES (?, ?, ?)',
                     [
-                        user.id || user.email || 'unknown', 
-                        user.role, 
+                        user.id || user.email || 'anonymous', 
                         actionDescription, 
                         JSON.stringify(details)
                     ]

@@ -2,12 +2,11 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Member } from '../../../../../models/member.model';
 import { SkeletonLoaderComponent } from '../../../../animations/skeleton-loader/skeleton-loader';
-import { FadeInComponent } from '../../../../animations/fade-in/fade-in';
 
 @Component({
   selector: 'app-member-table',
   standalone: true,
-  imports: [CommonModule, SkeletonLoaderComponent, FadeInComponent],
+  imports: [CommonModule, SkeletonLoaderComponent],
   templateUrl: './member-table.html',
   styleUrl: './member-table.css'
 })

@@ -2,12 +2,11 @@ import { Component, Input, Output, EventEmitter, signal, computed } from '@angul
 import { CommonModule } from '@angular/common';
 import { Book } from '../../../../../models/book.model';
 import { SkeletonLoaderComponent } from '../../../../../components/animations/skeleton-loader/skeleton-loader';
-import { FadeInComponent } from '../../../../../components/animations/fade-in/fade-in';
 
 @Component({
   selector: 'app-book-list',
   standalone: true,
-  imports: [CommonModule, SkeletonLoaderComponent, FadeInComponent],
+  imports: [CommonModule, SkeletonLoaderComponent],
   templateUrl: './book-list.html',
   styleUrl: './book-list.css'
 })
