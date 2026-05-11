@@ -85,7 +85,18 @@
 .ds-style-210136cf { background:transparent; border:none; padding: 4px 8px; font-size:1rem; cursor:pointer; }
 
 
-.input-focus-red:focus { border-color: #b91c1c !important; outline: none !important; }
+.clickable-row {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.clickable-row:hover {
+    transform: scale(1.002) translateY(-1px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    background-color: #fffaf5 !important;
+    z-index: 5;
+    position: relative;
+}
 
 
 

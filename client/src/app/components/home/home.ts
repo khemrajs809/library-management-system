@@ -1,10 +1,11 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth';
+import { ANIMATION_COMPONENTS } from '../animations/animations';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink],
+  imports: [RouterLink, ...ANIMATION_COMPONENTS],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })

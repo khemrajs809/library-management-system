@@ -13,16 +13,14 @@ import { CirculationDeskComponent } from './circulation-desk/circulation-desk';
 import { Router, NavigationStart } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
-import JsBarcode from 'jsbarcode';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import { FineManagerComponent } from './fine-manager/fine-manager';
 import { ModalService } from '../../services/modal.service';
+import { MemberProfileComponent } from './member-profile/member-profile';
 
 @Component({
   selector: 'app-librarian-dashboard',
   standalone: true,
-  imports: [CommonModule, BookManagerComponent, MemberManagerComponent, CirculationDeskComponent, FineManagerComponent],
+  imports: [CommonModule, BookManagerComponent, MemberManagerComponent, CirculationDeskComponent, FineManagerComponent, MemberProfileComponent],
   templateUrl: './librarian-dashboard.html',
   styleUrl: './librarian-dashboard.css',
 })
@@ -98,52 +96,17 @@ export class LibrarianDashboardComponent implements OnDestroy {
       next: (res) => { 
         this.viewingMember.set(res.data); 
         this.isProfileLoading.set(false); 
-        setTimeout(() => this.renderProfileBarcode(), 100);
       },
-      error: () => { this.viewingMember.set(null); this.isProfileLoading.set(false); this.toastService.error('Failed to load member profile'); }
+      error: () => { 
+        this.viewingMember.set(null); 
+        this.isProfileLoading.set(false); 
+        this.toastService.error('Failed to load member profile'); 
+      }
     });
   }
 
-  renderProfileBarcode() {
-    const svg = document.getElementById('profileBarcodeSvg');
-    const pdfSvg = document.getElementById('pdfBarcodeSvg');
-    if (this.viewingMember()) {
-      const opts = { format: 'CODE128', width: 1.5, height: 40, displayValue: false, margin: 0 };
-      if (svg) JsBarcode(svg, this.viewingMember()!.member.member_id, opts);
-      if (pdfSvg) JsBarcode(pdfSvg, this.viewingMember()!.member.member_id, { ...opts, height: 50, width: 2 });
-    }
-  }
-
-  closeProfile() { this.viewingMember.set(null); }
-
-  async downloadProfile() {
-    const element = document.getElementById('professionalProfilePdf');
-    if (!element) return;
-    
-    this.toastService.info('Generating official profile report...');
-    
-    try {
-      const canvas = await html2canvas(element, {
-        scale: 3, // Higher quality for official docs
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff'
-      });
-      
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-      
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`Member_Profile_${this.viewingMember()?.member.member_id}.pdf`);
-      
-      this.toastService.success('Profile downloaded successfully');
-    } catch (error) {
-      console.error('PDF Generation Error:', error);
-      this.toastService.error('Failed to generate PDF');
-    }
+  closeProfile() { 
+    this.viewingMember.set(null); 
   }
 
   onModalClick(event: Event) {

@@ -1,7 +1,6 @@
-import { Component, Input, Output, EventEmitter, signal, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType } from '@zxing/library';
-import { Member } from '../../../../../models/member.model';
 
 @Component({
   selector: 'app-return-scanner',
@@ -10,7 +9,7 @@ import { Member } from '../../../../../models/member.model';
   templateUrl: './return-scanner.html',
   styleUrl: './return-scanner.css'
 })
-export class ReturnScannerComponent {
+export class ReturnScannerComponent implements OnDestroy {
   @Input() scannedIssue: any | null = null;
   @Input() uploadsBase = '';
   @Input() isProcessing = false;
@@ -56,6 +55,9 @@ export class ReturnScannerComponent {
     this.codeReader = new BrowserMultiFormatReader(hints);
     this.codeReader.decodeFromConstraints({ video: { facingMode: 'environment' } }, videoId, (result) => {
       if (result) onScan(result.getText());
+    }).catch(err => {
+      console.error('Camera Error:', err);
+      this.isBookCameraActive = false;
     });
   }
 

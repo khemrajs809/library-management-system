@@ -18,6 +18,7 @@
   </div>
   <app-skeleton-loader [loading]="isLoading" message="Fetching book inventory...">
     @if (viewMode === 'grid') {
+    <app-fade-in>
       <div class="book-grid ds-style-2e4df57a">
         @if (books.length === 0) {
         <div class="empty-state ds-style-4523fa21">No books found. Add books using the form or import a CSV.</div>
@@ -59,6 +60,7 @@
         }
         }
       </div>
+    </app-fade-in>
     } @else {
     <div class="ds-style-43d1d7e1">
       <table class="lib-table ds-style-55f44ed8">
@@ -144,20 +146,25 @@
   </app-skeleton-loader>
 
   <!-- Pagination Controls -->
-  <div class="pagination-controls ds-style-36f9b7a9">
-    <button class="btn btn-sm ds-style-593c1773" (click)="onPageChange.emit(pagination.page - 1)" [disabled]="pagination.page === 1">Previous</button>
+  <div class="pagination-controls">
+    <button class="btn btn-sm btn-red-outline" (click)="onPageChange.emit(pagination.page - 1)" [disabled]="pagination.page === 1">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      Previous
+    </button>
     
-    <div class="ds-style-aa3bc8c">
+    <div class="pagination-numbers">
       @for (p of paginationArray(); track p) {
-        <button class="btn btn-sm ds-style-210136cf" 
-          [class.text-black]="p === pagination.page" [class.text-blue]="p !== pagination.page" 
-          [class.fw-bold]="p === pagination.page" [class.fw-normal]="p !== pagination.page" 
+        <button class="page-number" 
+          [class.active]="p === pagination.page"
           (click)="onPageChange.emit(p)">
           {{ p }}
         </button>
       }
     </div>
-
-    <button class="btn btn-sm ds-style-593c1773" (click)="onPageChange.emit(pagination.page + 1)" [disabled]="pagination.page === pagination.totalPages">Next</button>
+ 
+    <button class="btn btn-sm btn-red-outline" (click)="onPageChange.emit(pagination.page + 1)" [disabled]="pagination.page === pagination.totalPages">
+      Next
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    </button>
   </div>
 </div>

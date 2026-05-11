@@ -39,17 +39,6 @@ const initDB = async () => {
         await pool.query(`
             ALTER TABLE users ADD COLUMN IF NOT EXISTS status ENUM('active', 'inactive') DEFAULT 'active';
         `);
-        
-        // Ensure activity_log table exists for audit logging
-        await pool.query(`
-            CREATE TABLE IF NOT EXISTS activity_log (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                action VARCHAR(255) NOT NULL,
-                details TEXT,
-                performed_by VARCHAR(100),
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        `);
         console.log('✅ Database tables verified.');
     } catch (err) {
         console.error('❌ Database initialization error:', err);

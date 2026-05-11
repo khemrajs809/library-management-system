@@ -82,134 +82,72 @@
 
   <!-- Member Profile Modal Overlay -->
   @if (selectedMember()) {
-    <div class="modal-overlay ds-style-b72de35" (click)="closeMemberDetails()">
-      <div class="modal-content profile-overlay-content ds-style-4121cf81" (click)="stopPropagation($event)">
+    <div class="modal-overlay" (click)="closeMemberDetails()">
+      <div class="profile-modal-card" (click)="stopPropagation($event)">
+        <button class="modal-close-btn" (click)="closeMemberDetails()">&times;</button>
         
-        <!-- Left Sidebar: Photo & Core Actions (30%) -->
-        <div class="ds-style-17828592">
-          
-          <button class="btn-close ds-style-7312348e" (click)="closeMemberDetails()">&times;</button>
-
-          <!-- Photo Container -->
-          <div class="ds-style-6b5ecc08">
-            @if (selectedMember()?.photo_url) {
-              <img [src]="uploadsBase + selectedMember()?.photo_url" crossorigin="anonymous" class="ds-style-363d597c">
-            } @else {
-              <div class="ds-style-5e79cbc2">
-                <svg width="100" height="100" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-              </div>
-            }
-          </div>
-
-          <div class="ds-style-5b86a960">
-            <div class="ds-style-7de8c3ac">
-              <span class="ds-style-69f7b4d">ID: {{ selectedMember()?.member_id }}</span>
-              <span class="ds-style-715cc050">{{ selectedMember()?.membership_type }}</span>
+        <div class="profile-header">
+          <span class="profile-category">Member Identity</span>
+          <div class="profile-main-info">
+            <div class="profile-photo-wrap">
+              @if (selectedMember()?.photo_url) {
+                <img [src]="uploadsBase + selectedMember()?.photo_url" crossorigin="anonymous" class="profile-img">
+              } @else {
+                <div class="profile-img-placeholder">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                </div>
+              }
             </div>
-            <h1 class="ds-style-7f9280d9">{{ selectedMember()?.name }}</h1>
-            <p class="ds-style-3187f0b1">{{ selectedMember()?.course }} - {{ selectedMember()?.department }}</p>
-
+            <div class="profile-identity">
+              <h2>{{ selectedMember()?.name }}</h2>
+              <span class="id-badge">ID: {{ selectedMember()?.member_id }}</span>
+            </div>
           </div>
         </div>
 
-        <!-- Right Content (70%): Details -->
-        <div class="ds-style-2e1de126">
-          
-          <div class="ds-style-2476c98f">
-            <h2 class="ds-style-73a0dcf1">Member Profile File</h2>
-            <div class="ds-style-4bd115fd">
-              <div class="ds-style-55738656">
-                <div class="ds-style-46f25021">Status</div>
-                <div [class.text-success]="selectedMember()?.account_status === 'Active'" [class.text-danger]="selectedMember()?.account_status !== 'Active'" class="ds-style-2c1dfd51">
-                  {{ selectedMember()?.account_status || 'Active' }}
-                  @if (selectedMember()?.account_status === 'Suspended') {
-                    <span class="ds-style-3d4ef03a">(MEMBERSHIP EXPIRED)</span>
-                  }
-                </div>
-              </div>
-              <div class="ds-style-55738656">
-                <div class="ds-style-46f25021">Book Limit</div>
-                <div class="ds-style-4a9d2ce9">{{ selectedMember()?.max_book_limit || 3 }}</div>
-              </div>
+        <div class="profile-divider"></div>
+
+        <div class="profile-grid">
+          <div class="grid-item">
+            <label>Course & Dept</label>
+            <div class="value">{{ selectedMember()?.course || 'N/A' }} ({{ selectedMember()?.department || 'N/A' }})</div>
+          </div>
+          <div class="grid-item">
+            <label>Year/Sem & Session</label>
+            <div class="value">{{ selectedMember()?.year_semester || 'N/A' }} | {{ selectedMember()?.academic_session || 'N/A' }}</div>
+          </div>
+          <div class="grid-item">
+            <label>Membership Type</label>
+            <div class="value">{{ selectedMember()?.membership_type || 'Student' }}</div>
+          </div>
+          <div class="grid-item">
+            <label>Status / Dues</label>
+            <div class="value">
+              <span [class.text-success]="selectedMember()?.account_status === 'Active'" [class.text-danger]="selectedMember()?.account_status !== 'Active'">
+                {{ selectedMember()?.account_status || 'Active' }}
+              </span>
+              <span class="divider-pipe">|</span>
+              <span [class.text-success]="selectedMember()?.no_dues_status === 1" [class.text-danger]="selectedMember()?.no_dues_status !== 1">
+                {{ selectedMember()?.no_dues_status === 1 ? 'Clear' : 'Pending' }}
+              </span>
             </div>
           </div>
-
-          <div class="ds-style-55716408">
-            <div class="ds-style-1060f655">
-              <h3 class="ds-style-744692a7">Personal Information</h3>
-              <div class="ds-style-38bff0a8">
-                <div class="ds-style-14f4a9ff">
-                  <span class="ds-style-59c780a4">{{ selectedMember()?.dob | date:'dd/MM/yyyy' }}</span>
-                </div>
-                <div class="ds-style-14f4a9ff">
-                  <span class="ds-style-453e7c60">Gender</span>
-                  <span class="ds-style-59c780a4">{{ selectedMember()?.gender }}</span>
-                </div>
-                <div class="ds-style-14f4a9ff">
-                  <span class="ds-style-453e7c60">Blood Group</span>
-                  <span class="ds-style-78222686">{{ selectedMember()?.blood_group || 'N/A' }}</span>
-                </div>
-                <div class="ds-style-14f4a9ff">
-                  <span class="ds-style-453e7c60">Phone</span>
-                  <span class="ds-style-59c780a4">{{ selectedMember()?.phone }}</span>
-                </div>
-                <div class="ds-style-7e6e37a4">
-                  <span class="ds-style-453e7c60">Email</span>
-                  <span class="ds-style-50fb25d3">{{ selectedMember()?.email }}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="ds-style-1060f655">
-              <h3 class="ds-style-744692a7">Academic Credentials</h3>
-              <div class="ds-style-38bff0a8">
-                <div class="ds-style-14f4a9ff">
-                  <span class="ds-style-453e7c60">Roll Number</span>
-                  <span class="ds-style-1fb2c4bd">{{ selectedMember()?.roll_number || 'N/A' }}</span>
-                </div>
-                <div class="ds-style-14f4a9ff">
-                  <span class="ds-style-453e7c60">Year / Semester</span>
-                  <span class="ds-style-59c780a4">{{ selectedMember()?.year_semester || 'N/A' }}</span>
-                </div>
-                <div class="ds-style-14f4a9ff">
-                  <span class="ds-style-453e7c60">Session</span>
-                  <span class="ds-style-59c780a4">{{ selectedMember()?.academic_session || 'N/A' }}</span>
-                </div>
-                <div class="ds-style-14f4a9ff">
-                  <span class="ds-style-637d1cbf">{{ selectedMember()?.membership_expiry | date:'dd/MM/yyyy' }}</span>
-                </div>
-                <div class="ds-style-7e6e37a4">
-                  <span class="ds-style-453e7c60">HOD Name</span>
-                  <span class="ds-style-59c780a4">{{ selectedMember()?.hod_name || 'N/A' }}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="ds-style-57aef6df">
-              <h3 class="ds-style-744692a7">Address & Guardian Info</h3>
-              <div class="ds-style-62bda2ce">
-                <div>
-                  <h4 class="ds-style-2a3aeff5">Current Address</h4>
-                  <p class="ds-style-2ac14912">{{ selectedMember()?.current_address || 'N/A' }}</p>
-                  <h4 class="ds-style-2f6b3bdd">Permanent Address</h4>
-                  <p class="ds-style-2ac14912">{{ selectedMember()?.permanent_address || 'N/A' }}</p>
-                </div>
-                <div class="ds-style-7baa9f15">
-                  <h4 class="ds-style-10d7ff10">Guardian Details</h4>
-                  <div class="ds-style-679ea923">
-                    <div class="ds-style-43566f4e">
-                      <span class="ds-style-453e7c60">Name</span>
-                      <span class="ds-style-59c780a4">{{ selectedMember()?.guardian_name || 'N/A' }}</span>
-                    </div>
-                    <div class="ds-style-43566f4e">
-                      <span class="ds-style-453e7c60">Phone</span>
-                      <span class="ds-style-59c780a4">{{ selectedMember()?.guardian_phone || 'N/A' }}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div class="grid-item">
+            <label>Contact</label>
+            <div class="value">{{ selectedMember()?.phone || 'N/A' }}</div>
           </div>
+          <div class="grid-item">
+            <label>Email Address</label>
+            <div class="value">{{ selectedMember()?.email || 'N/A' }}</div>
+          </div>
+          <div class="grid-item full-width">
+            <label>Current Address</label>
+            <div class="value small-text">{{ selectedMember()?.current_address || 'N/A' }}</div>
+          </div>
+        </div>
+
+        <div class="profile-footer">
+          <button class="btn btn-crimson" (click)="closeMemberDetails()">Close Profile</button>
         </div>
       </div>
     </div>

@@ -1,0 +1,16 @@
+<div class="scene">
+  <div class="carousel" [style.transform]="'translateZ(-240px) rotateY(' + currentAngle() + 'deg)'">
+    @for (cell of cells; track cell.id; let i = $index) {
+      <div class="carousel__cell" 
+           [style.transform]="'rotateY(' + (i * 60) + 'deg) translateZ(240px)'">
+        <div class="card-inner" [style.background-color]="cell.bg">
+          <div class="card-glass"></div>
+          <div class="card-content">
+            <span class="card-icon" [style.color]="cell.color">{{ cell.icon }}</span>
+            <span class="card-title">{{ cell.title }}</span>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

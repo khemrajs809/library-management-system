@@ -201,7 +201,12 @@ export class MemberManagerComponent implements OnInit, OnChanges {
       metadata: [
         { label: 'Member ID', value: member.member_id, color: '#ef4444' },
         { label: 'Name', value: member.name },
-        { label: 'Course', value: member.course || 'N/A' }
+        { label: 'Course & Dept', value: `${member.course || 'N/A'} (${member.department || 'N/A'})` },
+        { label: 'Year/Sem & Session', value: `${member.year_semester || 'N/A'} | ${member.academic_session || 'N/A'}` },
+        { label: 'Membership Type', value: member.membership_type || 'Other' },
+        { label: 'Status / Dues', value: `${member.account_status || 'Active'} | ${member.no_dues_status === 1 ? 'Clear' : 'Pending'}` },
+        { label: 'Contact', value: member.phone || 'N/A' },
+        { label: 'Email Address', value: member.email || 'N/A', fullWidth: true }
       ],
       type: 'danger',
       confirmText: 'Delete Member',

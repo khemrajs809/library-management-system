@@ -1,48 +1,3 @@
-@import "../librarian-dashboard.css";
-
-/* Extracted Inline Styles */
-.ds-style-25465226 { display:flex; flex-direction:column; gap:0.5rem; }
-.ds-style-4c54f546 { display:flex; gap:1rem; align-items:stretch; margin-top: 0.5rem; }
-.ds-style-7dee73f7 { flex: 1.6; padding: 1rem; }
-.ds-style-64f518b1 { margin-top:0; }
-.ds-style-331f7af5 { color: #1e293b; text-align:center; padding:1rem; }
-.ds-style-6473e69 { padding:10px 0; border-bottom:1px solid #f1f5f9; display:flex; gap:12px; align-items:start; }
-.ds-style-4f283206 { background:#fee2e2; color:var(--primary-red); width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.ds-style-6d2580ad { font-size:0.85rem; font-weight:600; color:#1e293b; }
-.ds-style-5416046e { font-size:0.75rem; color: #1e293b; }
-.ds-style-1a0f214f { flex: 1; min-width: 850px; display: flex; align-items: center; justify-content: center; background: #fffcfc; border-radius: 20px; border: 1.5px solid #f9e7e7; padding: 4rem; }
-.ds-style-e4e0832 { display:flex; gap:0.5rem; align-items:start; flex-wrap:wrap; }
-.ds-style-64d4cb3f { flex:1; min-width:600px; }
-.ds-style-4975c694 { position:absolute; left:-9999px; width: 900px; height: 800px; }
-.ds-style-b72de35 { background: rgba(255,255,255,0.95); z-index: 10000; padding: 0; }
-.ds-style-4121cf81 { max-width: 1100px; width: 95%; padding: 0; background: transparent; box-shadow: none; display: flex; height: 85vh; max-height: 750px; gap: 2.5rem; }
-.ds-style-17828592 { width: 30%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff5ee; border-radius: 30px; padding: 2rem; box-shadow: 0 20px 40px rgba(0,0,0,0.05); position: relative; }
-.ds-style-7312348e { position: absolute; top: 1rem; right: 1rem; background: rgba(0,0,0,0.05); border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; }
-.ds-style-6b5ecc08 { width: 100%; max-width: 250px; aspect-ratio: 1/1; background: white; border-radius: 50%; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 8px solid white; margin-bottom: 2rem; }
-.ds-style-363d597c { width:100%; height:100%; object-fit:cover; }
-.ds-style-5e79cbc2 { width:100%; height:100%; background:#fee2e2; display:flex; align-items:center; justify-content:center; font-size:6rem; color: #b91c1c; }
-.ds-style-5b86a960 { text-align: center; width: 100%; }
-.ds-style-7de8c3ac { display: flex; justify-content: center; gap: 10px; margin-bottom: 0.5rem; }
-.ds-style-69f7b4d { background: #fbbf24; color: #78350f; padding: 4px 14px; border-radius: 6px; font-size: 1rem; font-weight: 800; }
-.ds-style-715cc050 { background: rgba(255,255,255,0.4); padding: 4px 14px; border-radius: 6px; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; color:#1e293b; }
-.ds-style-7f9280d9 { font-size: 2.2rem; margin: 0; font-weight: 900; line-height: 1.1; letter-spacing: -0.5px; color: #a51d2d; }
-.ds-style-3187f0b1 { font-size: 1.1rem; margin: 0.5rem 0 0; color: #1e293b; font-weight: 500; }
-.ds-style-2e1de126 { width: 70%; height: 100%; display: flex; flex-direction: column; overflow-y: auto; padding: 0.5rem 1rem 0.5rem 0; scrollbar-width: thin; }
-.ds-style-2476c98f { padding: 1.5rem 2.5rem; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
-.ds-style-73a0dcf1 { margin: 0; font-size: 1.5rem; font-weight: 900; color: #1e293b; letter-spacing: -0.5px; }
-.ds-style-4bd115fd { display: flex; gap: 2rem; }
-.ds-style-55738656 { text-align: right; }
-.ds-style-46f25021 { font-size: 0.75rem; font-weight: 800; color: #1e293b; text-transform: uppercase; }
-.ds-style-2c1dfd51 { font-size: 1.2rem; font-weight: 900; }
-.ds-style-3d4ef03a { display:block; font-size:10px; color: #b91c1c; font-weight:900; margin-top:4px; }
-.ds-style-4a9d2ce9 { font-size: 1.2rem; font-weight: 900; color: #1e40af; }
-.ds-style-55716408 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-.ds-style-1060f655 { background: white; border-radius: 20px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #f8fafc; }
-.ds-style-744692a7 { margin-top:0; color:#a51d2d; font-size:1.1rem; border-bottom:2px solid #fee2e2; padding-bottom:0.5rem; margin-bottom:1.5rem; }
-.ds-style-38bff0a8 { display: flex; flex-direction: column; gap: 1rem; }
-.ds-style-14f4a9ff { display:flex; justify-content:space-between; border-bottom:1px dashed #f1f5f9; padding-bottom:8px; }
-.ds-style-453e7c60 { color: #1e293b; font-weight:600; font-size:0.9rem; }
-.ds-style-59c780a4 { color:#1e293b; font-weight:700; font-size:0.9rem; }
 .ds-style-78222686 { color: #b91c1c; font-weight:800; font-size:0.9rem; }
 .ds-style-7e6e37a4 { display:flex; justify-content:space-between; padding-bottom:8px; }
 .ds-style-50fb25d3 { color: #1e40af; font-weight:700; font-size:0.9rem; }
@@ -111,3 +66,67 @@
 
 
 
+
+/* ─── Professional Identity Card ─── */
+.id-card {
+    width: 324px;
+    height: 204px;
+    background: linear-gradient(135deg, #ffffff 0%, #fcfcfc 100%);
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+.card-header {
+    background-color: #7f1d1d;
+    color: #ffffff !important;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card-logo { width: 30px; height: 30px; object-fit: contain; }
+.card-header h2 { font-size: 14px; margin: 0; font-weight: 800; letter-spacing: 0.5px; }
+
+.card-body {
+    flex: 1;
+    display: flex;
+    padding: 12px;
+    gap: 12px;
+}
+
+.card-photo {
+    width: 85px;
+    height: 105px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #f8fafc;
+}
+
+.card-photo img { width: 100%; height: 100%; object-fit: cover; }
+.card-photo-placeholder {
+    width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+    background: #fee2e2; color: #b91c1c; font-size: 32px; font-weight: 800;
+}
+
+.card-details { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.card-details h3 { font-size: 15px; font-weight: 800; color: #b91c1c; margin: 0 0 2px 0; }
+.detail-item { font-size: 10px; color: #475569; font-weight: 600; line-height: 1.2; }
+.detail-item strong { color: #1e293b; font-weight: 700; }
+
+.card-footer {
+    padding: 8px 12px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card-barcode svg { height: 35px; width: auto; }
