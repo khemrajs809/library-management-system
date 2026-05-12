@@ -4,13 +4,15 @@ import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth';
 import { ModalService } from '../../services/modal.service';
 import { StaffManagerComponent } from './staff-manager/staff-manager';
-import { ArchiveManagerComponent } from './archive-manager/archive-manager';
+import { DeletedBooksComponent } from './deleted-books/deleted-books';
+import { DeletedMembersComponent } from './deleted-members/deleted-members';
 import { AuditLogViewerComponent } from './audit-log-viewer/audit-log-viewer';
+import { SessionMonitorComponent } from './session-monitor/session-monitor';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, StaffManagerComponent, ArchiveManagerComponent, AuditLogViewerComponent],
+  imports: [CommonModule, RouterModule, StaffManagerComponent, DeletedBooksComponent, DeletedMembersComponent, AuditLogViewerComponent, SessionMonitorComponent],
   templateUrl: './admin-dashboard.html',
   styleUrl: './admin-dashboard.css',
 })
@@ -35,3 +37,4 @@ export class AdminDashboardComponent {
     });
   }
 }
+

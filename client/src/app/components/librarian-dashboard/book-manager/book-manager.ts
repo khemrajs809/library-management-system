@@ -33,7 +33,7 @@ export class BookManagerComponent implements OnInit {
   private modalService = inject(ModalService);
 
   books        = signal<Book[]>([]);
-  pagination   = signal<any>({ page: 1, limit: 50, totalPages: 1, total: 0 });
+  pagination   = signal<any>({ page: 1, limit: 8, totalPages: 1, total: 0 });
   viewMode     = signal<'grid' | 'list'>('grid');
   isEditing    = signal<boolean>(false);
   isLoading    = signal<boolean>(false);

@@ -5,3 +5,43 @@
   display: block;
   width: 100%;
 }
+
+.ds-data-value {
+    color: #0f172a !important; /* High contrast dark navy */
+    font-weight: 800 !important;
+    font-size: 1rem !important; /* Increased from inline 0.95rem */
+}
+
+.meta {
+    color: #334155 !important; /* Darker gray for better legibility */
+    font-weight: 600;
+    font-size: 0.8rem !important; /* Increased from 0.7rem */
+}
+
+.ds-id-pill {
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    font-size: 0.75rem !important;
+}
+
+.ds-admin-table th {
+    background: #145277 !important;
+    color: white !important;
+    font-size: 0.75rem !important; /* Increased from 0.65rem */
+    letter-spacing: 0.08em !important;
+    padding: 12px 15px !important;
+}
+
+.ds-admin-table tbody tr:nth-child(odd) {
+    background-color: #fff1e6 !important; /* Almond */
+}
+
+.ds-admin-table tbody tr:nth-child(even) {
+    background-color: #f0efeb !important; /* Off-white */
+}
+
+.ds-admin-table tbody tr:hover {
+    background-color: #e2e8f0 !important;
+}

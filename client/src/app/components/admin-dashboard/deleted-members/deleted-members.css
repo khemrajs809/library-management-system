@@ -1,0 +1,245 @@
+/* Page Wrapper */
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Header Bar */
+.page-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px 28px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.page-title-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.page-icon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #145277, #1e7bae);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 4px 12px rgba(20, 82, 119, 0.3);
+}
+
+.page-title-group h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 4px 0;
+}
+
+.page-title-group p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+
+.page-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.count-badge {
+  background: #eff6ff;
+  color: #145277;
+  border: 1px solid #bfdbfe;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+.btn-refresh {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  font-size: 13px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-refresh:hover {
+  background: #145277;
+  color: #fff;
+  border-color: #145277;
+}
+
+/* Table Card */
+.table-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  overflow: hidden;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+/* Table */
+.del-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.del-table thead th {
+  background-color: #145277;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 14px 18px;
+  text-align: left;
+  border: none;
+  white-space: nowrap;
+}
+
+.del-table thead th.text-right {
+  text-align: right;
+}
+
+.del-table tbody tr:nth-child(odd) {
+  background-color: #fff1e6;
+}
+
+.del-table tbody tr:nth-child(even) {
+  background-color: #f0efeb;
+}
+
+.del-table tbody tr:hover {
+  background-color: #fde8d4;
+  transition: background-color 0.2s ease;
+}
+
+.del-table td {
+  padding: 14px 18px;
+  font-size: 14px;
+  color: #1e293b;
+  border-bottom: 1px solid rgba(20, 82, 119, 0.06);
+  vertical-align: middle;
+}
+
+/* Member Cell */
+.member-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.member-photo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  flex-shrink: 0;
+}
+
+.photo-placeholder {
+  width: 40px;
+  height: 40px;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.member-name {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.id-badge {
+  background: #e0f2fe;
+  color: #145277;
+  border: 1px solid #bae6fd;
+  font-family: monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.email-text {
+  font-size: 13px;
+  color: #475569;
+}
+
+/* Action Buttons */
+.text-right { text-align: right; }
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.btn {
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.btn-restore {
+  background: none;
+  border-color: #bbf7d0;
+  color: #166534;
+}
+
+.btn-restore:hover {
+  background: #166534;
+  color: #fff;
+}
+
+.btn-perm-delete {
+  background: none;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.btn-perm-delete:hover {
+  background: #b91c1c;
+  color: #fff;
+}
+
+/* States */
+.loading-state,
+.empty-state {
+  text-align: center;
+  padding: 60px 20px !important;
+  color: #94a3b8;
+  font-size: 15px;
+}
+
+.empty-icon {
+  font-size: 40px;
+  margin-bottom: 10px;
+}

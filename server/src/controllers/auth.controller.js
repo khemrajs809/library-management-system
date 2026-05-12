@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const pool = require('../db');
 const { sendEmail } = require('../services/email.service');
 const crypto = require('crypto');
+const { logSession } = require('../services/session.service');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
@@ -26,6 +27,15 @@ const login = async (req, res) => {
             const { attempts, lockout_until } = lockoutRows[0];
             if (lockout_until && new Date(lockout_until) > new Date()) {
                 const waitTime = Math.ceil((new Date(lockout_until) - new Date()) / 1000 / 60);
+                const ipAddress = req.ip || req.connection?.remoteAddress || '';
+                const userAgent = req.headers['user-agent'] || '';
+                await logSession({
+                    email,
+                    ipAddress,
+                    userAgent,
+                    status: 'blocked',
+                    failureReason: 'Account temporarily locked due to too many failed attempts'
+                });
                 return res.status(403).json({ 
                     success: false, 
                     message: `Account is temporarily locked due to too many failed attempts. Try again in ${waitTime} minutes.` 
@@ -58,6 +68,17 @@ const login = async (req, res) => {
 
             // --- STATUS CHECK ---
             if (user.status === 'inactive') {
+                const ipAddress = req.ip || req.connection?.remoteAddress || '';
+                const userAgent = req.headers['user-agent'] || '';
+                await logSession({
+                    userId: user.id,
+                    userName: user.name,
+                    email,
+                    ipAddress,
+                    userAgent,
+                    status: 'blocked',
+                    failureReason: 'Account deactivated'
+                });
                 return res.status(403).json({ success: false, message: 'Your account is deactivated. Please contact the administrator.' });
             }
 
@@ -101,11 +122,31 @@ const login = async (req, res) => {
             } else {
                 // FAILURE: Increment attempts
                 await handleFailedAttempt(email);
+                const ipAddress = req.ip || req.connection?.remoteAddress || '';
+                const userAgent = req.headers['user-agent'] || '';
+                await logSession({
+                    userId: user.id,
+                    userName: user.name,
+                    email,
+                    ipAddress,
+                    userAgent,
+                    status: 'failed',
+                    failureReason: 'Incorrect password'
+                });
                 return res.status(401).json({ success: false, message: 'Invalid credentials' });
             }
         } else {
             // User not found
             await handleFailedAttempt(email);
+            const ipAddress = req.ip || req.connection?.remoteAddress || '';
+            const userAgent = req.headers['user-agent'] || '';
+            await logSession({
+                email,
+                ipAddress,
+                userAgent,
+                status: 'failed',
+                failureReason: 'User not found'
+            });
             return res.status(401).json({ success: false, message: 'Invalid credentials' });
         }
     } catch (err) {
@@ -152,6 +193,8 @@ const logout = async (req, res) => {
 
             // Mark session as inactive and set logout time
             const result = await pool.query('UPDATE token_blacklist SET status = "inactive", logout_time = NOW() WHERE token = ?', [token]);
+
+            await pool.query('UPDATE user_login_sessions SET session_status = "offline", logout_time = NOW() WHERE token = ?', [token]);
 
             // If it wasn't tracked (legacy or missing), insert full details from token
             if (result.affectedRows === 0) {
@@ -224,6 +267,16 @@ const verifyOTP = async (req, res) => {
              VALUES (?, ?, ?, ?, ?, 'active', ?, ?, ?)`,
             [token, user.id, user.name, user.email, user.role, expiresAt, ipAddress, userAgent]
         );
+
+        await logSession({
+            userId: user.id,
+            userName: user.name,
+            email: user.email,
+            ipAddress,
+            userAgent,
+            status: 'successful',
+            token
+        });
 
         return res.status(200).json({ success: true, message: 'MFA verified, login successful', token });
 

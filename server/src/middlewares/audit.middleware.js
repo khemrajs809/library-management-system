@@ -1,4 +1,5 @@
 const pool = require('../db');
+const { logSessionAction } = require('../services/session.service');
 
 /**
  * Middleware to log high-value actions (POST, PUT, DELETE) into the audit_logs table.
@@ -32,6 +33,19 @@ const auditLog = (actionDescription) => {
                         JSON.stringify(details)
                     ]
                 ).catch(err => console.error('Audit Log Error:', err.message));
+
+                // Also log to user_session_actions if token is available
+                const token = req.header('Authorization')?.split(' ')[1] || req.header('x-auth-token');
+                if (token) {
+                    let actionType = 'data_update';
+                    if (req.method === 'DELETE') {
+                        actionType = 'delete_action';
+                    } else if (actionDescription.toLowerCase().includes('security') || actionDescription.toLowerCase().includes('password') || actionDescription.toLowerCase().includes('status')) {
+                        actionType = 'security_change';
+                    }
+                    logSessionAction(token, actionType, `${actionDescription}`, req.originalUrl)
+                        .catch(err => console.error('Session Action Log Error:', err.message));
+                }
             }
             return originalSend.apply(res, arguments);
         };

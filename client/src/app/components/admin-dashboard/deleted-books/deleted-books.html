@@ -1,0 +1,81 @@
+<div class="page-wrapper">
+  <div class="page-header-bar">
+    <div class="page-title-group">
+      <div>
+        <h2>Deleted Books</h2>
+        <p>Review, restore, or permanently remove deleted books from the archive.</p>
+      </div>
+    </div>
+    <div class="page-meta">
+      <span class="count-badge">{{ deletedBooks().length }} record(s)</span>
+      <button class="btn-refresh" (click)="loadDeletedBooks()">🔄 Refresh</button>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-scroll">
+      <table class="del-table">
+        <thead>
+          <tr>
+            <th>Book</th>
+            <th>ISBN</th>
+            <th>Author</th>
+            <th>Category</th>
+            <th>Year</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading()) {
+            <tr>
+              <td colspan="6" class="loading-state">⏳ Loading deleted books...</td>
+            </tr>
+          } @else if (deletedBooks().length === 0) {
+            <tr>
+              <td colspan="6" class="empty-state">
+                <div class="empty-icon">✅</div>
+                <div>No deleted books in archive.</div>
+              </td>
+            </tr>
+          } @else {
+            @for (book of deletedBooks(); track book.book_id) {
+              <tr>
+                <td>
+                  <div class="book-cell">
+                    @if (book.cover_url) {
+                      <img [src]="uploadsBase + book.cover_url" class="book-cover">
+                    } @else {
+                      <div class="cover-placeholder">📖</div>
+                    }
+                    <div>
+                      <strong class="book-title">{{ book.title }}</strong>
+                      <span class="id-badge">{{ book.book_id }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td class="mono-text">{{ book.isbn || '—' }}</td>
+                <td>{{ book.author || '—' }}</td>
+                <td>
+                  @if (book.category) {
+                    <span class="category-tag">{{ book.category }}</span>
+                  } @else { — }
+                </td>
+                <td>{{ book.publication_year || '—' }}</td>
+                <td class="text-right">
+                  <div class="action-buttons">
+                    <button class="btn btn-restore" (click)="restoreBook(book.book_id)">
+                      ♻️ Restore
+                    </button>
+                    <button class="btn btn-perm-delete" (click)="permanentDeleteBook(book.book_id)">
+                      🗑️ Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

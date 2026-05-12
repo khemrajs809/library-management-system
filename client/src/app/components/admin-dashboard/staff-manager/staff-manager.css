@@ -188,22 +188,36 @@
 .lib-table th {
     text-align: left;
     padding: 15px;
-    border-bottom: 2px solid #f0f0f0;
-    color: var(--text-light, #757575);
+    background-color: #145277;
+    color: #ffffff;
     font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    border-bottom: none;
+}
+
+.lib-table thead tr {
+    background-color: #145277;
 }
 
 .lib-table td {
     padding: 15px;
-    border-bottom: 1px solid #f9f9f9;
+    border-bottom: 1px solid rgba(20, 82, 119, 0.08);
     color: var(--text-dark, #212121);
     font-size: 14px;
 }
 
-.lib-table tr:hover {
-    background-color: #fafafa;
+.lib-table tbody tr:nth-child(odd) {
+    background-color: #fff1e6;
+}
+
+.lib-table tbody tr:nth-child(even) {
+    background-color: #f0efeb;
+}
+
+.lib-table tbody tr:hover {
+    background-color: #fde8d4;
+    transition: background-color 0.2s ease;
 }
 
 .id-badge {

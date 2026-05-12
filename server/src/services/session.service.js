@@ -1,0 +1,240 @@
+const pool = require('../db');
+
+/**
+ * Self-healing Database Initialization for login sessions and user session actions
+ */
+const initSessionDb = async () => {
+    try {
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS user_login_sessions (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id VARCHAR(20) NULL,
+                user_name VARCHAR(100) NULL,
+                email VARCHAR(100) NOT NULL,
+                login_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                logout_time TIMESTAMP NULL,
+                last_activity_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                ip_address VARCHAR(45) NULL,
+                user_agent TEXT NULL,
+                browser VARCHAR(100) NULL,
+                os VARCHAR(100) NULL,
+                device_type VARCHAR(50) NULL,
+                location VARCHAR(100) NULL,
+                status ENUM('successful', 'failed', 'blocked', 'suspicious') DEFAULT 'successful',
+                failure_reason VARCHAR(255) NULL,
+                session_status ENUM('online', 'offline', 'expired') DEFAULT 'online',
+                risk_score INT DEFAULT 0,
+                risk_level VARCHAR(20) DEFAULT 'Low',
+                token VARCHAR(500) NULL,
+                INDEX idx_user_id (user_id),
+                INDEX idx_login_time (login_time),
+                INDEX idx_status (status),
+                INDEX idx_ip_address (ip_address)
+            );
+        `);
+
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS user_session_actions (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                session_id INT NOT NULL,
+                action_type VARCHAR(100) NOT NULL, -- 'page_visit', 'data_update', 'delete_action', 'download', 'security_change'
+                description VARCHAR(255) NOT NULL,
+                path VARCHAR(255) NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (session_id) REFERENCES user_login_sessions(id) ON DELETE CASCADE,
+                INDEX idx_session_id (session_id)
+            );
+        `);
+        console.log('✅ Session monitoring tables verified.');
+    } catch (err) {
+        console.error('❌ Session monitoring tables initialization error:', err);
+    }
+};
+
+/**
+ * Utility to parse User Agent string
+ */
+const parseUserAgent = (ua) => {
+    if (!ua) return { browser: 'Unknown', os: 'Unknown', device_type: 'Desktop' };
+    
+    let browser = 'Unknown';
+    let os = 'Unknown';
+    let device_type = 'Desktop';
+
+    // Device Type
+    const uaLower = ua.toLowerCase();
+    if (/mobi|android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(uaLower)) {
+        if (/ipad|tablet/i.test(uaLower)) {
+            device_type = 'Tablet';
+        } else {
+            device_type = 'Mobile';
+        }
+    } else {
+        device_type = 'Desktop';
+    }
+
+    // OS
+    if (/windows/i.test(ua)) os = 'Windows';
+    else if (/macintosh|mac os x/i.test(ua)) os = 'macOS';
+    else if (/linux/i.test(ua)) os = 'Linux';
+    else if (/android/i.test(ua)) os = 'Android';
+    else if (/iphone|ipad|ipod/i.test(ua)) os = 'iOS';
+
+    // Browser
+    if (/edg/i.test(ua)) browser = 'Edge';
+    else if (/chrome|crios/i.test(ua) && !/edge|edg|opr|opera/i.test(ua)) browser = 'Chrome';
+    else if (/safari/i.test(ua) && !/chrome|crios|edge|edg|opr|opera/i.test(ua)) browser = 'Safari';
+    else if (/firefox|fxios/i.test(ua)) browser = 'Firefox';
+    else if (/opr|opera/i.test(ua)) browser = 'Opera';
+
+    return { browser, os, device_type };
+};
+
+/**
+ * Helper to get simple Location from IP
+ */
+const getLocationFromIp = (ip) => {
+    if (!ip) return 'Unknown Location';
+    if (ip === '::1' || ip === '127.0.0.1' || ip.startsWith('192.168.') || ip.startsWith('10.')) {
+        return 'Local Network (Intranet)';
+    }
+    // Static mock list for demo/visual aesthetics
+    const mocks = [
+        'New York, USA', 'London, UK', 'Mumbai, India', 'New Delhi, India', 
+        'Bengaluru, India', 'San Francisco, USA', 'Singapore', 'Sydney, Australia'
+    ];
+    // Hash IP string to pick a mock location consistently
+    let hash = 0;
+    for (let i = 0; i < ip.length; i++) {
+        hash = ip.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const index = Math.abs(hash) % mocks.length;
+    return mocks[index];
+};
+
+/**
+ * Log a user login session (Successful or Failed)
+ */
+const logSession = async ({
+    userId = null,
+    userName = null,
+    email,
+    ipAddress,
+    userAgent,
+    status = 'successful',
+    failureReason = null,
+    token = null
+}) => {
+    try {
+        const { browser, os, device_type } = parseUserAgent(userAgent);
+        const location = getLocationFromIp(ipAddress);
+        
+        let riskScore = 0;
+        let riskLevel = 'Low';
+
+        if (status === 'failed') {
+            riskScore = 15;
+            riskLevel = 'Low';
+        } else if (status === 'blocked') {
+            riskScore = 40;
+            riskLevel = 'Medium';
+        } else if (status === 'suspicious') {
+            riskScore = 75;
+            riskLevel = 'High';
+        }
+
+        // Multi-device login detection:
+        // If there is already an active session for this user with a different device type or browser, elevate risk score
+        if (userId && status === 'successful') {
+            const activeSessions = await pool.query(
+                'SELECT id FROM user_login_sessions WHERE user_id = ? AND session_status = "online" AND (device_type != ? OR browser != ?)',
+                [userId, device_type, browser]
+            );
+            if (activeSessions.length > 0) {
+                riskScore += 30; // Elevate risk score
+                riskLevel = riskScore > 50 ? 'High' : 'Medium';
+            }
+        }
+
+        const result = await pool.query(
+            `INSERT INTO user_login_sessions 
+            (user_id, user_name, email, ip_address, user_agent, browser, os, device_type, location, status, failure_reason, session_status, risk_score, risk_level, token, login_time)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
+            [
+                userId,
+                userName,
+                email,
+                ipAddress,
+                userAgent,
+                browser,
+                os,
+                device_type,
+                location,
+                status,
+                failureReason,
+                status === 'successful' ? 'online' : 'offline',
+                riskScore,
+                riskLevel,
+                token
+            ]
+        );
+        
+        return Number(result.insertId);
+    } catch (err) {
+        console.error('Error logging user session:', err);
+        return null;
+    }
+};
+
+/**
+ * Log action performed during an active session
+ */
+const logSessionAction = async (token, actionType, description, path = null) => {
+    try {
+        if (!token) return;
+        // Find active session
+        const session = await pool.query(
+            'SELECT id FROM user_login_sessions WHERE token = ? AND session_status = "online" LIMIT 1',
+            [token]
+        );
+        if (session.length === 0) return;
+
+        const sessionId = session[0].id;
+        await pool.query(
+            'INSERT INTO user_session_actions (session_id, action_type, description, path) VALUES (?, ?, ?, ?)',
+            [sessionId, actionType, description, path]
+        );
+
+        // Update last activity time
+        await pool.query(
+            'UPDATE user_login_sessions SET last_activity_time = NOW() WHERE id = ?',
+            [sessionId]
+        );
+    } catch (err) {
+        console.error('Error logging session action:', err);
+    }
+};
+
+/**
+ * Terminate/Revoke a session
+ */
+const revokeSession = async (sessionId, isExpired = false) => {
+    try {
+        const sessionStatus = isExpired ? 'expired' : 'offline';
+        await pool.query(
+            'UPDATE user_login_sessions SET session_status = ?, logout_time = NOW() WHERE id = ?',
+            [sessionStatus, sessionId]
+        );
+    } catch (err) {
+        console.error('Error revoking session:', err);
+    }
+};
+
+module.exports = {
+    initSessionDb,
+    logSession,
+    logSessionAction,
+    revokeSession,
+    parseUserAgent,
+    getLocationFromIp
+};

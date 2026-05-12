@@ -45,4 +45,21 @@ router.get('/overview-stats', verifyToken, checkRole(['admin']), getOverviewStat
 // Protected: Audit Logs
 router.get('/audit-logs', verifyToken, checkRole(['admin']), getAuditLogs);
 
+// Protected: Session Monitoring (ADMIN ONLY)
+const { 
+    getSessions, 
+    getSessionActions, 
+    terminateSession, 
+    getSessionStats, 
+    logClientAction 
+} = require('../controllers/session.controller');
+
+router.get('/sessions/stats', verifyToken, checkRole(['admin']), getSessionStats);
+router.get('/sessions', verifyToken, checkRole(['admin']), getSessions);
+router.get('/sessions/:id/actions', verifyToken, checkRole(['admin']), getSessionActions);
+router.post('/sessions/:id/terminate', verifyToken, checkRole(['admin']), auditLog('Terminate Active Session'), terminateSession);
+
+// Client-side Session Activity Logging (ADMIN/LIBRARIAN)
+router.post('/sessions/log-action', verifyToken, logClientAction);
+
 module.exports = router;

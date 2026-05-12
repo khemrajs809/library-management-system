@@ -25,6 +25,8 @@ const { authLimiter } = require('./middlewares/security.middleware');
 const { setupNotificationJob } = require('./jobs/notification.job');
 const pool = require('./db');
 
+const { initSessionDb } = require('./services/session.service');
+
 // --- Database Self-Healing ---
 const initDB = async () => {
     try {
@@ -40,6 +42,7 @@ const initDB = async () => {
             ALTER TABLE users ADD COLUMN IF NOT EXISTS status ENUM('active', 'inactive') DEFAULT 'active';
         `);
         console.log('✅ Database tables verified.');
+        await initSessionDb();
     } catch (err) {
         console.error('❌ Database initialization error:', err);
     }

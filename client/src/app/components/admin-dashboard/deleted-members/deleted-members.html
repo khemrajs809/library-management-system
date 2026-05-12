@@ -1,0 +1,75 @@
+<div class="page-wrapper">
+  <div class="page-header-bar">
+    <div class="page-title-group">
+      <div>
+        <h2>Deleted Members</h2>
+        <p>Review, restore, or permanently remove deleted members from the archive.</p>
+      </div>
+    </div>
+    <div class="page-meta">
+      <span class="count-badge">{{ deletedMembers().length }} record(s)</span>
+      <button class="btn-refresh" (click)="loadDeletedMembers()">🔄 Refresh</button>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-scroll">
+      <table class="del-table">
+        <thead>
+          <tr>
+            <th>Member</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Joined Date</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading()) {
+            <tr>
+              <td colspan="5" class="loading-state">⏳ Loading deleted members...</td>
+            </tr>
+          } @else if (deletedMembers().length === 0) {
+            <tr>
+              <td colspan="5" class="empty-state">
+                <div class="empty-icon">✅</div>
+                <div>No deleted members in archive.</div>
+              </td>
+            </tr>
+          } @else {
+            @for (member of deletedMembers(); track member.member_id) {
+              <tr>
+                <td>
+                  <div class="member-cell">
+                    @if (member.photo_url) {
+                      <img [src]="uploadsBase + member.photo_url" class="member-photo">
+                    } @else {
+                      <div class="photo-placeholder">👤</div>
+                    }
+                    <div>
+                      <strong class="member-name">{{ member.name }}</strong>
+                      <span class="id-badge">{{ member.member_id }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ member.phone || '—' }}</td>
+                <td class="email-text">{{ member.email || '—' }}</td>
+                <td>{{ member.created_at | date:'dd/MM/yyyy' }}</td>
+                <td class="text-right">
+                  <div class="action-buttons">
+                    <button class="btn btn-restore" (click)="restoreMember(member.member_id)">
+                      ♻️ Restore
+                    </button>
+                    <button class="btn btn-perm-delete" (click)="permanentDeleteMember(member.member_id)">
+                      🗑️ Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

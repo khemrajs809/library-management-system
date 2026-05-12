@@ -1,0 +1,476 @@
+<div class="monitor-wrapper">
+  
+  <!-- Header Bar -->
+  <div class="page-header-bar">
+    <div class="page-title-group">
+      <div>
+        <h2>Login Activity & User Session Monitor</h2>
+        <p>Real-time security auditing, active user sessions, and risk intelligence center.</p>
+      </div>
+    </div>
+
+    <!-- Export and Auto Refresh Panel -->
+    <div class="header-actions">
+      <button class="btn btn-refresh" [class.active]="autoRefreshEnabled()" (click)="toggleAutoRefresh()" title="Toggle Real-Time Active Sessions Update">
+        <span class="refresh-indicator" [class.spinning]="autoRefreshEnabled() && loading()"></span>
+        {{ autoRefreshEnabled() ? 'Live Auto Refresh On' : 'Auto Refresh Paused' }}
+      </button>
+
+      <div class="dropdown-wrapper">
+        <button class="btn btn-secondary dropdown-trigger">Export Report</button>
+        <div class="dropdown-menu">
+          <button (click)="exportToCSV()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-2px; margin-right:4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            Export as CSV
+          </button>
+          <button (click)="exportToExcel()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-2px; margin-right:4px;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></svg>
+            Export as Excel
+          </button>
+          <button (click)="exportToPDF()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-2px; margin-right:4px;"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            Print / PDF Report
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI Grid Cards -->
+  <div class="kpi-grid" *ngIf="!statsLoading()">
+    <div class="kpi-card total-logins">
+      <div class="kpi-content">
+        <span class="kpi-label">Total Authentications</span>
+        <span class="kpi-value">{{ stats().kpi.totalLogins }}</span>
+        <span class="kpi-subtext">Cumulative audit records</span>
+      </div>
+      <div class="kpi-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="stroke-primary">
+          <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3M15.5 7.5L14 9M18.5 4.5L20 6" />
+        </svg>
+      </div>
+    </div>
+
+    <div class="kpi-card online-sessions">
+      <div class="kpi-content">
+        <span class="kpi-label">Active Users Online</span>
+        <span class="kpi-value text-green">{{ stats().kpi.online }}</span>
+        <span class="kpi-subtext">Live active sessions</span>
+      </div>
+      <div class="kpi-icon pulse">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="stroke-green">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+          <path d="M2 12h20" />
+        </svg>
+      </div>
+    </div>
+
+    <div class="kpi-card failed-logins">
+      <div class="kpi-content">
+        <span class="kpi-label">Failed Credentials</span>
+        <span class="kpi-value text-orange">{{ stats().kpi.failed }}</span>
+        <span class="kpi-subtext">Unauthorized password entries</span>
+      </div>
+      <div class="kpi-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="stroke-orange">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+      </div>
+    </div>
+
+    <div class="kpi-card high-risk">
+      <div class="kpi-content">
+        <span class="kpi-label">High-Risk Alerts</span>
+        <span class="kpi-value text-red">{{ stats().kpi.highRisk }}</span>
+        <span class="kpi-subtext">Flagged session risks</span>
+      </div>
+      <div class="kpi-icon alert-shake">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="stroke-red">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+          <line x1="12" y1="9" x2="12" y2="13" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-bar-placeholder" *ngIf="statsLoading() || loading()">
+    <div class="loading-bar"></div>
+  </div>
+
+  <!-- Advanced Search & Filter Grid -->
+  <div class="filter-card">
+    <div class="filter-title">🔎 Session Filters & Intelligent Search</div>
+    
+    <div class="filter-grid">
+      <!-- Search Input -->
+      <div class="filter-group col-span-2">
+        <label>Smart Search</label>
+        <input type="text" 
+               [value]="searchQuery()" 
+               (input)="searchQuery.set($any($event.target).value); loadSessions(1)" 
+               placeholder="Search by Email, Name, IP, Location..." />
+      </div>
+
+      <!-- User Email Input -->
+      <div class="filter-group">
+        <label>User Email/ID</label>
+        <input type="text" 
+               [value]="userFilter()" 
+               (input)="userFilter.set($any($event.target).value); loadSessions(1)" 
+               placeholder="Filter email/id..." />
+      </div>
+
+      <!-- Status Dropdown -->
+      <div class="filter-group">
+        <label>Login Status</label>
+        <select [value]="statusFilter()" (change)="statusFilter.set($any($event.target).value); loadSessions(1)">
+          <option value="">All Statuses</option>
+          <option value="successful">Successful</option>
+          <option value="failed">Failed</option>
+          <option value="blocked">Blocked</option>
+          <option value="suspicious">Suspicious</option>
+        </select>
+      </div>
+
+      <!-- Device Dropdown -->
+      <div class="filter-group">
+        <label>Device Type</label>
+        <select [value]="deviceFilter()" (change)="deviceFilter.set($any($event.target).value); loadSessions(1)">
+          <option value="">All Devices</option>
+          <option value="Desktop">Desktop</option>
+          <option value="Mobile">Mobile</option>
+          <option value="Tablet">Tablet</option>
+        </select>
+      </div>
+
+      <!-- Browser Dropdown -->
+      <div class="filter-group">
+        <label>Browser Type</label>
+        <select [value]="browserFilter()" (change)="browserFilter.set($any($event.target).value); loadSessions(1)">
+          <option value="">All Browsers</option>
+          <option value="Chrome">Chrome</option>
+          <option value="Safari">Safari</option>
+          <option value="Firefox">Firefox</option>
+          <option value="Edge">Edge</option>
+          <option value="Opera">Opera</option>
+        </select>
+      </div>
+
+      <!-- Date Range Start -->
+      <div class="filter-group">
+        <label>From Date</label>
+        <input type="date" 
+               [value]="startDate()" 
+               (change)="startDate.set($any($event.target).value); loadSessions(1)" />
+      </div>
+
+      <!-- Date Range End -->
+      <div class="filter-group">
+        <label>To Date</label>
+        <input type="date" 
+               [value]="endDate()" 
+               (change)="endDate.set($any($event.target).value); loadSessions(1)" />
+      </div>
+    </div>
+
+    <!-- Filter Action Buttons -->
+    <div class="filter-actions-row">
+      <button class="btn btn-secondary reset-btn" (click)="resetFilters()">Clear Filters</button>
+      <button class="btn btn-primary" (click)="loadSessions(1)">Apply Filter Config</button>
+    </div>
+  </div>
+
+  <!-- Suspicious Activity Critical Alerts Banner -->
+  <div class="alerts-banner" *ngIf="stats().alerts.length > 0">
+    <div class="alerts-banner-header">
+      <span class="warning-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+          <line x1="12" y1="9" x2="12" y2="13" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
+        </svg>
+      </span>
+      <div>
+        <h4>Critical Security Incidents Blocked / Suspicious</h4>
+        <p>Review immediate failed or blocked authentication events flagged by internal heuristic engines.</p>
+      </div>
+    </div>
+    <div class="alerts-banner-list">
+      <div class="alert-banner-item" *ngFor="let alert of stats().alerts" [class.high-risk]="alert.risk_level === 'High'">
+        <div class="alert-header">
+          <span class="alert-status-badge bg-red" *ngIf="alert.status === 'blocked'">BLOCKED</span>
+          <span class="alert-status-badge bg-orange" *ngIf="alert.status === 'failed'">FAILED</span>
+          <span class="alert-status-badge bg-purple" *ngIf="alert.status === 'suspicious'">SUSPICIOUS</span>
+          <span class="alert-email">{{ alert.email }}</span>
+          <span class="alert-time">{{ alert.login_time | date:'medium' }}</span>
+        </div>
+        <div class="alert-details">
+          <span>IP Address: <strong>{{ alert.ip_address }}</strong></span> | 
+          <span>Reason: <strong class="text-red">{{ alert.failure_reason || 'Visual Heuristic Flag' }}</strong></span> | 
+          <span>Device: <strong>{{ alert.device_type }} / {{ alert.browser }}</strong></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sessions Main Table -->
+  <div class="table-card">
+    <div class="table-header-title">
+      <h3>Active Session Registry & Auth Logs</h3>
+      <span class="row-count">Showing {{ sessions().length }} of {{ pagination().total }} log files</span>
+    </div>
+
+    <div class="table-container">
+      <table class="session-table">
+        <thead>
+          <tr>
+            <th>User Account</th>
+            <th>Login Time</th>
+            <th>Logout Time</th>
+            <th>Duration</th>
+            <th>IP Address & Location</th>
+            <th>Terminal Device</th>
+            <th>Auth Status</th>
+            <th>Session State</th>
+            <th>Risk Metric</th>
+            <th class="actions-col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let s of sessions()" [class.row-flagged]="s.status === 'blocked' || s.status === 'suspicious'">
+            <!-- User Info -->
+            <td>
+              <div class="user-cell">
+                <span class="user-avatar" [class.librarian]="s.role === 'librarian'" [class.admin]="s.role === 'admin'">
+                  {{ (s.user_name || s.email).slice(0,2).toUpperCase() }}
+                </span>
+                <div class="user-meta">
+                  <strong class="user-name">{{ s.user_name || 'Guest / Anonymous' }}</strong>
+                  <span class="user-email">{{ s.email }}</span>
+                </div>
+              </div>
+            </td>
+
+            <!-- Timestamps -->
+            <td>{{ s.login_time | date:'medium' }}</td>
+            <td>
+              <span *ngIf="s.logout_time">{{ s.logout_time | date:'medium' }}</span>
+              <span class="text-muted" *ngIf="!s.logout_time">Still active</span>
+            </td>
+
+            <!-- Spending Duration -->
+            <td>
+              <strong>{{ formatDuration(s.login_time, s.logout_time, s.status) }}</strong>
+            </td>
+
+            <!-- IP and Location -->
+            <td>
+              <div class="ip-cell">
+                <code class="ip-address">{{ s.ip_address }}</code>
+                <span class="location-name">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-1px; margin-right:2px; stroke: #64748b;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                  {{ s.location || 'Localhost Network' }}
+                </span>
+              </div>
+            </td>
+
+            <!-- Device Type & OS -->
+            <td>
+              <div class="device-cell">
+                <span class="device-type-badge">{{ s.device_type }}</span>
+                <span class="device-os">{{ s.os }} ({{ s.browser }})</span>
+              </div>
+            </td>
+
+            <!-- Auth Status -->
+            <td>
+              <span [class]="getStatusBadgeClass(s.status, s.session_status)">
+                {{ s.status | uppercase }}
+              </span>
+            </td>
+
+            <!-- Session Status -->
+            <td>
+              <span class="session-state-dot" [class.online]="s.session_status === 'online'" [class.offline]="s.session_status === 'offline'" [class.expired]="s.session_status === 'expired'"></span>
+              <span class="state-label">{{ s.session_status | uppercase }}</span>
+            </td>
+
+            <!-- Risk Metrics -->
+            <td>
+              <div class="risk-cell">
+                <span [class]="getRiskBadgeClass(s.risk_level)">{{ s.risk_level }}</span>
+                <div class="risk-bar-container">
+                  <div class="risk-bar" [style.width.%]="s.risk_score" [class.high]="s.risk_score > 60" [class.med]="s.risk_score > 30"></div>
+                </div>
+              </div>
+            </td>
+
+            <!-- Actions buttons -->
+            <td class="actions-col">
+              <div class="action-btn-group">
+                <button class="action-btn btn-view" (click)="loadSessionActions(s)" title="Inspect Complete Audit Timeline">
+                  Timeline
+                </button>
+                <button class="action-btn btn-terminate" 
+                        *ngIf="s.session_status === 'online'" 
+                        (click)="terminateSession(s.id, s.email)" 
+                        title="Force Immediate User Session Revoke">
+                  Kill
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Empty State -->
+          <tr *ngIf="sessions().length === 0 && !loading()">
+            <td colspan="10" class="empty-state">
+              <div class="empty-state-content">
+                <span class="empty-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                </span>
+                <p>No login activity matching current search parameter config.</p>
+                <button class="btn btn-secondary" (click)="resetFilters()">Clear Filters</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Table Pagination -->
+    <div class="pagination-section" *ngIf="pagination().totalPages > 1">
+      <span class="pagination-summary">Page {{ pagination().page }} of {{ pagination().totalPages }}</span>
+      <div class="pagination-buttons">
+        <button class="page-nav-btn" (click)="prevPage()" [disabled]="pagination().page === 1">Previous</button>
+        <button class="page-num-btn" 
+                *ngFor="let page of paginationArray()" 
+                [class.active]="page === pagination().page"
+                (click)="goToPage(page)">
+          {{ page }}
+        </button>
+        <button class="page-nav-btn" (click)="nextPage()" [disabled]="pagination().page === pagination().totalPages">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail inspect modal (Timeline of activities) -->
+  <div class="modal-backdrop" *ngIf="selectedSession()" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title-area">
+          <span class="modal-badge text-green" *ngIf="selectedSession()?.session_status === 'online'">ONLINE SESSION</span>
+          <span class="modal-badge text-grey" *ngIf="selectedSession()?.session_status !== 'online'">OFFLINE HISTORIC RECORD</span>
+          <h3>Audit Timeline & Device Inspection</h3>
+          <p>Analyzing detailed digital footprints for account <strong>{{ selectedSession()?.email }}</strong></p>
+        </div>
+        <button class="close-btn" (click)="closeModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        
+        <!-- Info Summary Panel -->
+        <div class="info-summary-panel">
+          <div class="info-item">
+            <span class="info-label">Full Name</span>
+            <strong class="info-value">{{ selectedSession()?.user_name || 'Anonymous User' }}</strong>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Email Context</span>
+            <strong class="info-value">{{ selectedSession()?.email }}</strong>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Current Node IP</span>
+            <strong class="info-value">{{ selectedSession()?.ip_address }}</strong>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Location Point</span>
+            <strong class="info-value">
+              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-1px; margin-right:2px; stroke: #64748b;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              {{ selectedSession()?.location || 'Local Intranet' }}
+            </strong>
+          </div>
+        </div>
+
+        <div class="info-summary-panel second-row">
+          <div class="info-item">
+            <span class="info-label">User Terminal Device</span>
+            <strong class="info-value">{{ selectedSession()?.device_type }} / {{ selectedSession()?.os }}</strong>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Software Client</span>
+            <strong class="info-value">{{ selectedSession()?.browser }}</strong>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Security Evaluation Score</span>
+            <strong class="info-value text-red" *ngIf="selectedSession()?.risk_score > 50">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-2px; margin-right:3px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+              HIGH RISK ({{ selectedSession()?.risk_score }}%)
+            </strong>
+            <strong class="info-value text-green" *ngIf="selectedSession()?.risk_score <= 50">SECURE ({{ selectedSession()?.risk_score }}%)</strong>
+          </div>
+        </div>
+
+        <!-- Activity Timeline -->
+        <div class="timeline-container">
+          <h4 class="timeline-title">Session Action Footprint Timeline</h4>
+
+          <div class="timeline-loading" *ngIf="actionsLoading()">
+            <div class="spinner"></div>
+            <p>Gathering session actions from indexers...</p>
+          </div>
+
+          <div class="timeline-empty" *ngIf="sessionActions().length === 0 && !actionsLoading()">
+            <span class="empty-state-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </span>
+            <p>No critical state modifications or transactional actions performed in this session context.</p>
+            <span class="info-helper">Only state-altering data actions (POST, PUT, DELETE) and audited system events are timeline-indexed.</span>
+          </div>
+
+          <div class="timeline" *ngIf="sessionActions().length > 0 && !actionsLoading()">
+            <div class="timeline-item" *ngFor="let act of sessionActions()" [class.danger]="act.action_type === 'delete_action'" [class.security]="act.action_type === 'security_change'">
+              <div class="timeline-badge-icon" [ngSwitch]="act.action_type">
+                <span *ngSwitchCase="'delete_action'">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                </span>
+                <span *ngSwitchCase="'security_change'">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                </span>
+                <span *ngSwitchCase="'data_update'">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                </span>
+                <span *ngSwitchDefault>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </span>
+              </div>
+              <div class="timeline-card">
+                <div class="timeline-header">
+                  <span class="action-type-label">{{ act.action_type | uppercase }}</span>
+                  <span class="action-time">{{ act.created_at | date:'medium' }}</span>
+                </div>
+                <div class="timeline-body">
+                  <p class="action-desc"><strong>{{ act.description }}</strong></p>
+                  <code class="action-path" *ngIf="act.path">Endpoint Path: {{ act.path }}</code>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeModal()">Dismiss Inspection Window</button>
+        <button class="btn btn-primary" 
+                *ngIf="selectedSession()?.session_status === 'online'" 
+                (click)="terminateSession(selectedSession()?.id, selectedSession()?.email); closeModal()">
+          Terminate & Block Live Session
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -2,9 +2,11 @@
     <!-- Tab Navigation -->
     <nav class="tabs-container no-print ds-style-8a08d99f" >
       <ul class="tabs-list ds-style-35d35f28" >
-        <li [class.active]="activeTab === 'staff'" (click)="setTab('staff')" class="admin-tab ds-style-e9e32f30">👥 Staff Management</li>
-        <li [class.active]="activeTab === 'archive'" (click)="setTab('archive')" class="admin-tab ds-style-e9e32f30">🗑️ Trash / Archive</li>
-        <li [class.active]="activeTab === 'audit'" (click)="setTab('audit')" class="admin-tab ds-style-e9e32f30">📊 Audit Logs</li>
+        <li [class.active]="activeTab === 'staff'" (click)="setTab('staff')" class="admin-tab ds-style-e9e32f30">Staff Management</li>
+        <li [class.active]="activeTab === 'deleted-books'" (click)="setTab('deleted-books')" class="admin-tab ds-style-e9e32f30">Deleted Books</li>
+        <li [class.active]="activeTab === 'deleted-members'" (click)="setTab('deleted-members')" class="admin-tab ds-style-e9e32f30">Deleted Members</li>
+        <li [class.active]="activeTab === 'audit'" (click)="setTab('audit')" class="admin-tab ds-style-e9e32f30">Audit Logs</li>
+        <li [class.active]="activeTab === 'sessions'" (click)="setTab('sessions')" class="admin-tab ds-style-e9e32f30">Session Monitor</li>
       </ul>
     </nav>
 
@@ -14,11 +16,17 @@
             @if (activeTab === 'staff') {
               <app-staff-manager></app-staff-manager>
             }
-            @if (activeTab === 'archive') {
-              <app-archive-manager [activeTab]="activeTab"></app-archive-manager>
+            @if (activeTab === 'deleted-books') {
+              <app-deleted-books></app-deleted-books>
+            }
+            @if (activeTab === 'deleted-members') {
+              <app-deleted-members></app-deleted-members>
             }
             @if (activeTab === 'audit') {
               <app-audit-log-viewer></app-audit-log-viewer>
+            }
+            @if (activeTab === 'sessions') {
+              <app-session-monitor></app-session-monitor>
             }
         </div>
     </div>

@@ -13,7 +13,9 @@ import { FadeInComponent } from '../../../../../components/animations/fade-in/fa
 })
 export class BookTableComponent {
   @Input() books: Book[] = [];
-  @Input() pagination: any = { page: 1, limit: 50, totalPages: 1, total: 0 };
+  _pagination = signal<any>({ page: 1, limit: 8, totalPages: 1, total: 0 });
+  @Input() set pagination(val: any) { this._pagination.set(val); }
+  get pagination() { return this._pagination(); }
   @Input() viewMode: 'grid' | 'list' = 'grid';
   @Input() isLoading = false;
   @Input() isImporting = false;
@@ -31,7 +33,7 @@ export class BookTableComponent {
   @Output() onToggleView = new EventEmitter<void>();
 
   paginationArray = computed(() => {
-    const p = this.pagination;
+    const p = this._pagination();
     const current = p.page || 1;
     const totalPages = p.totalPages || 1;
     

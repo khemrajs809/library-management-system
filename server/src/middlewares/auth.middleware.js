@@ -30,6 +30,11 @@ const verifyToken = async (req, res, next) => {
         const decoded = jwt.verify(token, JWT_SECRET);
         // Standardize the user object on the request
         req.user = decoded; 
+
+        // Non-blocking update of last activity time
+        pool.query('UPDATE user_login_sessions SET last_activity_time = NOW() WHERE token = ? AND session_status = "online"', [token])
+            .catch(err => console.error('Error updating activity time:', err.message));
+
         next();
     } catch (err) {
         res.status(401).json({ success: false, message: 'Token is not valid' });
