@@ -10,10 +10,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #ffffff;
+  background: #b91c1c;
   border-radius: 12px;
   padding: 20px 28px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  box-shadow: 0 4px 15px rgba(185, 28, 28, 0.25);
 }
 
 .page-title-group {
@@ -25,25 +25,25 @@
 .page-icon {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, #145277, #1e7bae);
+  background: linear-gradient(135deg, #ffffff, #ffe4e1);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 22px;
-  box-shadow: 0 4px 12px rgba(20, 82, 119, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .page-title-group h2 {
   font-size: 20px;
   font-weight: 700;
-  color: #1e293b;
+  color: #ffffff;
   margin: 0 0 4px 0;
 }
 
 .page-title-group p {
   font-size: 13px;
-  color: #64748b;
+  color: #ffe4e1;
   margin: 0;
 }
 
@@ -54,9 +54,9 @@
 }
 
 .count-badge {
-  background: #eff6ff;
-  color: #145277;
-  border: 1px solid #bfdbfe;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
   font-size: 13px;
   font-weight: 600;
   padding: 6px 14px;
@@ -64,10 +64,11 @@
 }
 
 .btn-refresh {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  color: #475569;
+  background: #ffffff;
+  border: 1px solid #ffffff;
+  color: #b91c1c;
   font-size: 13px;
+  font-weight: 600;
   padding: 8px 16px;
   border-radius: 8px;
   cursor: pointer;
@@ -75,9 +76,9 @@
 }
 
 .btn-refresh:hover {
-  background: #145277;
-  color: #fff;
-  border-color: #145277;
+  background: #991b1b;
+  color: #ffffff;
+  border-color: #991b1b;
 }
 
 /* Table Card */

@@ -41,7 +41,7 @@ export class MemberManagerComponent implements OnInit, OnChanges {
   @ViewChild('directoryCard') directoryCard!: MemberCardComponent;
 
   members            = signal<Member[]>([]);
-  pagination         = signal<any>({ page: 1, limit: 50, totalPages: 1, total: 0 });
+  pagination         = signal<any>({ page: 1, limit: 10, totalPages: 1, total: 0 });
   recentActivities   = signal<any[]>([]);
   searchedMemberInfo = signal<Member | null>(null);
   isEditing          = signal<boolean>(false);
@@ -97,7 +97,7 @@ export class MemberManagerComponent implements OnInit, OnChanges {
 
   loadMembers(q = '', page = 1) {
     this.isLoading.set(true);
-    this.memberService.getMembers(q, page).subscribe({
+    this.memberService.getMembers(q, page, this.pagination().limit).subscribe({
       next: (r) => {
         this.members.set(r.data);
         if (r.pagination) this.pagination.set(r.pagination);

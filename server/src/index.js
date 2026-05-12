@@ -24,6 +24,8 @@ const { authLimiter } = require('./middlewares/security.middleware');
 // --- Jobs ---
 const { setupNotificationJob } = require('./jobs/notification.job');
 const pool = require('./db');
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const { initSessionDb } = require('./services/session.service');
 
@@ -79,8 +81,22 @@ const io = new Server(server, {
 // Make `io` available to controllers if needed in future
 app.set('io', io);
 
+// --- Socket.io Authentication Middleware ---
+io.use((socket, next) => {
+    const token = socket.handshake.auth.token;
+    if (!token) return next(new Error('Authentication error: No token provided'));
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        socket.user = decoded;
+        next();
+    } catch (err) {
+        next(new Error('Authentication error: Invalid token'));
+    }
+});
+
 io.on('connection', (socket) => {
-    console.log('Client connected:', socket.id);
+    console.log(`Authenticated client connected: ${socket.id} (User: ${socket.user?.email})`);
 });
 
 // =====================================================

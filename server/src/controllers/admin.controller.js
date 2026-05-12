@@ -1,6 +1,7 @@
 const pool = require('../db');
 const bcrypt = require('bcryptjs');
 const Papa = require('papaparse');
+const { sanitizeObject } = require('../services/sanitizer.service');
 
 // POST /api/admin/librarians — Create a new librarian account
 const createLibrarian = async (req, res) => {
@@ -184,8 +185,9 @@ const importBooks = async (req, res) => {
             let successCount = 0;
             let errors = [];
 
-            for (const book of books) {
+            for (let book of books) {
                 try {
+                    book = sanitizeObject(book); // Sanitize for CSV Injection safety
                     if (!book.title || !book.isbn) {
                         errors.push(`Row: Missing title or ISBN`);
                         continue;
@@ -216,8 +218,9 @@ const importMembers = async (req, res) => {
             let successCount = 0;
             let errors = [];
 
-            for (const member of members) {
+            for (let member of members) {
                 try {
+                    member = sanitizeObject(member); // Sanitize for CSV Injection safety
                     if (!member.name || !member.member_id) {
                         errors.push(`Row: Missing name or Member ID`);
                         continue;
@@ -339,7 +342,13 @@ const getAuditLogs = async (req, res) => {
         const countResult = await pool.query('SELECT COUNT(*) as total FROM audit_logs');
         const total = Number(countResult[0].total);
 
-        const rows = await pool.query('SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT ? OFFSET ?', [limit, offset]);
+        const rows = await pool.query(`
+            SELECT a.*, u.name as user_name, u.email as user_email
+            FROM audit_logs a 
+            LEFT JOIN users u ON a.user_id = u.id 
+            ORDER BY a.created_at DESC 
+            LIMIT ? OFFSET ?
+        `, [limit, offset]);
         
         res.status(200).json({ 
             success: true, 

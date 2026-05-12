@@ -9,6 +9,8 @@
       <tr>
         <th>Timestamp</th>
         <th>User ID</th>
+        <th>User Name</th>
+        <th>Email</th>
         <th>Role</th>
         <th>Action</th>
         <th>Method & Target</th>
@@ -17,13 +19,15 @@
     <tbody>
       @if (logs().length === 0) {
         <tr>
-          <td colspan="5" class="empty-state">No audit logs available.</td>
+          <td colspan="7" class="empty-state">No audit logs available.</td>
         </tr>
       } @else {
         @for (log of logs(); track log.log_id) {
           <tr>
             <td  class="ds-style-0ca50382">{{ log.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
             <td><span class="badge ds-style-23bcb564" >{{ log.user_id }}</span></td>
+            <td><strong style="color: #1e293b;">{{ log.user_name || 'System Administrator' }}</strong></td>
+            <td><span class="text-muted small">{{ log.user_email || 'N/A' }}</span></td>
             <td><span class="badge" [ngClass]="{'bg-purple': log.user_role === 'admin', 'bg-blue': log.user_role === 'librarian'}">{{ log.user_role | uppercase }}</span></td>
             <td><strong>{{ log.action }}</strong></td>
             <td>

@@ -18,11 +18,24 @@ export class AuthService {
   userRole = signal<string | null>(this.getRoleFromToken(this.#token()));
   sessionRemaining = signal<string>('');
   private sessionTimerInterval: any;
+  private internalNavKey = 'lib_internal_nav';
 
   constructor() {
     if (this.isLoggedIn()) {
       this.startSessionTimer();
     }
+  }
+
+  markInternalNavigation() {
+    sessionStorage.setItem(this.internalNavKey, 'true');
+  }
+
+  isInternalNavigation(): boolean {
+    return sessionStorage.getItem(this.internalNavKey) === 'true';
+  }
+
+  clearInternalNavigation() {
+    sessionStorage.removeItem(this.internalNavKey);
   }
 
   private getRoleFromToken(token: string | null): string | null {
@@ -77,6 +90,7 @@ export class AuthService {
       this.isLoggedIn.set(true);
       const role = this.getRoleFromToken(res.token);
       this.userRole.set(role);
+      this.markInternalNavigation();
       this.startSessionTimer();
     }
   }
@@ -141,6 +155,7 @@ export class AuthService {
     this.#token.set(null);
     this.isLoggedIn.set(false);
     this.userRole.set(null);
+    this.clearInternalNavigation();
     this.router.navigate(['/']);
   }
 }

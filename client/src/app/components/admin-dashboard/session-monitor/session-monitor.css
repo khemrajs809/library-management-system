@@ -13,6 +13,11 @@
   margin-bottom: 0.75rem;
   flex-wrap: wrap;
   gap: 0.75rem;
+  background: #FFF5EE;
+  border-radius: 8px;
+  padding: 0.75rem 1.25rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  border: 1px solid #cbd5e1;
 }
 
 .page-title-group h2 {
@@ -322,29 +327,35 @@
 }
 
 .filter-group label {
-  font-size: 0.68rem;
-  font-weight: 600;
-  color: #64748b;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #0f172a; /* High contrast dark navy/black label */
   text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .filter-grid input,
 .filter-grid select {
   padding: 0.35rem 0.5rem;
   border-radius: 4px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid #475569; /* High contrast distinct border */
   font-size: 0.8rem;
-  color: #334155;
+  color: #0f172a; /* Ultra dark input/value text for maximum contrast */
   outline: none;
-  background: #f8fafc;
-  transition: border-color 0.15s ease;
+  background: #ffffff; /* Brighter background for better contrast */
+  transition: all 0.15s ease;
   height: 28px;
+}
+
+.filter-grid input::placeholder {
+  color: #475569; /* High contrast dark grey placeholder */
+  opacity: 0.95;
 }
 
 .filter-grid input:focus,
 .filter-grid select:focus {
-  border-color: #145277;
-  background: #ffffff;
+  border-color: #b91c1c; /* Royal red focus border */
+  box-shadow: 0 0 0 2px rgba(185, 28, 28, 0.15);
 }
 
 .filter-actions-row {

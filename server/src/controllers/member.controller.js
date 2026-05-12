@@ -1,6 +1,7 @@
 const pool = require('../db');
 const Papa = require('papaparse');
 const { sendEmail } = require('../services/email.service');
+const { sanitizeObject } = require('../services/sanitizer.service');
 
 // POST /api/members — Register a new member
 const addMember = async (req, res) => {
@@ -16,7 +17,6 @@ const addMember = async (req, res) => {
         membership_expiry, max_book_limit, account_status
     } = req.body;
     let { member_id } = req.body;
-    console.log('Adding Member. Body:', req.body);
     if (!member_id) {
         member_id = 'MEM-' + Math.floor(1000 + Math.random() * 9000);
     }
@@ -114,12 +114,30 @@ const getMembers = async (req, res) => {
             const countResult = await pool.query('SELECT COUNT(*) as total FROM members WHERE is_deleted = 0 AND (name LIKE ? OR member_id LIKE ? OR phone LIKE ?)', [like, like, like]);
             totalCount = Number(countResult[0].total);
 
-            rows = await pool.query('SELECT * FROM members WHERE is_deleted = 0 AND (name LIKE ? OR member_id LIKE ? OR phone LIKE ?) ORDER BY created_at DESC LIMIT ? OFFSET ?', [like, like, like, limit, offset]);
+            rows = await pool.query(`
+                SELECT member_id, name, dob, gender, phone, email, permanent_address, current_address, 
+                       curr_house, curr_street, curr_area, curr_city, curr_state, curr_pincode,
+                       perm_house, perm_street, perm_area, perm_city, perm_state, perm_pincode,
+                       course, department, year_semester, membership_type, no_dues_status, 
+                       roll_number, academic_session, hod_name, guardian_name, guardian_phone, blood_group, 
+                       membership_expiry, max_book_limit, account_status, photo_url, created_at
+                FROM members 
+                WHERE is_deleted = 0 AND (name LIKE ? OR member_id LIKE ? OR phone LIKE ?) 
+                ORDER BY created_at DESC LIMIT ? OFFSET ?`, [like, like, like, limit, offset]);
         } else {
             const countResult = await pool.query('SELECT COUNT(*) as total FROM members WHERE is_deleted = 0');
             totalCount = Number(countResult[0].total);
 
-            rows = await pool.query('SELECT * FROM members WHERE is_deleted = 0 ORDER BY created_at DESC LIMIT ? OFFSET ?', [limit, offset]);
+            rows = await pool.query(`
+                SELECT member_id, name, dob, gender, phone, email, permanent_address, current_address, 
+                       curr_house, curr_street, curr_area, curr_city, curr_state, curr_pincode,
+                       perm_house, perm_street, perm_area, perm_city, perm_state, perm_pincode,
+                       course, department, year_semester, membership_type, no_dues_status, 
+                       roll_number, academic_session, hod_name, guardian_name, guardian_phone, blood_group, 
+                       membership_expiry, max_book_limit, account_status, photo_url, created_at
+                FROM members 
+                WHERE is_deleted = 0 
+                ORDER BY created_at DESC LIMIT ? OFFSET ?`, [limit, offset]);
         }
 
         res.status(200).json({
@@ -146,7 +164,15 @@ const getMembers = async (req, res) => {
 // GET /api/members/:id — Get a single member
 const getMember = async (req, res) => {
     try {
-        const rows = await pool.query('SELECT * FROM members WHERE member_id = ?', [req.params.id]);
+        const rows = await pool.query(`
+            SELECT member_id, name, dob, gender, phone, email, permanent_address, current_address, 
+                   curr_house, curr_street, curr_area, curr_city, curr_state, curr_pincode,
+                   perm_house, perm_street, perm_area, perm_city, perm_state, perm_pincode,
+                   course, department, year_semester, membership_type, no_dues_status, 
+                   roll_number, academic_session, hod_name, guardian_name, guardian_phone, blood_group, 
+                   membership_expiry, max_book_limit, account_status, photo_url, created_at
+            FROM members 
+            WHERE member_id = ?`, [req.params.id]);
         if (rows.length === 0) return res.status(404).json({ success: false, message: 'Member not found' });
         
         const member = rows[0];
@@ -164,7 +190,15 @@ const getMember = async (req, res) => {
 // GET /api/members/:id/profile — Full member profile with borrowing history & stats
 const getMemberProfile = async (req, res) => {
     try {
-        const memberRows = await pool.query('SELECT * FROM members WHERE member_id = ?', [req.params.id]);
+        const memberRows = await pool.query(`
+            SELECT member_id, name, dob, gender, phone, email, permanent_address, current_address, 
+                   curr_house, curr_street, curr_area, curr_city, curr_state, curr_pincode,
+                   perm_house, perm_street, perm_area, perm_city, perm_state, perm_pincode,
+                   course, department, year_semester, membership_type, no_dues_status, 
+                   roll_number, academic_session, hod_name, guardian_name, guardian_phone, blood_group, 
+                   membership_expiry, max_book_limit, account_status, photo_url, created_at
+            FROM members 
+            WHERE member_id = ?`, [req.params.id]);
         if (memberRows.length === 0) return res.status(404).json({ success: false, message: 'Member not found' });
         const member = memberRows[0];
         if (member.membership_expiry && new Date(member.membership_expiry) < new Date()) {
@@ -307,7 +341,8 @@ const importMembers = async (req, res) => {
 
     const results = { added: 0, failed: [] };
 
-    for (const row of data) {
+    for (let row of data) {
+        row = sanitizeObject(row); // Sanitize for CSV Injection safety
         const {
             member_id, name, dob, photo_url, created_at, phone, email, is_deleted,
             gender, permanent_address, current_address,
@@ -380,7 +415,11 @@ const generateUniqueMemberId = async (req, res) => {
 
 const getDeletedMembers = async (req, res) => {
     try {
-        const rows = await pool.query('SELECT * FROM members WHERE is_deleted = 1 ORDER BY created_at DESC');
+        const rows = await pool.query(`
+            SELECT member_id, name, dob, gender, phone, email, course, department, account_status, created_at
+            FROM members 
+            WHERE is_deleted = 1 
+            ORDER BY created_at DESC`);
         res.status(200).json({ success: true, data: rows });
     } catch (err) {
         console.error(err);

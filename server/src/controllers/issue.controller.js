@@ -132,7 +132,8 @@ const markAsLost = async (req, res) => {
         const issueCheck = await pool.query(`
             SELECT i.*, b.price, b.title as book_title, m.name as member_name, m.email as member_email
             FROM issues i
-            JOIN books b ON i.book_id = b.book_id
+            JOIN book_copies bc ON i.book_id = bc.copy_id
+            JOIN books b ON bc.book_id = b.book_id
             JOIN members m ON i.member_id = m.member_id
             WHERE i.issue_id = ? AND i.status = ?
         `, [issue_id, 'issued']);

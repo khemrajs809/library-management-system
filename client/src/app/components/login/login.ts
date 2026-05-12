@@ -43,13 +43,19 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     if (this.authService.isLoggedIn()) {
-      const role = this.authService.userRole();
-      if (role === 'admin') {
-        this.router.navigate(['/admin/dashboard']);
+      if (this.authService.isInternalNavigation()) {
+        const role = this.authService.userRole();
+        if (role === 'admin') {
+          this.router.navigate(['/admin/dashboard']);
+        } else {
+          this.router.navigate(['/librarian/dashboard']);
+        }
+        return;
       } else {
-        this.router.navigate(['/librarian/dashboard']);
+        // Logged in but no internal navigation flag (e.g. new tab/pasted URL)
+        // We clear the session to force a fresh login in this tab
+        this.authService.logout();
       }
-      return;
     }
 
     this.loadCaptcha();

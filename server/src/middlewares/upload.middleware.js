@@ -12,11 +12,18 @@ const upload = multer({
     fileFilter: (req, file, cb) => {
         const allowedExts = ['.jpg', '.jpeg', '.png', '.webp', '.pdf'];
         const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+        
         const ext = path.extname(file.originalname).toLowerCase();
-        if (allowedExts.includes(ext) || allowedMimes.includes(file.mimetype)) {
+        const mime = file.mimetype.toLowerCase();
+
+        // Security: Both extension AND MIME type must be valid and correspond to each other
+        const isExtAllowed = allowedExts.includes(ext);
+        const isMimeAllowed = allowedMimes.includes(mime);
+
+        if (isExtAllowed && isMimeAllowed) {
             cb(null, true);
         } else {
-            cb(new Error('Only valid images (.jpg, .png) or PDF files are allowed'));
+            cb(new Error('Security Alert: File type mismatch. Only valid images (.jpg, .png, .webp) or PDF files are allowed.'));
         }
     },
     limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit

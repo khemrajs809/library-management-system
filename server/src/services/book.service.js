@@ -20,7 +20,9 @@ class BookService {
 
         let countSql = `SELECT COUNT(*) as total FROM books b WHERE b.is_deleted = 0`;
         let sql = `
-            SELECT b.*, 
+            SELECT b.book_id, b.isbn, b.title, b.author, b.stream, b.publication_year, 
+                   b.quantity, b.available, b.price, b.publisher, b.edition, 
+                   b.shelf_location, b.cover_url, b.created_at,
                    (SELECT COUNT(*) FROM book_copies WHERE book_id = b.book_id) as total_copies,
                    (SELECT COUNT(*) FROM book_copies WHERE book_id = b.book_id AND status = 'available') as available_copies
             FROM books b
@@ -60,7 +62,7 @@ class BookService {
     }
 
     async getBookCopies(bookId) {
-        return await pool.query('SELECT * FROM book_copies WHERE book_id = ? ORDER BY copy_id', [bookId]);
+        return await pool.query('SELECT copy_id, book_id, status FROM book_copies WHERE book_id = ? ORDER BY copy_id', [bookId]);
     }
 
     async updateBook(id, data, cover_url) {
@@ -95,14 +97,14 @@ class BookService {
     }
 
     async deleteBook(id) {
-        const active = await pool.query('SELECT * FROM book_copies WHERE book_id = ? AND status = ?', [id, 'issued']);
+        const active = await pool.query('SELECT copy_id FROM book_copies WHERE book_id = ? AND status = ?', [id, 'issued']);
         if (active.length > 0) throw new Error('Cannot delete: some copies are currently issued.');
         
         await pool.query('UPDATE books SET is_deleted = 1 WHERE book_id = ?', [id]);
     }
 
     async getDeletedBooks() {
-        return await pool.query('SELECT * FROM books WHERE is_deleted = 1 ORDER BY created_at DESC');
+        return await pool.query('SELECT book_id, title, author, isbn, stream, created_at FROM books WHERE is_deleted = 1 ORDER BY created_at DESC');
     }
 
     async restoreBook(id) {

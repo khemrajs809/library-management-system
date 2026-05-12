@@ -46,9 +46,12 @@ export class LibrarianDashboardComponent implements OnDestroy {
   today = new Date();
 
   constructor() {
-    // Connect socket with options to prevent beforeunload dialog
+    // Connect socket with authentication token
     this.socket = io(UPLOADS_BASE, {
-      closeOnBeforeunload: false  // Prevents browser dialog on back/navigation
+      closeOnBeforeunload: false,
+      auth: {
+        token: localStorage.getItem('lib_token')
+      }
     });
     this.setupSocketListeners();
     this.loadStats();

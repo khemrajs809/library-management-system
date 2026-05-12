@@ -65,26 +65,26 @@ const login = async (req, res) => {
         
         if (rows.length > 0) {
             const user = rows[0];
-
-            // --- STATUS CHECK ---
-            if (user.status === 'inactive') {
-                const ipAddress = req.ip || req.connection?.remoteAddress || '';
-                const userAgent = req.headers['user-agent'] || '';
-                await logSession({
-                    userId: user.id,
-                    userName: user.name,
-                    email,
-                    ipAddress,
-                    userAgent,
-                    status: 'blocked',
-                    failureReason: 'Account deactivated'
-                });
-                return res.status(403).json({ success: false, message: 'Your account is deactivated. Please contact the administrator.' });
-            }
-
             const isMatch = await bcrypt.compare(password, user.password);
 
             if (isMatch) {
+                // --- STATUS CHECK (Only after password match) ---
+                if (user.status === 'inactive') {
+                    const ipAddress = req.ip || req.connection?.remoteAddress || '';
+                    const userAgent = req.headers['user-agent'] || '';
+                    await logSession({
+                        userId: user.id,
+                        userName: user.name,
+                        email,
+                        ipAddress,
+                        userAgent,
+                        status: 'blocked',
+                        failureReason: 'Account deactivated'
+                    });
+                    // Standard message to avoid enumeration, but can be helpful if you want to tell them they are deactivated
+                    return res.status(403).json({ success: false, message: 'Your account is deactivated. Please contact the administrator.' });
+                }
+
                 // SUCCESS: Reset failed attempts
                 await pool.query('DELETE FROM login_attempts WHERE email = ?', [email]);
 
