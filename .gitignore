@@ -29,3 +29,7 @@ Thumbs.db
 
 # Uploads
 server/uploads/
+
+# Security & Temp
+server/certs/
+server/scratch/
