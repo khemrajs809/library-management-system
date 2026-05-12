@@ -39,6 +39,16 @@ A professional, high-density digital library management solution with a "Seashel
    ```bash
    cd server
    npm install
+   ```
+
+3. **Manual Setup (Required)**:
+   Since sensitive files are ignored by Git, you must manually create the following:
+   - **Environment Variables**: Create a `.env` file in the `server/` directory with `DB_HOST`, `JWT_SECRET`, and `EMAIL_PASS`.
+   - **Security Certificates**: Create a `server/certs/` directory and add your `localhost.key` and `localhost.crt` for HTTPS support.
+   - **Uploads Folder**: Create a `server/uploads/` directory for storing member photos and book covers.
+
+4. **Run Server**:
+   ```bash
    npm run dev
    ```
 
