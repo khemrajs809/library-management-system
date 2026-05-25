@@ -4,6 +4,8 @@ import { HttpClient } from '@angular/common/http';
 import { ToastService } from '../../../services/toast.service';
 import { API_BASE } from '../../../core/api.config';
 import { ModalService } from '../../../services/modal.service';
+import { RefreshService } from '../../../services/refresh.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-session-monitor',
@@ -16,6 +18,8 @@ export class SessionMonitorComponent implements OnInit, OnDestroy {
   private http = inject(HttpClient);
   private toastService = inject(ToastService);
   private modalService = inject(ModalService);
+  public refreshService = inject(RefreshService);
+  private refreshSub?: Subscription;
 
   // Sessions and statistics
   sessions = signal<any[]>([]);
@@ -54,10 +58,23 @@ export class SessionMonitorComponent implements OnInit, OnDestroy {
     this.loadSessions();
     this.loadStats();
     this.startAutoRefresh();
+
+    // Listen for global refresh signals
+    this.refreshSub = this.refreshService.refresh$.subscribe(() => {
+      this.refreshData();
+    });
   }
 
   ngOnDestroy() {
     this.stopAutoRefresh();
+    if (this.refreshSub) this.refreshSub.unsubscribe();
+  }
+
+  refreshData() {
+    this.loadStats();
+    this.loadSessions();
+    // Complete the refresh animation after a short delay
+    setTimeout(() => this.refreshService.completeRefresh(), 800);
   }
 
   // Load KPI and chart statistics
@@ -66,13 +83,13 @@ export class SessionMonitorComponent implements OnInit, OnDestroy {
     this.http.get<any>(`${API_BASE}/admin/sessions/stats`).subscribe({
       next: (res) => {
         if (res.success) {
-          this.stats.set(res.data);
+          setTimeout(() => this.stats.set(res.data), 0);
         }
-        this.statsLoading.set(false);
+        setTimeout(() => this.statsLoading.set(false), 0);
       },
       error: () => {
         this.toastService.error('Failed to load session monitoring statistics');
-        this.statsLoading.set(false);
+        setTimeout(() => this.statsLoading.set(false), 0);
       }
     });
   }
@@ -182,14 +199,14 @@ export class SessionMonitorComponent implements OnInit, OnDestroy {
       this.http.get<any>(`${API_BASE}/admin/sessions?page=${this.pagination().page}&limit=12`).subscribe({
         next: (res) => {
           if (res.success) {
-            this.sessions.set(res.data);
+            setTimeout(() => this.sessions.set(res.data), 0);
           }
         }
       });
       this.http.get<any>(`${API_BASE}/admin/sessions/stats`).subscribe({
         next: (res) => {
           if (res.success) {
-            this.stats.set(res.data);
+            setTimeout(() => this.stats.set(res.data), 0);
           }
         }
       });
@@ -248,12 +265,13 @@ export class SessionMonitorComponent implements OnInit, OnDestroy {
   exportToCSV() {
     try {
       this.toastService.info('Preparing CSV Export...');
-      const headers = ['Session ID', 'User ID', 'Name', 'Email', 'Login Time', 'Logout Time', 'Status', 'IP Address', 'Browser', 'OS', 'Device Type', 'Location', 'Risk Level', 'Risk Score'];
+      const headers = ['Session ID', 'User ID', 'Name', 'Email', 'Role', 'Login Time', 'Logout Time', 'Status', 'IP Address', 'Browser', 'OS', 'Device Type', 'Location', 'Risk Level', 'Risk Score'];
       const rows = this.sessions().map(s => [
         s.id,
         s.user_id || 'N/A',
         s.user_name || 'N/A',
         s.email,
+        s.role || 'N/A',
         s.login_time,
         s.logout_time || 'N/A',
         s.status,
@@ -295,12 +313,20 @@ export class SessionMonitorComponent implements OnInit, OnDestroy {
   }
 
   // Calculations
-  formatDuration(login: string, logout: string | null, status: string): string {
+  formatDuration(login: string, logout: string | null, status: string, realtimeStatus: string): string {
     const start = new Date(login).getTime();
-    const end = logout ? new Date(logout).getTime() : Date.now();
     
     if (status !== 'successful' && !logout) {
       return 'N/A';
+    }
+
+    let end;
+    if (logout) {
+      end = new Date(logout).getTime();
+    } else if (realtimeStatus === 'offline') {
+      return 'Session Expired';
+    } else {
+      end = Date.now();
     }
 
     const diffMs = end - start;
@@ -325,13 +351,23 @@ export class SessionMonitorComponent implements OnInit, OnDestroy {
     }
   }
 
-  getStatusBadgeClass(status: string, sessionStatus: string): string {
+  getStatusBadgeClass(status: string, realtimeStatus: string): string {
     if (status === 'failed') return 'badge bg-red';
     if (status === 'blocked') return 'badge bg-dark-red';
     if (status === 'suspicious') return 'badge bg-purple';
     
-    if (sessionStatus === 'online') return 'badge bg-active-green';
-    if (sessionStatus === 'expired') return 'badge bg-orange';
+    if (realtimeStatus === 'online') return 'badge bg-active-green';
+    if (realtimeStatus === 'idle') return 'badge bg-orange';
     return 'badge bg-grey';
+  }
+
+  getStatusLabel(status: string, realtimeStatus: string): string {
+    if (status === 'failed') return 'FAILED';
+    if (status === 'blocked') return 'BLOCKED';
+    if (status === 'suspicious') return 'SUSPICIOUS';
+    
+    if (realtimeStatus === 'online') return 'ACTIVE';
+    if (realtimeStatus === 'idle') return 'IDLE';
+    return 'OFFLINE';
   }
 }

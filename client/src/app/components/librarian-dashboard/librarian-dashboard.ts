@@ -1,5 +1,5 @@
-import { Component, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, signal, OnDestroy, OnInit } from '@angular/core';
+
 import { AuthService } from '../../services/auth';
 import { MemberService } from '../../services/member.service';
 import { IssueService } from '../../services/issue.service';
@@ -16,15 +16,16 @@ import { io, Socket } from 'socket.io-client';
 import { FineManagerComponent } from './fine-manager/fine-manager';
 import { ModalService } from '../../services/modal.service';
 import { MemberProfileComponent } from './member-profile/member-profile';
+import { RefreshService } from '../../services/refresh.service';
 
 @Component({
   selector: 'app-librarian-dashboard',
   standalone: true,
-  imports: [CommonModule, BookManagerComponent, MemberManagerComponent, CirculationDeskComponent, FineManagerComponent, MemberProfileComponent],
+  imports: [BookManagerComponent, MemberManagerComponent, CirculationDeskComponent, FineManagerComponent, MemberProfileComponent],
   templateUrl: './librarian-dashboard.html',
   styleUrl: './librarian-dashboard.css',
 })
-export class LibrarianDashboardComponent implements OnDestroy {
+export class LibrarianDashboardComponent implements OnInit, OnDestroy {
   private authService   = inject(AuthService);
   private memberService = inject(MemberService);
   private issueService  = inject(IssueService);
@@ -32,8 +33,10 @@ export class LibrarianDashboardComponent implements OnDestroy {
   private router        = inject(Router);
   public toastService   = inject(ToastService);
   private modalService   = inject(ModalService);
+  private refreshService = inject(RefreshService);
   private socket: Socket;
   private routerSub: Subscription;
+  private refreshSub: Subscription | undefined;
 
   readonly uploadsBase = UPLOADS_BASE;
 
@@ -126,12 +129,20 @@ export class LibrarianDashboardComponent implements OnDestroy {
     });
   }
 
+  ngOnInit() {
+    this.refreshSub = this.refreshService.refresh$.subscribe(() => {
+      this.refreshData();
+    });
+  }
+
+  refreshData() {
+    this.loadStats();
+    setTimeout(() => this.refreshService.completeRefresh(), 800);
+  }
+
   ngOnDestroy() {
-    if (this.socket) {
-      this.socket.disconnect();
-    }
-    if (this.routerSub) {
-      this.routerSub.unsubscribe();
-    }
+    if (this.socket) this.socket.disconnect();
+    if (this.routerSub) this.routerSub.unsubscribe();
+    if (this.refreshSub) this.refreshSub.unsubscribe();
   }
 }

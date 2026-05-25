@@ -3,6 +3,11 @@
     flex-direction: column;
     min-height: 100vh;
     background-color: #fff9f8; /* Very light tint for global consistency */
+    transition: padding-top 0.3s ease;
+}
+
+.app-layout.with-marquee {
+    padding-top: 32px; /* Same as marquee height */
 }
 
 .app-main {

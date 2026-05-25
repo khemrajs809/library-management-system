@@ -1,0 +1,31 @@
+export interface Announcement {
+    id?: number;
+    uuid?: string;
+    title: string;
+    message: string;
+    short_message?: string;
+    type: 'info' | 'success' | 'warning' | 'error' | 'emergency' | 'maintenance' | 'holiday' | 'event' | 'update' | 'system';
+    priority: 'low' | 'medium' | 'high' | 'critical';
+    is_active: boolean;
+    is_popup: boolean;
+    scroll_speed: number;
+    text_color: string;
+    background_color: string;
+    border_color: string;
+    icon_name?: string;
+    show_icon: boolean;
+    show_close_button: boolean;
+    pause_on_hover: boolean;
+    repeat_loop: boolean;
+    animation_type: string;
+    clickable_link?: string;
+    open_in_new_tab: boolean;
+    start_time: string | Date;
+    end_time: string | Date;
+    display_order: number;
+    target_roles: string;
+    target_pages: string;
+    device_visibility: 'all' | 'desktop' | 'mobile';
+    view_count?: number;
+    click_count?: number;
+}

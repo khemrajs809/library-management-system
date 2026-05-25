@@ -53,7 +53,7 @@
               <td>
                 <div class="ds-member-cell">
                   @if (row.member_photo) {
-                    <img [src]="uploadsBase + row.member_photo" class="ds-member-photo">
+                    <img [src]="uploadsBase + row.member_photo" class="ds-member-photo" (error)="row.member_photo = null">
                   } @else {
                     <div class="ds-member-placeholder">{{ row.member_name.charAt(0) }}</div>
                   }

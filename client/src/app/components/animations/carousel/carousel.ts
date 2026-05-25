@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'app-carousel-3d',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './carousel.html',
   styleUrl: './carousel.css'
 })

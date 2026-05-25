@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth';
 import { ModalService } from '../../services/modal.service';
@@ -9,10 +9,12 @@ import { DeletedMembersComponent } from './deleted-members/deleted-members';
 import { AuditLogViewerComponent } from './audit-log-viewer/audit-log-viewer';
 import { SessionMonitorComponent } from './session-monitor/session-monitor';
 
+import { AnnouncementManagerComponent } from './announcement-manager/announcement-manager';
+
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, StaffManagerComponent, DeletedBooksComponent, DeletedMembersComponent, AuditLogViewerComponent, SessionMonitorComponent],
+  imports: [RouterModule, StaffManagerComponent, DeletedBooksComponent, DeletedMembersComponent, AuditLogViewerComponent, SessionMonitorComponent, AnnouncementManagerComponent],
   templateUrl: './admin-dashboard.html',
   styleUrl: './admin-dashboard.css',
 })

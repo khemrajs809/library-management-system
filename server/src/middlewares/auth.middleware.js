@@ -14,7 +14,8 @@ if (!JWT_SECRET) {
  * Basic authentication middleware to verify JWT presence and validity.
  */
 const verifyToken = async (req, res, next) => {
-    const token = req.header('Authorization')?.split(' ')[1] || req.header('x-auth-token');
+    // Check for token in cookies first, fallback to headers for legacy support during transition
+    const token = req.cookies?.token || req.header('Authorization')?.split(' ')[1] || req.header('x-auth-token');
 
     if (!token) {
         return res.status(401).json({ success: false, message: 'No token, authorization denied' });
@@ -22,7 +23,7 @@ const verifyToken = async (req, res, next) => {
 
     try {
         // Check if session is inactive
-        const sessionCheck = await pool.query('SELECT status FROM token_blacklist WHERE token = ?', [token]);
+        const [sessionCheck] = await pool.query('CALL proc_check_token_status(?)', [token]);
         if (sessionCheck.length > 0 && sessionCheck[0].status === 'inactive') {
             return res.status(401).json({ success: false, message: 'Token has been revoked. Please log in again.' });
         }
@@ -32,7 +33,7 @@ const verifyToken = async (req, res, next) => {
         req.user = decoded; 
 
         // Non-blocking update of last activity time
-        pool.query('UPDATE user_login_sessions SET last_activity_time = NOW() WHERE token = ? AND session_status = "online"', [token])
+        pool.query('CALL proc_update_last_activity(?)', [token])
             .catch(err => console.error('Error updating activity time:', err.message));
 
         next();
@@ -62,4 +63,3 @@ const checkRole = (allowedRoles) => {
 };
 
 module.exports = { verifyToken, checkRole };
-

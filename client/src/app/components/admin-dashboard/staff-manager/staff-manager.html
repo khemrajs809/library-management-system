@@ -16,9 +16,9 @@
             <div class="form-group">
                 <label for="lib_id">Librarian ID</label>
                 <div class="member-id-auto">
-                  @if (libForm.get('lib_id')?.value) {
+                  @if (generatedId()) {
                     <span class="id-value-badge">
-                      <span class="auto-icon">🪪</span> {{ libForm.get('lib_id')?.value }}
+                      <span class="auto-icon">🪪</span> {{ generatedId() }}
                     </span>
                   } @else {
                     <span class="id-auto-badge"><span class="auto-icon">⚡</span> Auto-assigned by system</span>
@@ -62,8 +62,14 @@
 
   <div class="list-card">
     <div class="section-header">
-        <h2>Librarian Directory</h2>
-        <p>Manage all registered librarian accounts.</p>
+        <div class="header-title-group">
+          <h2>Librarian Directory</h2>
+          <p>Manage all registered librarian accounts.</p>
+        </div>
+        <button class="local-refresh-btn" (click)="refreshData()" [class.spinning]="refreshService.isRefreshing()" title="Refresh Directory">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path><path d="M16 16h5v5"></path></svg>
+          <span>Refresh</span>
+        </button>
     </div>
 
     <div class="table-container">

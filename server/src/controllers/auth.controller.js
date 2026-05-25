@@ -18,10 +18,7 @@ const login = async (req, res) => {
         console.log(`[AUTH] Attempting login for: ${email}`);
 
         // --- ACCOUNT LOCKOUT CHECK ---
-        const lockoutRows = await pool.query(
-            'SELECT attempts, lockout_until FROM login_attempts WHERE email = ?', 
-            [email]
-        );
+        const [lockoutRows] = await pool.query('CALL proc_get_login_attempts(?)', [email]);
 
         if (lockoutRows.length > 0) {
             const { attempts, lockout_until } = lockoutRows[0];
@@ -48,20 +45,20 @@ const login = async (req, res) => {
         }
 
         // Validate Captcha
-        const captchaRows = await pool.query('SELECT * FROM captchas WHERE id = ?', [captchaId]);
+        const [captchaRows] = await pool.query('CALL proc_get_captcha(?)', [captchaId]);
         if (captchaRows.length === 0) {
             return res.status(400).json({ success: false, message: 'Invalid or expired captcha' });
         }
         
         const validCaptcha = captchaRows[0];
-        await pool.query('DELETE FROM captchas WHERE id = ?', [captchaId]);
+        await pool.query('CALL proc_delete_captcha(?)', [captchaId]);
 
         if (validCaptcha.text.toLowerCase() !== captchaText.toLowerCase()) {
             return res.status(400).json({ success: false, message: 'Incorrect captcha' });
         }
 
         // Check if user exists
-        const rows = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+        const [rows] = await pool.query('CALL proc_get_user_by_email(?)', [email]);
         
         if (rows.length > 0) {
             const user = rows[0];
@@ -79,25 +76,22 @@ const login = async (req, res) => {
                         ipAddress,
                         userAgent,
                         status: 'blocked',
-                        failureReason: 'Account deactivated'
+                        failureReason: 'Account deactivated',
+                        role: user.role
                     });
                     // Standard message to avoid enumeration, but can be helpful if you want to tell them they are deactivated
                     return res.status(403).json({ success: false, message: 'Your account is deactivated. Please contact the administrator.' });
                 }
 
                 // SUCCESS: Reset failed attempts
-                await pool.query('DELETE FROM login_attempts WHERE email = ?', [email]);
+                await pool.query('CALL proc_reset_login_attempts(?)', [email]);
 
                 console.log(`[AUTH] Credentials valid for ${email}. Generating OTP...`);
                 // --- MFA STEP 1: Generate and Send OTP ---
                 const otp = Math.floor(100000 + Math.random() * 900000).toString();
-                const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes expiry
 
                 try {
-                    await pool.query(
-                        'INSERT INTO otps (user_id, otp_code, expires_at) VALUES (?, ?, ?)',
-                        [user.id, otp, expiresAt]
-                    );
+                    await pool.query('CALL proc_create_otp(?, ?)', [user.id, otp]);
                 } catch (dbErr) {
                     console.error('[AUTH] Database error storing OTP:', dbErr);
                     return res.status(500).json({ success: false, message: 'Security system error. Please contact admin.' });
@@ -131,7 +125,8 @@ const login = async (req, res) => {
                     ipAddress,
                     userAgent,
                     status: 'failed',
-                    failureReason: 'Incorrect password'
+                    failureReason: 'Incorrect password',
+                    role: user.role
                 });
                 return res.status(401).json({ success: false, message: 'Invalid credentials' });
             }
@@ -156,27 +151,21 @@ const login = async (req, res) => {
 };
 
 const handleFailedAttempt = async (email) => {
-    const rows = await pool.query('SELECT attempts FROM login_attempts WHERE email = ?', [email]);
+    const [rows] = await pool.query('CALL proc_get_login_attempts(?)', [email]);
     if (rows.length > 0) {
         const newAttempts = rows[0].attempts + 1;
         let lockoutUntil = null;
         if (newAttempts >= 5) {
-            lockoutUntil = new Date(Date.now() + 15 * 60 * 1000); // 15 mins lock
+            lockoutUntil = new Date(Date.now() + 1 * 60 * 1000); // 1 min lock
         }
-        await pool.query(
-            'UPDATE login_attempts SET attempts = ?, lockout_until = ? WHERE email = ?',
-            [newAttempts, lockoutUntil, email]
-        );
+        await pool.query('CALL proc_update_login_attempts(?, ?, ?)', [email, newAttempts, lockoutUntil]);
     } else {
-        await pool.query(
-            'INSERT INTO login_attempts (email, attempts) VALUES (?, 1)',
-            [email]
-        );
+        await pool.query('CALL proc_insert_login_attempt(?)', [email]);
     }
 };
 
 const logout = async (req, res) => {
-    const token = req.header('Authorization')?.split(' ')[1] || req.header('x-auth-token');
+    const token = req.cookies?.token || req.header('Authorization')?.split(' ')[1] || req.header('x-auth-token');
 
     if (!token) {
         return res.status(200).json({ success: true, message: 'Already logged out' });
@@ -185,30 +174,28 @@ const logout = async (req, res) => {
     try {
         const decoded = jwt.decode(token);
         if (decoded && decoded.exp) {
-            // Convert UNIX timestamp to MariaDB TIMESTAMP format
             const expiresAt = new Date(decoded.exp * 1000).toISOString().slice(0, 19).replace('T', ' ');
 
-            // Cleanup old expired tokens from blacklist periodically
-            await pool.query('DELETE FROM token_blacklist WHERE expires_at < NOW()');
+            // Cleanup
+            await pool.query('CALL proc_cleanup_token_blacklist()');
 
-            // Mark session as inactive and set logout time
-            const result = await pool.query('UPDATE token_blacklist SET status = "inactive", logout_time = NOW() WHERE token = ?', [token]);
+            // Logout
+            const [logoutResult] = await pool.query('CALL proc_logout_session(?)', [token]);
+            const affectedRows = logoutResult[0].affected_rows;
 
-            await pool.query('UPDATE user_login_sessions SET session_status = "offline", logout_time = NOW() WHERE token = ?', [token]);
-
-            // If it wasn't tracked (legacy or missing), insert full details from token
-            if (result.affectedRows === 0) {
+            if (affectedRows === 0) {
                 const ipAddress = req.ip || req.connection?.remoteAddress || '';
                 const userAgent = req.headers['user-agent'] || '';
 
                 await pool.query(
-                    `INSERT IGNORE INTO token_blacklist 
-                    (token, user_id, email, role, status, expires_at, login_time, logout_time, ip_address, user_agent) 
-                    VALUES (?, ?, ?, ?, "inactive", ?, NOW(), NOW(), ?, ?)`,
-                    [token, decoded.id || null, decoded.email || null, decoded.role || null, expiresAt, ipAddress, userAgent]
+                    'CALL proc_insert_token_blacklist(?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                    [token, decoded.id || null, decoded.name || null, decoded.email || null, decoded.role || null, 'inactive', expiresAt, ipAddress, userAgent]
                 );
             }
         }
+
+        // Clear the cookie
+        res.clearCookie('token');
 
         return res.status(200).json({ success: true, message: 'Logged out successfully' });
     } catch (err) {
@@ -226,24 +213,21 @@ const verifyOTP = async (req, res) => {
         }
 
         // Find user
-        const userRows = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+        const [userRows] = await pool.query('CALL proc_get_user_by_email(?)', [email]);
         if (userRows.length === 0) {
             return res.status(401).json({ success: false, message: 'Invalid session' });
         }
         const user = userRows[0];
 
         // Validate OTP
-        const otpRows = await pool.query(
-            'SELECT * FROM otps WHERE user_id = ? AND otp_code = ? AND expires_at > UTC_TIMESTAMP() ORDER BY created_at DESC LIMIT 1',
-            [user.id, otp]
-        );
+        const [otpRows] = await pool.query('CALL proc_verify_otp(?, ?)', [user.id, otp]);
 
         if (otpRows.length === 0) {
             return res.status(401).json({ success: false, message: 'Invalid or expired security code' });
         }
 
         // OTP is valid, delete all OTPs for this user
-        await pool.query('DELETE FROM otps WHERE user_id = ?', [user.id]);
+        await pool.query('CALL proc_delete_user_otps(?)', [user.id]);
 
         // --- Generate Final JWT ---
         const token = jwt.sign(
@@ -263,8 +247,7 @@ const verifyOTP = async (req, res) => {
         const userAgent = req.headers['user-agent'] || '';
 
         await pool.query(
-            `INSERT INTO token_blacklist (token, user_id, user_name, email, role, status, expires_at, ip_address, user_agent) 
-             VALUES (?, ?, ?, ?, ?, 'active', ?, ?, ?)`,
+            'CALL proc_create_active_session(?, ?, ?, ?, ?, ?, ?, ?)',
             [token, user.id, user.name, user.email, user.role, expiresAt, ipAddress, userAgent]
         );
 
@@ -275,10 +258,25 @@ const verifyOTP = async (req, res) => {
             ipAddress,
             userAgent,
             status: 'successful',
-            token
+            token,
+            role: user.role
         });
 
-        return res.status(200).json({ success: true, message: 'MFA verified, login successful', token });
+        // Set the token in an HttpOnly cookie
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production' || true, // since we have https locally
+            sameSite: 'strict',
+            maxAge: 3 * 60 * 60 * 1000 // 3 hours
+        });
+
+        // We don't send the token in the response body anymore, just the necessary session metadata
+        return res.status(200).json({ 
+            success: true, 
+            message: 'MFA verified, login successful',
+            role: user.role,
+            exp: decoded.exp
+        });
 
     } catch (err) {
         console.error('OTP Verification Error:', err);
@@ -295,23 +293,19 @@ const resendOTP = async (req, res) => {
         }
 
         // Find user
-        const userRows = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+        const [userRows] = await pool.query('CALL proc_get_user_by_email(?)', [email]);
         if (userRows.length === 0) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
         const user = userRows[0];
 
-        // --- INVALIDATE PREVIOUS OTPS ---
-        await pool.query('DELETE FROM otps WHERE user_id = ?', [user.id]);
+        // Invalidate previous
+        await pool.query('CALL proc_delete_user_otps(?)', [user.id]);
 
         // --- GENERATE NEW OTP ---
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-
-        await pool.query(
-            'INSERT INTO otps (user_id, otp_code, expires_at) VALUES (?, ?, ?)',
-            [user.id, otp, expiresAt]
-        );
+        
+        await pool.query('CALL proc_create_otp(?, ?)', [user.id, otp]);
 
         console.log(`[AUTH] New OTP generated for resend: ${user.email}`);
 
@@ -341,26 +335,19 @@ const forgotPassword = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Email is required' });
         }
 
-        const userRows = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+        const [userRows] = await pool.query('CALL proc_get_user_by_email(?)', [email]);
         if (userRows.length === 0) {
-            // Security best practice: don't reveal if email exists or not, 
-            // but for a library system, we can be more helpful if preferred.
-            // Let's go with "helpful" for this internal tool.
             return res.status(404).json({ success: false, message: 'No account found with this email' });
         }
         const user = userRows[0];
 
         // Invalidate old OTPs
-        await pool.query('DELETE FROM otps WHERE user_id = ?', [user.id]);
+        await pool.query('CALL proc_delete_user_otps(?)', [user.id]);
 
         // Generate OTP
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
 
-        await pool.query(
-            'INSERT INTO otps (user_id, otp_code, expires_at) VALUES (?, ?, ?)',
-            [user.id, otp, expiresAt]
-        );
+        await pool.query('CALL proc_create_otp(?, ?)', [user.id, otp]);
 
         console.log(`[AUTH] Forgot Password OTP sent to: ${user.email}`);
 
@@ -391,17 +378,14 @@ const resetPassword = async (req, res) => {
         }
 
         // Find user
-        const userRows = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+        const [userRows] = await pool.query('CALL proc_get_user_by_email(?)', [email]);
         if (userRows.length === 0) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
         const user = userRows[0];
 
         // Verify OTP
-        const otpRows = await pool.query(
-            'SELECT * FROM otps WHERE user_id = ? AND otp_code = ? AND expires_at > UTC_TIMESTAMP() ORDER BY created_at DESC LIMIT 1',
-            [user.id, otp]
-        );
+        const [otpRows] = await pool.query('CALL proc_verify_otp(?, ?)', [user.id, otp]);
 
         if (otpRows.length === 0) {
             return res.status(401).json({ success: false, message: 'Invalid or expired reset code' });
@@ -412,10 +396,10 @@ const resetPassword = async (req, res) => {
         const hashedPassword = await bcrypt.hash(newPassword, salt);
 
         // Update password
-        await pool.query('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, user.id]);
+        await pool.query('CALL proc_update_password(?, ?)', [user.id, hashedPassword]);
 
         // Delete all OTPs for this user
-        await pool.query('DELETE FROM otps WHERE user_id = ?', [user.id]);
+        await pool.query('CALL proc_delete_user_otps(?)', [user.id]);
 
         console.log(`[AUTH] Password successfully reset for: ${user.email}`);
 

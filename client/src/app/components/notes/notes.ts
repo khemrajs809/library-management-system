@@ -1,12 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { NotesService } from '../../services/notes.service';
 import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-notes',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './notes.html',
   styleUrl: './notes.css'
 })

@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, Input, Output, EventEmitter, ViewChild, SimpleChanges, OnInit, OnChanges } from '@angular/core';
+import { Component, inject, signal, computed, Input, Output, EventEmitter, ViewChild, SimpleChanges, OnInit, OnChanges, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MemberService } from '../../../services/member.service';
@@ -8,6 +8,8 @@ import { UPLOADS_BASE } from '../../../core/api.config';
 import { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType } from '@zxing/library';
 import { EmailSenderComponent } from '../email-sender/email-sender';
 import { ModalService } from '../../../services/modal.service';
+import { RefreshService } from '../../../services/refresh.service';
+import { Subscription } from 'rxjs';
 
 // New Sub-components
 import { MemberTableComponent } from './components/member-table/member-table';
@@ -28,10 +30,12 @@ import { MemberFormComponent } from './components/member-form/member-form';
   templateUrl: './member-manager.html',
   styleUrl: './member-manager.css'
 })
-export class MemberManagerComponent implements OnInit, OnChanges {
+export class MemberManagerComponent implements OnInit, OnChanges, OnDestroy {
   private memberService = inject(MemberService);
   private toastService = inject(ToastService);
   private modalService = inject(ModalService);
+  public refreshService = inject(RefreshService);
+  private refreshSub?: Subscription;
 
   @Input() activeTab = 'member_directory';
   @Output() openProfile = new EventEmitter<string>();
@@ -71,6 +75,21 @@ export class MemberManagerComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     this.fetchNextId();
+    this.refreshSub = this.refreshService.refresh$.subscribe(() => {
+      this.refreshData();
+    });
+  }
+
+  refreshData() {
+    this.loadMembers();
+    this.loadActivities();
+    this.fetchNextId();
+    setTimeout(() => this.refreshService.completeRefresh(), 800);
+  }
+
+  ngOnDestroy() {
+    if (this.refreshSub) this.refreshSub.unsubscribe();
+    this.stopScanner();
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -304,5 +323,13 @@ export class MemberManagerComponent implements OnInit, OnChanges {
     this.selectedEmail.set(null);
   }
 
-  ngOnDestroy() { this.stopScanner(); }
+  onPhotoError() {
+    const member = this.selectedMember();
+    if (member) {
+      member.photo_url = undefined;
+      this.selectedMember.set({ ...member });
+    }
+  }
+
+  // ngOnDestroy moved up
 }

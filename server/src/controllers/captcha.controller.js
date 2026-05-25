@@ -17,11 +17,11 @@ const generateCaptcha = async (req, res) => {
         const id = crypto.randomUUID();
 
         // Cleanup old captchas (older than 10 mins)
-        await pool.query('DELETE FROM captchas WHERE created_at < DATE_SUB(NOW(), INTERVAL 10 MINUTE)');
+        await pool.query('CALL proc_cleanup_captchas()');
 
         // Save to database
         await pool.query(
-            'INSERT INTO captchas (id, text) VALUES (?, ?)',
+            'CALL proc_create_captcha(?, ?)',
             [id, captcha.text]
         );
 

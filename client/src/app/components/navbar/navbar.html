@@ -1,7 +1,7 @@
 <nav class="navbar">
     <div class="container nav-content">
         <div class="logo">
-            <img src="logolms.png" alt="Library Logo" class="logo-img" width="180" height="45">
+            <img src="/logolms.png" alt="Library Logo" class="logo-img" width="180" height="45">
         </div>
         <ul class="nav-links">
             @if (!authService.isLoggedIn()) {
@@ -20,6 +20,9 @@
                             <span class="timer-value">{{ (idleService.idleRemaining() / 60 | number:'1.0-0') }}:{{ (idleService.idleRemaining() % 60 | number:'2.0-0') }}</span>
                         </div>
                     }
+                </li>
+                <li class="refresh-section" style="display: flex; align-items: center;">
+                    <app-refresh-button></app-refresh-button>
                 </li>
                 <li><a [routerLink]="authService.userRole() === 'librarian' ? '/librarian/dashboard' : '/admin/dashboard'" routerLinkActive="active">Dashboard</a></li>
                 <li><a (click)="logout()" class="logout-link">Logout</a></li>

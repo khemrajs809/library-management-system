@@ -1,10 +1,10 @@
 <div class="desk-layout">
-  
+
   <div class="desk-grid" [class.no-sidebar]="activeTab !== 'issues'">
     <!-- Left Side: Issue Form -->
     @if (activeTab === 'issues') {
       <div class="side-panel">
-        <app-issue-form 
+        <app-issue-form
           [recentActivity]="recentActivity()"
           (onIssue)="executeIssue($event.member_id, $event.book_id)">
         </app-issue-form>
@@ -13,7 +13,7 @@
 
     <!-- Main Area -->
     <div class="main-content" [class.full-width]="activeTab === 'history' || activeTab === 'scanner_mode'">
-      
+
       @if (activeTab === 'issues') {
         <div class="active-header-main">
           <div class="header-top-row">
@@ -21,11 +21,13 @@
               <h2 class="table-title">Active Circulation</h2>
               <div class="badge-row">
                 <span class="ds-badge-blue">{{ totalActiveCount() }} Active Issues</span>
-                <span class="ds-badge-red" *ngIf="overdueCount() > 0">{{ overdueCount() }} Overdue</span>
+                @if (overdueCount() > 0) {
+                  <span class="ds-badge-red">{{ overdueCount() }} Overdue</span>
+                }
               </div>
             </div>
             <div class="header-search">
-              <input type="search" class="custom-input" style="width: 320px;" 
+              <input type="search" class="custom-input" style="width: 320px;"
                 placeholder="Search active records..." [value]="issuesQuery()" (input)="onIssuesSearch($any($event.target).value)">
             </div>
           </div>
@@ -77,46 +79,46 @@
 
 <!-- Issue Confirmation Modal -->
 @if (issuePreview()) {
-<div class="modal-overlay" (click)="cancelIssuePreview()">
-  <div class="modal-card ds-style-5a1da65e" (click)="stopPropagation($event)">
-    <div class="ds-style-57b30d25">
-      <h3 class="ds-style-3e46aca9">Confirm Book Issue</h3>
-      <button class="btn btn-xs btn-red-outline" (click)="cancelIssuePreview()">✕</button>
-    </div>
-    
-    <div class="preview-details">
-      <div class="member-box">
-        <img [src]="issuePreview()?.member?.photo_url ? (uploadsBase + issuePreview()?.member?.photo_url) : 'assets/placeholder-user.png'" class="avatar">
-        <div class="info">
-          <strong>{{ issuePreview()?.member?.name }}</strong>
-          <span>ID: {{ issuePreview()?.member?.member_id }}</span>
-        </div>
+  <div class="modal-overlay" (click)="cancelIssuePreview()">
+    <div class="modal-card ds-style-5a1da65e" (click)="stopPropagation($event)">
+      <div class="ds-style-57b30d25">
+        <h3 class="ds-style-3e46aca9">Confirm Book Issue</h3>
+        <button class="btn btn-xs btn-red-outline" (click)="cancelIssuePreview()">✕</button>
       </div>
-      
-      <div class="book-box">
-        <img [src]="issuePreview()?.book?.cover_url || 'assets/cover-placeholder.png'" class="cover">
-        <div class="info">
-          <strong>{{ issuePreview()?.book?.title }}</strong>
-          <span>ISBN: {{ issuePreview()?.book?.isbn || 'N/A' }}</span>
+
+      <div class="preview-details">
+        <div class="member-box">
+          <img [src]="issuePreview()?.member?.photo_url ? (uploadsBase + issuePreview()?.member?.photo_url) : '/assets/placeholder-user.png'" class="avatar">
+          <div class="info">
+            <strong>{{ issuePreview()?.member?.name }}</strong>
+            <span>ID: {{ issuePreview()?.member?.member_id }}</span>
+          </div>
+        </div>
+
+        <div class="book-box">
+          <img [src]="issuePreview()?.book?.cover_url || '/assets/cover-placeholder.png'" class="cover">
+          <div class="info">
+            <strong>{{ issuePreview()?.book?.title }}</strong>
+            <span>ISBN: {{ issuePreview()?.book?.isbn || 'N/A' }}</span>
+          </div>
+        </div>
+
+        <div class="timeline-box">
+          <div class="item">
+            <span>Issue Date:</span>
+            <strong>{{ currentDate | date:'dd/MM/yyyy' }}</strong>
+          </div>
+          <div class="item">
+            <span>Due Date:</span>
+            <strong class="text-blue">{{ issuePreview()?.dueDate }}</strong>
+          </div>
         </div>
       </div>
 
-      <div class="timeline-box">
-        <div class="item">
-          <span>Issue Date:</span>
-          <strong>{{ currentDate | date:'dd/MM/yyyy' }}</strong>
-        </div>
-        <div class="item">
-          <span>Due Date:</span>
-          <strong class="text-blue">{{ issuePreview()?.dueDate }}</strong>
-        </div>
+      <div class="ds-style-afbae23">
+        <button class="btn btn-red-outline btn-cancel-hover" (click)="cancelIssuePreview()">Cancel</button>
+        <button class="btn btn-red btn-confirm-hover" (click)="confirmIssuePreview()">Confirm & Issue</button>
       </div>
-    </div>
-
-    <div class="ds-style-afbae23">
-      <button class="btn btn-red-outline btn-cancel-hover" (click)="cancelIssuePreview()">Cancel</button>
-      <button class="btn btn-red btn-confirm-hover" (click)="confirmIssuePreview()">Confirm & Issue</button>
     </div>
   </div>
-</div>
 }

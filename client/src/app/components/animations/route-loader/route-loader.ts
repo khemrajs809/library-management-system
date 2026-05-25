@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { SpinnerComponent } from '../spinner/spinner';
 
 /**
@@ -13,7 +13,7 @@ import { SpinnerComponent } from '../spinner/spinner';
 @Component({
   selector: 'app-route-loader',
   standalone: true,
-  imports: [CommonModule, SpinnerComponent],
+  imports: [SpinnerComponent],
   templateUrl: './route-loader.html',
   styleUrl: './route-loader.css'
 })

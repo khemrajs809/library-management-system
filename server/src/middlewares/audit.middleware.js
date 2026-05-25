@@ -23,9 +23,9 @@ const auditLog = (actionDescription) => {
                     ip: req.ip
                 };
 
-                // Non-blocking log to DB
+                // Non-blocking log to DB using stored procedure
                 pool.query(
-                    'INSERT INTO audit_logs (user_id, user_role, action, details) VALUES (?, ?, ?, ?)',
+                    'CALL proc_log_audit_action(?, ?, ?, ?)',
                     [
                         user.id || user.email || 'unknown', 
                         user.role, 

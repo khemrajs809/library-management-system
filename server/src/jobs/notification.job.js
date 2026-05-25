@@ -13,16 +13,9 @@ function setupNotificationJob(io) {
         try {
             const today = new Date().toISOString().split('T')[0];
             const twoDaysFromNow = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-            const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
             // 1. Due in 2 days — send reminder
-            const dueSoon = await pool.query(`
-                SELECT i.*, m.name, m.email, b.title 
-                FROM issues i 
-                JOIN members m ON i.member_id = m.member_id 
-                JOIN books b ON i.book_id = b.book_id 
-                WHERE i.due_date = ? AND i.status = 'issued'
-            `, [twoDaysFromNow]);
+            const [dueSoon] = await pool.query('CALL proc_get_issues_due_on(?)', [twoDaysFromNow]);
 
             for (const issue of dueSoon) {
                 transporter.sendMail({
@@ -34,13 +27,7 @@ function setupNotificationJob(io) {
             }
 
             // 2. Due today — last warning
-            const dueToday = await pool.query(`
-                SELECT i.*, m.name, m.email, b.title 
-                FROM issues i 
-                JOIN members m ON i.member_id = m.member_id 
-                JOIN books b ON i.book_id = b.book_id 
-                WHERE i.due_date = ? AND i.status = 'issued'
-            `, [today]);
+            const [dueToday] = await pool.query('CALL proc_get_issues_due_on(?)', [today]);
 
             for (const issue of dueToday) {
                 transporter.sendMail({
@@ -52,13 +39,7 @@ function setupNotificationJob(io) {
             }
 
             // 3. Overdue — fine notice + real-time librarian alert
-            const overdue = await pool.query(`
-                SELECT i.*, m.name, m.email, b.title 
-                FROM issues i 
-                JOIN members m ON i.member_id = m.member_id 
-                JOIN books b ON i.book_id = b.book_id 
-                WHERE i.due_date < ? AND i.status = 'issued'
-            `, [today]);
+            const [overdue] = await pool.query('CALL proc_get_issues_overdue(?)', [today]);
 
             for (const issue of overdue) {
                 transporter.sendMail({

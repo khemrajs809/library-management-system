@@ -166,17 +166,52 @@
 
 .section-header {
     margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.section-header h2 {
+.header-title-group h2 {
     color: var(--text-dark, #212121);
     font-size: 20px;
     margin-bottom: 5px;
 }
 
-.section-header p {
+.header-title-group p {
     color: var(--text-light, #757575);
     font-size: 14px;
+}
+
+.local-refresh-btn {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.local-refresh-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+}
+
+.local-refresh-btn.spinning svg {
+  animation: spin 1s linear infinite;
+  color: #16a34a;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .lib-table {

@@ -9,20 +9,12 @@ import { ToastService } from '../services/toast.service';
  * This runs for ALL requests, so we only add the header when a token exists.
  */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const token = localStorage.getItem('lib_token');
   const authService = inject(AuthService);
   const toastService = inject(ToastService);
 
-  // If no token, pass the request through unchanged (e.g. login requests)
-  if (!token) {
-    return next(req);
-  }
-
-  // Clone the request and add the Authorization header
+  // Clone the request and add withCredentials to send the HttpOnly cookie
   const authReq = req.clone({
-    setHeaders: {
-      Authorization: `Bearer ${token}`
-    }
+    withCredentials: true
   });
 
   // Handle the response and catch 401 Unauthorized errors

@@ -1,0 +1,206 @@
+<div class="manager-container">
+  <div class="manager-header">
+    <div class="header-info">
+      <h2>Broadcasting & Marquee Management</h2>
+      <p>Configure live system-wide notifications, emergency alerts, and event schedules.</p>
+    </div>
+    <button class="btn btn-crimson" (click)="toggleForm()">
+      {{ showForm() ? 'View Active Broadcasts' : 'Create New Announcement' }}
+    </button>
+  </div>
+
+  <!-- Creation Form -->
+  @if (showForm()) {
+    <div class="form-section card">
+      <form [formGroup]="annForm" (ngSubmit)="onSubmit()" class="broadcast-form">
+        <div class="form-grid">
+          <!-- Main Row: Title & Type -->
+          <div class="form-group span-2">
+            <label>Broadcast Title (Internal)</label>
+            <input type="text" formControlName="title" placeholder="e.g. System Maintenance Alert">
+          </div>
+          <div class="form-group">
+            <label>Notification Type</label>
+            <select formControlName="type">
+              <option value="info">General Information</option>
+              <option value="success">Success / Milestone</option>
+              <option value="warning">Warning / Caution</option>
+              <option value="error">Critical Error</option>
+              <option value="emergency">Emergency Alert</option>
+              <option value="maintenance">Maintenance Update</option>
+              <option value="holiday">Holiday Greeting</option>
+              <option value="event">Event / Workshop</option>
+              <option value="update">System Update</option>
+              <option value="arrival">New Book Arrival</option>
+              <option value="hours">Library Hours</option>
+              <option value="policy">Policy Update</option>
+              <option value="staff">Staff Pick</option>
+            </select>
+          </div>
+          <!-- Content Row -->
+          <div class="form-group span-3">
+            <label>Message Content (Scrolling Text)</label>
+            <textarea formControlName="message" rows="2" placeholder="Enter the full message to be displayed in the marquee..."></textarea>
+          </div>
+          <!-- Control Row: Priority, Speed, Availability -->
+          <div class="form-group">
+            <label>Display Priority</label>
+            <select formControlName="priority">
+              <option value="low">Low Priority</option>
+              <option value="medium">Medium Priority</option>
+              <option value="high">High Priority</option>
+              <option value="critical">Critical (Priority)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Scroll Speed</label>
+            <select formControlName="scroll_speed">
+              <option [value]="10">Blazing (10s)</option>
+              <option [value]="12">Swift (12s)</option>
+              <option [value]="14">Fast (14s)</option>
+              <option [value]="16">Brisk (16s)</option>
+              <option [value]="18">Active (18s)</option>
+              <option [value]="20">Standard (20s)</option>
+              <option [value]="22">Smooth (22s)</option>
+              <option [value]="24">Gentle (24s)</option>
+              <option [value]="26">Calm (26s)</option>
+              <option [value]="28">Slow (28s)</option>
+              <option [value]="30">Very Slow (30s)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Broadcast Status</label>
+            <select formControlName="is_active" class="status-select">
+              <option [ngValue]="true">🟢 Active (Live)</option>
+              <option [ngValue]="false">⚪ Inactive (Draft)</option>
+            </select>
+          </div>
+          <!-- Style Row: Presets -->
+          <div class="form-group span-3">
+            <label>Smooth & Creamy Style Presets</label>
+            <div class="color-presets">
+              <button type="button" class="preset-btn" style="background: #fdfaf1; color: #1e293b; border: 1px solid #e2e8f0;" (click)="applyPreset('#fdfaf1', '#1e293b')">Creamy Pearl</button>
+              <button type="button" class="preset-btn" style="background: #fff5f5; color: #991b1b; border: 1px solid #fee2e2;" (click)="applyPreset('#fff5f5', '#991b1b')">Soft Rose</button>
+              <button type="button" class="preset-btn" style="background: #f0fdf4; color: #166534; border: 1px solid #dcfce7;" (click)="applyPreset('#f0fdf4', '#166534')">Mint Cream</button>
+              <button type="button" class="preset-btn" style="background: #eff6ff; color: #1e40af; border: 1px solid #dbeafe;" (click)="applyPreset('#eff6ff', '#1e40af')">Sky Silk</button>
+              <button type="button" class="preset-btn" style="background: #fffbeb; color: #92400e; border: 1px solid #fef3c7;" (click)="applyPreset('#fffbeb', '#92400e')">Honey Glow</button>
+              <button type="button" class="preset-btn" style="background: #faf5ff; color: #6b21a8; border: 1px solid #f3e8ff;" (click)="applyPreset('#faf5ff', '#6b21a8')">Lavender Mist</button>
+              <button type="button" class="preset-btn" style="background: #1e293b; color: #f8fafc; border: 1px solid #334155;" (click)="applyPreset('#1e293b', '#f8fafc')">Midnight Slate</button>
+              <button type="button" class="preset-btn" style="background: #b91c1c; color: #ffffff; border: 1px solid #991b1b;" (click)="applyPreset('#b91c1c', '#ffffff')">Royal Red</button>
+            </div>
+          </div>
+          <!-- Fine Tuning: Colors -->
+          <div class="form-group">
+            <label>Background Color</label>
+            <div class="color-picker-wrap">
+              <input type="color" formControlName="background_color">
+              <span>{{ annForm.get('background_color')?.value }}</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Text Color</label>
+            <div class="color-picker-wrap">
+              <input type="color" formControlName="text_color">
+              <span>{{ annForm.get('text_color')?.value }}</span>
+            </div>
+          </div>
+          <div class="toggle-group span-3">
+            <label class="toggle-item">
+              <input type="checkbox" formControlName="show_icon"> Show Icon
+            </label>
+            <label class="toggle-item">
+              <input type="checkbox" formControlName="show_close_button"> Allow Close
+            </label>
+            <label class="toggle-item">
+              <input type="checkbox" formControlName="pause_on_hover"> Pause on Hover
+            </label>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-gray-outline" (click)="toggleForm()">Cancel</button>
+          <button type="submit" class="btn btn-crimson" [disabled]="annForm.invalid || isLoading()">
+            {{ isLoading() ? 'Publishing...' : 'Launch Broadcast' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <!-- Data Table -->
+  @if (!showForm()) {
+    <div class="table-section card">
+      <div class="table-controls">
+        <h3>Active & Scheduled Broadcasts</h3>
+        <div class="stats-mini">
+          <span>Active: <strong>{{ announcements().length }}</strong></span>
+        </div>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Priority & Type</th>
+              <th>Message Preview</th>
+              <th>Duration Schedule</th>
+              <th>Reach Analytics</th>
+              <th>Status</th>
+              <th class="text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (ann of announcements(); track ann.id) {
+              <tr>
+                <td>
+                  <div class="type-cell">
+                    <span class="prio-dot" [class]="ann.priority"></span>
+                    <div class="type-info">
+                      <span class="type-badge" [style.background]="ann.background_color">{{ ann.type }}</span>
+                      <span class="prio-text">{{ ann.priority }} priority</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="msg-preview">
+                    <strong>{{ ann.title }}</strong>
+                    <p>{{ ann.message }}</p>
+                  </div>
+                </td>
+                <td>
+                  <div class="date-cell">
+                    <span>Start: {{ ann.start_time | date:'MMM d, h:mm a' }}</span>
+                    <span>End: {{ ann.end_time | date:'MMM d, h:mm a' }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="stats-cell">
+                    <span title="Total Views">👁️ {{ ann.view_count }}</span>
+                    @if (ann.clickable_link) {
+                      <span title="Total Clicks">🖱️ {{ ann.click_count }}</span>
+                    }
+                  </div>
+                </td>
+                <td>
+                  <button class="status-toggle" [class.active]="ann.is_active" (click)="toggleStatus(ann.id!, ann.is_active)">
+                    {{ ann.is_active ? 'ON AIR' : 'OFF AIR' }}
+                  </button>
+                </td>
+                <td class="text-right">
+                  <div class="action-btns">
+                    <button class="btn-icon delete" (click)="deleteAnnouncement(ann.id!)" title="Remove">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+            @if (announcements().length === 0) {
+              <tr>
+                <td colspan="6" class="empty-state">No broadcast history found. Launch your first announcement above.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>

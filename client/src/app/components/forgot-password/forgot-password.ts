@@ -4,12 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth';
 import { ToastService } from '../../services/toast.service';
 import { SpinnerComponent } from '../animations/spinner/spinner';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
-  imports: [RouterLink, FormsModule, SpinnerComponent, CommonModule],
+  imports: [RouterLink, FormsModule, SpinnerComponent],
   templateUrl: './forgot-password.html',
   styleUrl: './forgot-password.css',
 })

@@ -11,16 +11,16 @@ export class IdleTimeoutService {
   private ngZone = inject(NgZone);
 
   private readonly INACTIVITY_THRESHOLD_SECONDS = 60; // 1 minute of silence before countdown starts
-  private readonly GRACE_PERIOD_SECONDS = 10 * 60; // 10 minutes countdown
-  
+  private readonly GRACE_PERIOD_SECONDS = 9 * 60; // 10 minutes countdown
+
   public idleRemaining = signal<number>(this.GRACE_PERIOD_SECONDS);
   public isThresholdReached = signal<boolean>(false);
-  
+
   private destroy$ = new Subject<void>();
   private countdownInterval: any;
   private lastActivityTime: number = Date.now();
 
-  constructor() {}
+  constructor() { }
 
   /**
    * Starts monitoring user activity. 
@@ -41,7 +41,7 @@ export class IdleTimeoutService {
 
     this.ngZone.runOutsideAngular(() => {
       activityEvents$.pipe(
-        throttleTime(1000), 
+        throttleTime(1000),
         takeUntil(this.destroy$)
       ).subscribe(() => {
         this.lastActivityTime = Date.now();
@@ -59,19 +59,17 @@ export class IdleTimeoutService {
 
   private startTick() {
     if (this.countdownInterval) clearInterval(this.countdownInterval);
-    
+
     this.countdownInterval = setInterval(() => {
       if (!this.authService.isLoggedIn()) return;
 
       const secondsSinceLastActivity = Math.floor((Date.now() - this.lastActivityTime) / 1000);
 
       if (secondsSinceLastActivity >= this.INACTIVITY_THRESHOLD_SECONDS) {
-        if (!this.isThresholdReached()) {
-          this.ngZone.run(() => this.isThresholdReached.set(true));
-        }
+          this.isThresholdReached.set(true);
 
         const remainingGrace = this.GRACE_PERIOD_SECONDS - (secondsSinceLastActivity - this.INACTIVITY_THRESHOLD_SECONDS);
-        
+
         if (remainingGrace <= 0) {
           this.ngZone.run(() => {
             console.log('[IdleTimeout] Total inactivity period reached. Logging out...');
@@ -79,12 +77,13 @@ export class IdleTimeoutService {
           });
           clearInterval(this.countdownInterval);
         } else {
-          this.idleRemaining.set(remainingGrace);
+          // Update the signal directly
+          if (this.idleRemaining() !== remainingGrace) {
+            this.idleRemaining.set(remainingGrace);
+          }
         }
       } else {
-        if (this.isThresholdReached()) {
-          this.ngZone.run(() => this.isThresholdReached.set(false));
-        }
+          this.isThresholdReached.set(false);
       }
     }, 1000);
   }

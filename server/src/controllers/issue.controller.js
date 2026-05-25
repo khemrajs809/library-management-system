@@ -7,37 +7,31 @@ const issueBook = async (req, res) => {
     if (!member_id || !copy_id) return res.status(400).json({ success: false, message: 'Member ID and Copy ID required' });
 
     try {
-        const memberCheck = await pool.query('SELECT * FROM members WHERE member_id = ?', [member_id]);
-        if (memberCheck.length === 0) return res.status(404).json({ success: false, message: 'Member not found' });
+        const [results] = await pool.query('CALL proc_check_issue_eligibility(?, ?)', [member_id, copy_id]);
+        const memberCheck = results[0];
+        const copyCheck = results[1];
+        const alreadyIssuedCheck = results[2];
+        const fineCheck = results[3];
+        const issueCount = results[4];
 
-        const copyCheck = await pool.query('SELECT * FROM book_copies WHERE copy_id = ?', [copy_id]);
+        if (memberCheck.length === 0) return res.status(404).json({ success: false, message: 'Member not found' });
         if (copyCheck.length === 0) return res.status(404).json({ success: false, message: 'Book copy not found' });
         if (copyCheck[0].status !== 'available') return res.status(400).json({ success: false, message: `This copy is currently ${copyCheck[0].status}.` });
-
-        const actual_book_id = copyCheck[0].book_id;
-        const alreadyIssuedCheck = await pool.query(`
-            SELECT i.* FROM issues i
-            JOIN book_copies bc ON i.book_id = bc.copy_id
-            WHERE i.member_id = ? AND bc.book_id = ? AND i.status = 'issued'
-        `, [member_id, actual_book_id]);
 
         if (alreadyIssuedCheck.length > 0) {
             return res.status(400).json({ success: false, message: 'Member already has a copy of this book issued.' });
         }
 
-        const fineCheck = await pool.query('SELECT SUM(fine_amount) as total_unpaid FROM issues WHERE member_id = ? AND fine_paid = 0', [member_id]);
-        if (fineCheck[0].total_unpaid > 0) {
+        if (Number(fineCheck[0]?.total_unpaid || 0) > 0) {
             return res.status(400).json({ success: false, message: `Member has pending fines of ₹${fineCheck[0].total_unpaid}.` });
         }
 
-        const issueCount = await pool.query('SELECT COUNT(*) as count FROM issues WHERE member_id = ? AND status = ?', [member_id, 'issued']);
         if (Number(issueCount[0].count) >= 3) return res.status(400).json({ success: false, message: 'Member has already issued 3 books' });
 
         const issue_date = new Date().toISOString().split('T')[0];
         const due_date = new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-        await pool.query('INSERT INTO issues (book_id, member_id, issue_date, due_date) VALUES (?, ?, ?, ?)', [copy_id, member_id, issue_date, due_date]);
-        await pool.query('UPDATE book_copies SET status = "issued" WHERE copy_id = ?', [copy_id]);
+        await pool.query('CALL proc_issue_book(?, ?, ?, ?)', [copy_id, member_id, issue_date, due_date]);
 
         res.status(201).json({ success: true, message: 'Book issued successfully', due_date });
     } catch (err) {
@@ -52,14 +46,10 @@ const renewBook = async (req, res) => {
     if (!issue_id) return res.status(400).json({ success: false, message: 'Issue ID required' });
 
     try {
-        const issueCheck = await pool.query(`
-            SELECT i.*, bc.book_id as actual_book_id 
-            FROM issues i 
-            JOIN book_copies bc ON i.book_id = bc.copy_id 
-            WHERE i.issue_id = ? AND i.status = ?
-        `, [issue_id, 'issued']);
+        const [results] = await pool.query('CALL proc_get_issue_details(?)', [issue_id]);
+        const issueCheck = results[0];
         
-        if (issueCheck.length === 0) return res.status(404).json({ success: false, message: 'Active issue not found' });
+        if (issueCheck.length === 0 || issueCheck[0].status !== 'issued') return res.status(404).json({ success: false, message: 'Active issue not found' });
 
         const issue = issueCheck[0];
         const today = new Date();
@@ -75,22 +65,19 @@ const renewBook = async (req, res) => {
         newDueDate.setDate(newDueDate.getDate() + 15);
         const newDueStr = newDueDate.toISOString().split('T')[0];
 
-        const otherCopiesCheck = await pool.query('SELECT * FROM book_copies WHERE book_id = ? AND status = "available" LIMIT 1', [issue.actual_book_id]);
+        const [resultsSwap] = await pool.query('CALL proc_find_available_copies(?)', [issue.actual_book_id]);
+        const otherCopiesCheck = resultsSwap[0];
         
         if (otherCopiesCheck.length > 0) {
             const newCopy = otherCopiesCheck[0];
             const issue_date = new Date().toISOString().split('T')[0];
             
-            await pool.query('UPDATE issues SET return_date = ?, fine_amount = 0, status = "returned" WHERE issue_id = ?', [issue_date, issue_id]);
-            await pool.query('UPDATE book_copies SET status = "available" WHERE copy_id = ?', [issue.book_id]);
-            
-            await pool.query('INSERT INTO issues (book_id, member_id, issue_date, due_date) VALUES (?, ?, ?, ?)', [newCopy.copy_id, issue.member_id, issue_date, newDueStr]);
-            await pool.query('UPDATE book_copies SET status = "issued" WHERE copy_id = ?', [newCopy.copy_id]);
+            await pool.query('CALL proc_renew_book_with_swap(?, ?, ?, ?, ?, ?)', [issue_id, issue.book_id, newCopy.copy_id, issue.member_id, issue_date, newDueStr]);
             
             return res.status(200).json({ success: true, message: `Renewed successfully by swapping to another available copy (ID: ${newCopy.copy_id})`, new_due_date: newDueStr });
         }
 
-        await pool.query('UPDATE issues SET due_date = ? WHERE issue_id = ?', [newDueStr, issue_id]);
+        await pool.query('CALL proc_renew_book_simple(?, ?)', [issue_id, newDueStr]);
         res.status(200).json({ success: true, message: 'Book renewed successfully', new_due_date: newDueStr });
     } catch (err) {
         console.error(err);
@@ -102,8 +89,9 @@ const renewBook = async (req, res) => {
 const returnBook = async (req, res) => {
     const { issue_id } = req.body;
     try {
-        const issueCheck = await pool.query('SELECT * FROM issues WHERE issue_id = ? AND status = ?', [issue_id, 'issued']);
-        if (issueCheck.length === 0) return res.status(404).json({ success: false, message: 'Active issue not found' });
+        const [results] = await pool.query('CALL proc_get_issue_details(?)', [issue_id]);
+        const issueCheck = results[0];
+        if (issueCheck.length === 0 || issueCheck[0].status !== 'issued') return res.status(404).json({ success: false, message: 'Active issue not found' });
 
         const issue = issueCheck[0];
         const return_date = new Date().toISOString().split('T')[0];
@@ -112,8 +100,7 @@ const returnBook = async (req, res) => {
         const ret = new Date(return_date);
         if (ret > due) fine = Math.ceil(Math.abs(ret - due) / (1000*60*60*24)) * 1;
 
-        await pool.query('UPDATE issues SET return_date = ?, fine_amount = ?, status = ? WHERE issue_id = ?', [return_date, fine, 'returned', issue_id]);
-        await pool.query('UPDATE book_copies SET status = "available" WHERE copy_id = ?', [issue.book_id]);
+        await pool.query('CALL proc_return_book(?, ?, ?, ?)', [issue_id, issue.book_id, return_date, fine]);
 
         res.status(200).json({ success: true, message: 'Returned successfully', fine_amount: fine });
     } catch (err) {
@@ -128,25 +115,18 @@ const markAsLost = async (req, res) => {
     if (!issue_id) return res.status(400).json({ success: false, message: 'Issue ID required' });
 
     try {
-        // Fixed query: now properly JOINs members table to get name and email
-        const issueCheck = await pool.query(`
-            SELECT i.*, b.price, b.title as book_title, m.name as member_name, m.email as member_email
-            FROM issues i
-            JOIN book_copies bc ON i.book_id = bc.copy_id
-            JOIN books b ON bc.book_id = b.book_id
-            JOIN members m ON i.member_id = m.member_id
-            WHERE i.issue_id = ? AND i.status = ?
-        `, [issue_id, 'issued']);
+        const [results] = await pool.query('CALL proc_get_lost_book_details(?)', [issue_id]);
+        const issueCheck = results[0];
 
-        if (issueCheck.length === 0) return res.status(404).json({ success: false, message: 'Active issue not found' });
+        if (issueCheck.length === 0 || issueCheck[0].status !== 'issued') return res.status(404).json({ success: false, message: 'Active issue not found' });
 
         const issue = issueCheck[0];
         const bookPrice = parseFloat(issue.price) || 0;
         const fine = bookPrice + 150;
 
-        await pool.query('UPDATE issues SET fine_amount = ?, status = ? WHERE issue_id = ?', [fine, 'lost', issue_id]);
+        await pool.query('CALL proc_mark_as_lost(?, ?)', [issue_id, fine]);
 
-        // Send email notification (non-blocking — failure won't affect the API response)
+        // Send email notification
         if (issue.member_email) {
             const mailOptions = {
                 from: process.env.EMAIL_USER,
@@ -166,23 +146,10 @@ const markAsLost = async (req, res) => {
     }
 };
 
-// GET /api/issues — Get all active (currently issued) books
+// GET /api/issues — Get all active issues
 const getActiveIssues = async (req, res) => {
     try {
-        const rows = await pool.query(`
-            SELECT i.issue_id, i.issue_date, i.due_date, i.status, i.fine_amount, i.fine_paid, i.created_at,
-                   m.member_id, m.name as member_name, m.email as member_email, m.phone as member_phone,
-                   m.department as member_dept, m.course as member_course, m.membership_type, m.photo_url as member_photo,
-                   m.academic_session, m.guardian_name, m.guardian_phone,
-                   bc.copy_id as book_id, b.title as book_title, b.author as book_author, b.stream as book_stream, 
-                   b.price as book_price, b.isbn, b.publisher, b.shelf_location
-            FROM issues i
-            JOIN members m ON i.member_id = m.member_id
-            JOIN book_copies bc ON i.book_id = bc.copy_id
-            JOIN books b ON bc.book_id = b.book_id
-            WHERE i.status = 'issued'
-            ORDER BY i.issue_date DESC
-        `);
+        const [rows] = await pool.query('CALL proc_get_active_issues()');
         res.status(200).json({ success: true, data: rows });
     } catch (err) {
         console.error(err);
@@ -193,20 +160,7 @@ const getActiveIssues = async (req, res) => {
 // GET /api/issues/history — Get returned and lost issues
 const getIssueHistory = async (req, res) => {
     try {
-        const rows = await pool.query(`
-            SELECT i.issue_id, i.issue_date, i.due_date, i.return_date, i.status, i.fine_amount, i.fine_paid, i.created_at,
-                   m.member_id, m.name as member_name, m.email as member_email, m.phone as member_phone, 
-                   m.department as member_dept, m.course as member_course, m.photo_url as member_photo,
-                   m.academic_session, m.guardian_name, m.guardian_phone,
-                   bc.copy_id as book_id, b.title as book_title, b.price as book_price, b.isbn, 
-                   b.author as book_author, b.stream as book_stream, b.publisher, b.shelf_location
-            FROM issues i
-            JOIN members m ON i.member_id = m.member_id
-            JOIN book_copies bc ON i.book_id = bc.copy_id
-            JOIN books b ON bc.book_id = b.book_id
-            WHERE i.status IN ('returned', 'lost')
-            ORDER BY i.return_date DESC
-        `);
+        const [rows] = await pool.query('CALL proc_get_issue_history()');
         res.status(200).json({ success: true, data: rows });
     } catch (err) {
         console.error(err);
@@ -218,20 +172,14 @@ const getIssueHistory = async (req, res) => {
 const payFine = async (req, res) => {
     const { id } = req.params;
     try {
-        const issueCheck = await pool.query(`
-            SELECT i.*, m.name as member_name, m.email as member_email, b.title as book_title
-            FROM issues i
-            JOIN members m ON i.member_id = m.member_id
-            JOIN book_copies bc ON i.book_id = bc.copy_id
-            JOIN books b ON bc.book_id = b.book_id
-            WHERE i.issue_id = ?
-        `, [id]);
+        const [results] = await pool.query('CALL proc_get_issue_for_payment(?)', [id]);
+        const issueCheck = results[0];
 
         if (issueCheck.length === 0) return res.status(404).json({ success: false, message: 'Issue not found' });
         
         const issue = issueCheck[0];
 
-        await pool.query('UPDATE issues SET fine_paid = 1 WHERE issue_id = ?', [id]);
+        await pool.query('CALL proc_pay_fine(?)', [id]);
 
         if (issue.member_email) {
             const mailOptions = {
@@ -256,8 +204,8 @@ const payFine = async (req, res) => {
 const returnByBookId = async (req, res) => {
     const { book_id: copy_id } = req.body;
     try {
-        const issueCheck = await pool.query('SELECT * FROM issues WHERE book_id = ? AND status = ?', [copy_id, 'issued']);
-        if (issueCheck.length === 0) return res.status(404).json({ success: false, message: 'No active issue for this barcode' });
+        const [rows] = await pool.query('CALL proc_find_active_issue_by_copy(?)', [copy_id]);
+        if (rows.length === 0) return res.status(404).json({ success: false, message: 'No active issue for this barcode' });
 
         const issue = issueCheck[0];
         const return_date = new Date().toISOString().split('T')[0];
@@ -266,8 +214,7 @@ const returnByBookId = async (req, res) => {
         const ret = new Date(return_date);
         if (ret > due) fine = Math.ceil(Math.abs(ret - due) / (1000*60*60*24)) * 1;
 
-        await pool.query('UPDATE issues SET return_date = ?, fine_amount = ?, status = ? WHERE issue_id = ?', [return_date, fine, 'returned', issue.issue_id]);
-        await pool.query('UPDATE book_copies SET status = "available" WHERE copy_id = ?', [copy_id]);
+        await pool.query('CALL proc_return_book(?, ?, ?, ?)', [issue.issue_id, copy_id, return_date, fine]);
 
         res.status(200).json({ success: true, message: 'Returned successfully', fine_amount: fine });
     } catch (err) {
@@ -280,22 +227,8 @@ const returnByBookId = async (req, res) => {
 const lookupIssueByBookId = async (req, res) => {
     const { book_id: copy_id } = req.params;
     try {
-        const rows = await pool.query(`
-            SELECT i.issue_id, i.issue_date, i.due_date, i.fine_amount,
-                   m.member_id, m.name as member_name, m.photo_url as member_photo,
-                   m.phone as member_phone, m.email as member_email, m.department as member_dept, m.roll_number as member_roll,
-                   m.course as member_course, m.year_semester as member_sem, m.membership_type as member_type,
-                   m.academic_session as member_session, m.account_status, m.no_dues_status,
-                   bc.copy_id, b.title as book_title, b.cover_url as book_cover,
-                   b.author as book_author, b.isbn as book_isbn, b.stream as book_category, b.price as book_price, b.publication_year,
-                   NULL as book_publisher, NULL as book_edition, NULL as book_shelf
-            FROM issues i
-            JOIN members m ON i.member_id = m.member_id
-            JOIN book_copies bc ON i.book_id = bc.copy_id
-            JOIN books b ON bc.book_id = b.book_id
-            WHERE bc.copy_id = ? AND i.status = 'issued'
-        `, [copy_id]);
-
+        const [results] = await pool.query('CALL proc_lookup_issue_by_copy(?)', [copy_id]);
+        const rows = results[0];
         if (rows.length === 0) return res.status(404).json({ success: false, message: 'No active issue for this barcode' });
         res.status(200).json({ success: true, data: rows[0] });
     } catch (err) {
@@ -303,22 +236,12 @@ const lookupIssueByBookId = async (req, res) => {
         res.status(500).json({ success: false, message: 'Internal server error' });
     }
 };
+
 // GET /api/issues/fines-and-lost — Get all lost issues and issues with fines
 const getFinesAndLost = async (req, res) => {
     try {
-        const rows = await pool.query(`
-            SELECT i.issue_id, i.issue_date, i.due_date, i.return_date, i.status, i.fine_amount, i.fine_paid, i.created_at,
-                   m.member_id, m.name as member_name, m.email as member_email, m.phone as member_phone, m.department as member_dept, m.course as member_course, m.photo_url as member_photo, m.academic_session, m.guardian_name, m.guardian_phone,
-                   bc.copy_id as book_id, b.title as book_title, b.price as book_price, b.author as book_author, b.stream as book_stream, b.isbn, b.publication_year, b.publisher, b.shelf_location
-            FROM issues i
-            JOIN members m ON i.member_id = m.member_id
-            JOIN book_copies bc ON i.book_id = bc.copy_id
-            JOIN books b ON bc.book_id = b.book_id
-            WHERE i.status = 'lost' OR i.fine_amount > 0 OR (i.status = 'issued' AND i.due_date < CURDATE())
-            ORDER BY CASE WHEN i.status = 'issued' THEN 0 ELSE 1 END, i.due_date ASC
-        `);
+        const [rows] = await pool.query('CALL proc_get_fines_and_lost()');
         
-        // Calculate dynamic fines for overdue active issues
         const today = new Date();
         today.setHours(0,0,0,0);
         
@@ -328,7 +251,7 @@ const getFinesAndLost = async (req, res) => {
                 if (today > due) {
                     const diffTime = Math.abs(today - due);
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                    r.dynamic_fine = diffDays * 1; // 1 rupee per day
+                    r.dynamic_fine = diffDays * 1;
                 } else {
                     r.dynamic_fine = 0;
                 }
@@ -349,14 +272,8 @@ const getFinesAndLost = async (req, res) => {
 const sendFineReminder = async (req, res) => {
     const { id } = req.params;
     try {
-        const check = await pool.query(`
-            SELECT i.*, m.name as member_name, m.email as member_email, b.title as book_title
-            FROM issues i
-            JOIN members m ON i.member_id = m.member_id
-            JOIN book_copies bc ON i.book_id = bc.copy_id
-            JOIN books b ON bc.book_id = b.book_id
-            WHERE i.issue_id = ?
-        `, [id]);
+        const [results] = await pool.query('CALL proc_get_issue_for_payment(?)', [id]);
+        const check = results[0];
 
         if (check.length === 0) return res.status(404).json({ success: false, message: 'Issue not found' });
         

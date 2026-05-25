@@ -42,7 +42,7 @@
   @if (searchedMemberInfo) {
     <div class="ds-style-51b757d8">
       @if (searchedMemberInfo.photo_url) {
-        <img [src]="uploadsBase + searchedMemberInfo.photo_url" class="ds-style-19764673">
+        <img [src]="uploadsBase + searchedMemberInfo.photo_url" class="ds-style-19764673" (error)="searchedMemberInfo.photo_url = undefined">
       }
       <div>
         <h4 class="ds-style-5219c1b2">Found: {{ searchedMemberInfo.name }}</h4>
@@ -75,7 +75,7 @@
             @for (member of members; track member.member_id; let odd = $odd) {
               <tr class="expandable-row clickable-row ds-style-406c8d95">
                 <td (click)="onOpenProfile.emit(member.member_id)" class="ds-style-222fc98b">
-                  @if (member.photo_url) { <img [src]="uploadsBase + member.photo_url" class="mini-photo ds-style-234848a1"> }
+                  @if (member.photo_url) { <img [src]="uploadsBase + member.photo_url" class="mini-photo ds-style-234848a1" (error)="member.photo_url = undefined"> }
                   @else { <div class="no-photo-mini">Photo</div> }
                 </td>
                 <td (click)="onOpenProfile.emit(member.member_id)" class="ds-style-2022e629"><span class="id-badge ds-style-411fac98">{{ member.member_id }}</span></td>

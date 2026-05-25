@@ -28,7 +28,7 @@
           @if (book.cover_url) {
           <img [src]="book.cover_url" alt="Book Cover" class="gallery-cover ds-style-4f7b02be" crossorigin="anonymous" (click)="onViewDetails.emit(book)">
           } @else {
-          <img src="assets/cover-placeholder.png" alt="No Cover" class="gallery-cover ds-style-346e4bf" (click)="onViewDetails.emit(book)">
+          <img src="/assets/cover-placeholder.png" alt="No Cover" class="gallery-cover ds-style-346e4bf" (click)="onViewDetails.emit(book)">
           }
           <h3 (click)="onViewDetails.emit(book)" class="ds-style-1fc2fc62">{{ book.title }}</h3>
           <p class="author">{{ book.author || 'Unknown Author' }}</p>

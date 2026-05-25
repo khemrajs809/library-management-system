@@ -12,13 +12,13 @@ const createLibrarian = async (req, res) => {
             let unique = false;
             while (!unique) {
                 lib_id = 'LIB' + Math.floor(10000 + Math.random() * 90000);
-                const rows = await pool.query('SELECT 1 FROM users WHERE id = ?', [lib_id]);
+                const [rows] = await pool.query('CALL proc_check_user_id(?)', [lib_id]);
                 if (rows.length === 0) unique = true;
             }
         }
         const hashedPassword = await bcrypt.hash(password, 8);
         await pool.query(
-            'INSERT INTO users (id, name, email, password, role) VALUES (?, ?, ?, ?, \'librarian\')',
+            'CALL proc_create_librarian(?, ?, ?, ?)',
             [lib_id, name, email, hashedPassword]
         );
         res.status(201).json({ success: true, message: 'Librarian account created successfully', lib_id });
@@ -35,11 +35,16 @@ const createLibrarian = async (req, res) => {
 // GET /api/admin/librarians — List all librarians
 const getLibrarians = async (req, res) => {
     try {
-        const rows = await pool.query('SELECT id as lib_id, name, email, status, created_at FROM users WHERE role = \'librarian\' ORDER BY created_at DESC');
+        const [rows] = await pool.query('CALL proc_get_librarians()');
         res.status(200).json({ success: true, data: rows });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, message: 'Server error' });
+        console.error("❌ getLibrarians Error:", err);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error',
+            error: err.message,
+            stack: err.stack
+        });
     }
 };
 
@@ -54,7 +59,7 @@ const updateLibrarianPassword = async (req, res) => {
 
     try {
         const hashedPassword = await bcrypt.hash(password, 8);
-        await pool.query('UPDATE users SET password = ? WHERE id = ? AND role = \'librarian\'', [hashedPassword, id]);
+        await pool.query('CALL proc_update_librarian_password(?, ?)', [id, hashedPassword]);
         res.status(200).json({ success: true, message: 'Password updated successfully' });
     } catch (err) {
         console.error(err);
@@ -65,16 +70,16 @@ const updateLibrarianPassword = async (req, res) => {
 // GET /api/admin/stats — Overview metrics for dashboard
 const getStats = async (req, res) => {
     try {
-        const rowsBooks = await pool.query('SELECT COUNT(*) as count FROM books');
-        const rowsMembers = await pool.query('SELECT COUNT(*) as count FROM members');
-        const rowsIssued = await pool.query('SELECT COUNT(*) as count FROM issues WHERE status = "issued"');
-        const rowsReturned = await pool.query('SELECT COUNT(*) as count FROM issues WHERE status = "returned"');
-        const rowsOverdue = await pool.query('SELECT COUNT(*) as count FROM issues WHERE status = "issued" AND due_date < CURDATE()');
+        const [rowsBooks] = await pool.query('CALL proc_get_total_books_count()');
+        const [rowsMembers] = await pool.query('CALL proc_get_total_members_count()');
+        const [rowsIssued] = await pool.query('CALL proc_get_total_issued_count()');
+        const [rowsReturned] = await pool.query('CALL proc_get_total_returned_count()');
+        const [rowsOverdue] = await pool.query('CALL proc_get_total_overdue_count()');
         
         // 1. Line Chart (Rental rate vs User conversion for 12 months)
         const currentYear = new Date().getFullYear();
-        const monthlyIssues = await pool.query(`SELECT MONTH(issue_date) as month, COUNT(*) as count FROM issues WHERE YEAR(issue_date) = ? GROUP BY MONTH(issue_date)`, [currentYear]);
-        const monthlyMembers = await pool.query(`SELECT MONTH(created_at) as month, COUNT(*) as count FROM members WHERE YEAR(created_at) = ? GROUP BY MONTH(created_at)`, [currentYear]);
+        const [monthlyIssues] = await pool.query(`CALL proc_get_monthly_issue_stats(?)`, [currentYear]);
+        const [monthlyMembers] = await pool.query(`CALL proc_get_monthly_member_stats(?)`, [currentYear]);
         
         const lineChartIssues = new Array(12).fill(0);
         const lineChartMembers = new Array(12).fill(0);
@@ -82,7 +87,7 @@ const getStats = async (req, res) => {
         monthlyMembers.forEach(r => lineChartMembers[r.month - 1] = Number(r.count));
 
         // 2. Donut Chart (Books condition)
-        const donutStats = await pool.query(`SELECT status, COUNT(*) as count FROM book_copies GROUP BY status`);
+        const [donutStats] = await pool.query(`CALL proc_get_book_condition_stats()`);
         let allCopies = 0, newCopies = 0, damageCopies = 0, lostCopies = 0, issuedCopies = 0;
         donutStats.forEach(r => {
             allCopies += Number(r.count);
@@ -93,36 +98,17 @@ const getStats = async (req, res) => {
         });
 
         // 3. Bar Chart (Borrowed rate by stream)
-        const streamStats = await pool.query(`
-            SELECT COALESCE(b.stream, 'General') as stream, COUNT(i.issue_id) as count 
-            FROM issues i 
-            JOIN books b ON i.book_id = b.book_id 
-            GROUP BY b.stream 
-            ORDER BY count DESC 
-            LIMIT 9
-        `);
+        const [streamStats] = await pool.query(`CALL proc_get_borrow_rate_by_stream()`);
         const barLabels = streamStats.map(r => r.stream || 'Unknown');
         const barData = streamStats.map(r => Number(r.count));
 
         // 4. Restricted Members Count (for the stat card)
-        const restrictedCountRes = await pool.query(`
-            SELECT COUNT(DISTINCT m.member_id) as count 
-            FROM members m 
-            JOIN issues i ON m.member_id = i.member_id 
-            WHERE i.status = 'issued' AND i.due_date < CURDATE()
-        `);
+        const [restrictedCountRes] = await pool.query(`CALL proc_get_restricted_members_count()`);
         const restrictedMembersCount = Number(restrictedCountRes[0].count);
 
         // 5. Top 5 Popular Books
-        const popularBooksRes = await pool.query(`
-            SELECT b.title, b.author, COUNT(i.issue_id) as borrow_count 
-            FROM issues i 
-            JOIN books b ON i.book_id = b.book_id 
-            GROUP BY b.book_id, b.title, b.author 
-            ORDER BY borrow_count DESC 
-            LIMIT 5
-        `);
-        const popularBooks = popularBooksRes.map(b => ({
+        const [rowsPop] = await pool.query(`CALL proc_get_popular_books()`);
+        const popularBooks = rowsPop.map(b => ({
             title: b.title,
             author: b.author,
             borrow_count: Number(b.borrow_count)
@@ -154,7 +140,7 @@ const getStats = async (req, res) => {
 const deleteLibrarian = async (req, res) => {
     const { id } = req.params;
     try {
-        await pool.query('DELETE FROM users WHERE id = ? AND role = \'librarian\'', [id]);
+        await pool.query('CALL proc_delete_librarian(?)', [id]);
         res.status(200).json({ success: true, message: 'Librarian account deleted' });
     } catch (err) {
         console.error(err);
@@ -163,14 +149,19 @@ const deleteLibrarian = async (req, res) => {
 };
 
 const generateUniqueLibrarianId = async (req, res) => {
-    let unique = false;
-    let newId = '';
-    while (!unique) {
-        newId = 'LIB' + Math.floor(10000 + Math.random() * 90000);
-        const rows = await pool.query('SELECT 1 FROM users WHERE id = ?', [newId]);
-        if (rows.length === 0) unique = true;
+    try {
+        let unique = false;
+        let newId = '';
+        while (!unique) {
+            newId = 'LIB' + Math.floor(10000 + Math.random() * 90000);
+            const [rows] = await pool.query('CALL proc_check_user_id(?)', [newId]);
+            if (rows.length === 0) unique = true;
+        }
+        res.json({ success: true, id: newId });
+    } catch (err) {
+        console.error("❌ generateUniqueLibrarianId Error:", err);
+        res.status(500).json({ success: false, message: 'Server error', error: err.message });
     }
-    res.json({ success: true, id: newId });
 };
 
 const importBooks = async (req, res) => {
@@ -193,7 +184,7 @@ const importBooks = async (req, res) => {
                         continue;
                     }
                     await pool.query(
-                        'INSERT INTO books (title, author, isbn, category, quantity, available, price, shelf_location) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                        'CALL proc_import_book(?, ?, ?, ?, ?, ?, ?, ?)',
                         [book.title, book.author || 'Unknown', book.isbn, book.category || 'General', book.quantity || 1, book.quantity || 1, book.price || 0, book.shelf_location || 'A1']
                     );
                     successCount++;
@@ -226,7 +217,7 @@ const importMembers = async (req, res) => {
                         continue;
                     }
                     await pool.query(
-                        'INSERT INTO members (member_id, name, email, phone, address, status) VALUES (?, ?, ?, ?, ?, ?)',
+                        'CALL proc_import_member(?, ?, ?, ?, ?, ?)',
                         [member.member_id, member.name, member.email || '', member.phone || '', member.address || '', 'active']
                     );
                     successCount++;
@@ -244,53 +235,35 @@ const getOverviewStats = async (req, res) => {
         const [
             rowsBooks, rowsMembers, rowsLibrarians, rowsAdmins, rowsIssued, rowsOverdue
         ] = await Promise.all([
-            pool.query('SELECT SUM(quantity) as count FROM books'),
-            pool.query('SELECT COUNT(*) as count FROM members'),
-            pool.query('SELECT COUNT(*) as count FROM users WHERE role = \'librarian\''),
-            pool.query('SELECT COUNT(*) as count FROM users WHERE role = \'admin\''),
-            pool.query('SELECT COUNT(*) as count FROM issues WHERE status = "issued"'),
-            pool.query('SELECT COUNT(*) as count FROM issues WHERE status = "issued" AND due_date < CURDATE()')
+            pool.query('CALL proc_get_total_books_quantity()'),
+            pool.query('CALL proc_get_total_members_count()'),
+            pool.query('CALL proc_get_total_librarians_count()'),
+            pool.query('CALL proc_get_total_admins_count()'),
+            pool.query('CALL proc_get_total_issued_count()'),
+            pool.query('CALL proc_get_total_overdue_count()')
         ]);
 
-        const totalBooks = Number(rowsBooks[0].count) || 0;
-        const totalMembers = Number(rowsMembers[0].count) || 0;
-        const totalStaff = Number(rowsLibrarians[0].count) + Number(rowsAdmins[0].count);
-        const totalIssued = Number(rowsIssued[0].count) || 0;
-        const totalOverdue = Number(rowsOverdue[0].count) || 0;
+        const totalBooks = Number(rowsBooks[0][0].count) || 0;
+        const totalMembers = Number(rowsMembers[0][0].count) || 0;
+        const totalStaff = Number(rowsLibrarians[0][0].count) + Number(rowsAdmins[0][0].count);
+        const totalIssued = Number(rowsIssued[0][0].count) || 0;
+        const totalOverdue = Number(rowsOverdue[0][0].count) || 0;
 
         // Categories (Stream)
-        const categoriesRes = await pool.query('SELECT COALESCE(stream, "General") as category, COUNT(*) as count FROM books GROUP BY stream ORDER BY count DESC LIMIT 6');
-        const categoriesData = categoriesRes.map(row => ({ category: row.category, count: Number(row.count) }));
+        const [rowsCategories] = await pool.query('CALL proc_get_book_categories_stats()');
+        const categoriesData = rowsCategories.map(row => ({ category: row.category, count: Number(row.count) }));
 
         // Top Borrowed Books
-        const popularRes = await pool.query(`
-            SELECT b.title, b.author, COUNT(i.issue_id) as count, b.cover_url
-            FROM issues i 
-            JOIN books b ON i.book_id = b.book_id 
-            GROUP BY b.book_id, b.title, b.author, b.cover_url 
-            ORDER BY count DESC 
-            LIMIT 5
-        `);
-        const popularBooks = popularRes.map(row => ({ title: row.title, author: row.author, cover_url: row.cover_url, count: Number(row.count) }));
+        const [rowsPopular] = await pool.query('CALL proc_get_popular_books_with_cover()');
+        const popularBooks = rowsPopular.map(row => ({ title: row.title, author: row.author, cover_url: row.cover_url, count: Number(row.count) }));
 
         // Recent Activities
-        const recentActivities = await pool.query(`
-            SELECT 'issue' as type, b.title, m.name as user_name, i.issue_date as date 
-            FROM issues i JOIN books b ON i.book_id = b.book_id JOIN members m ON i.member_id = m.member_id 
-            ORDER BY i.issue_date DESC LIMIT 5
-        `);
+        const [rowsRecent] = await pool.query('CALL proc_get_recent_activities()');
+        const recentActivities = rowsRecent;
         
         // Overdue details
-        const overdueRes = await pool.query(`
-            SELECT m.name as member_name, m.member_id, b.title as book_title, i.issue_date, i.due_date,
-                   DATEDIFF(CURDATE(), i.due_date) as overdue_days, i.fine_amount
-            FROM issues i 
-            JOIN books b ON i.book_id = b.book_id 
-            JOIN members m ON i.member_id = m.member_id 
-            WHERE i.status = 'issued' AND i.due_date < CURDATE()
-            ORDER BY overdue_days DESC LIMIT 10
-        `);
-        const overdueList = overdueRes.map(row => ({
+        const [rowsOverdueDetailed] = await pool.query('CALL proc_get_overdue_details()');
+        const overdueList = rowsOverdueDetailed.map(row => ({
             member_name: row.member_name,
             member_id: row.member_id,
             book_title: row.book_title,
@@ -301,14 +274,16 @@ const getOverviewStats = async (req, res) => {
         }));
 
         // Fine Amount
-        const fineResult = await pool.query('SELECT SUM(fine_amount) as total FROM issues WHERE fine_paid = 0');
-        const totalFine = Number(fineResult[0].total) || 0;
+        const [fineResult] = await pool.query('CALL proc_get_total_unpaid_fine()');
+        const totalFine = Number(fineResult[0][0].total) || 0;
 
         // Library Collection Summary
-        const [catRes, authorRes, newBooksRes] = await Promise.all([
-            pool.query('SELECT COUNT(DISTINCT stream) as count FROM books'),
-            pool.query('SELECT COUNT(DISTINCT author) as count FROM books'),
-            pool.query('SELECT COUNT(*) as count FROM books WHERE MONTH(created_at) = MONTH(CURDATE()) AND YEAR(created_at) = YEAR(CURDATE())')
+        const [
+            [catRes], [authorRes], [newBooksRes]
+        ] = await Promise.all([
+            pool.query('CALL proc_get_total_categories_count()'),
+            pool.query('CALL proc_get_total_authors_count()'),
+            pool.query('CALL proc_get_new_books_count_this_month()')
         ]);
 
         res.status(200).json({
@@ -321,9 +296,9 @@ const getOverviewStats = async (req, res) => {
                 overdueList,
                 totalFine,
                 collection: {
-                    totalCategories: Number(catRes[0].count),
-                    totalAuthors: Number(authorRes[0].count),
-                    newBooksThisMonth: Number(newBooksRes[0].count)
+                    totalCategories: Number(catRes[0][0].count),
+                    totalAuthors: Number(authorRes[0][0].count),
+                    newBooksThisMonth: Number(newBooksRes[0][0].count)
                 }
             }
         });
@@ -339,16 +314,10 @@ const getAuditLogs = async (req, res) => {
         const limit = parseInt(req.query.limit) || 20;
         const offset = (page - 1) * limit;
 
-        const countResult = await pool.query('SELECT COUNT(*) as total FROM audit_logs');
+        const [countResult] = await pool.query('CALL proc_get_total_audit_logs_count()');
         const total = Number(countResult[0].total);
 
-        const rows = await pool.query(`
-            SELECT a.*, u.name as user_name, u.email as user_email
-            FROM audit_logs a 
-            LEFT JOIN users u ON a.user_id = u.id 
-            ORDER BY a.created_at DESC 
-            LIMIT ? OFFSET ?
-        `, [limit, offset]);
+        const [rows] = await pool.query('CALL proc_get_audit_logs(?, ?)', [limit, offset]);
         
         res.status(200).json({ 
             success: true, 
@@ -375,8 +344,23 @@ const updateLibrarianStatus = async (req, res) => {
     }
 
     try {
-        await pool.query('UPDATE users SET status = ? WHERE id = ? AND role = \'librarian\'', [status, id]);
-        res.status(200).json({ success: true, message: `Librarian status updated to ${status}` });
+        await pool.query('CALL proc_update_librarian_status(?, ?)', [id, status]);
+
+        // --- SECURITY KILL SWITCH ---
+        // If deactivating, kill all active sessions immediately
+        if (status === 'inactive') {
+            const [sessions] = await pool.query('CALL proc_get_active_sessions(?)', [id]);
+            
+            for (const s of sessions) {
+                // Blacklist the token
+                await pool.query('CALL proc_blacklist_token(?, ?)', [s.token, id]);
+            }
+            
+            // Mark all sessions as offline in the registry
+            await pool.query('CALL proc_terminate_user_sessions(?)', [id]);
+        }
+
+        res.status(200).json({ success: true, message: `Librarian status updated to ${status}${status === 'inactive' ? ' and all active sessions terminated' : ''}` });
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, message: 'Server error' });

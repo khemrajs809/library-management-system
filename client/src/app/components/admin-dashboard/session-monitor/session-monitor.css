@@ -453,6 +453,21 @@
   color: #475569;
 }
 
+.live-status-badge {
+  margin-left: 8px;
+  background: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.live-status-badge strong {
+  font-weight: 800;
+}
+
 /* Tables visual */
 .table-card {
   background: #ffffff;
@@ -477,6 +492,43 @@
   font-size: 0.95rem;
   font-weight: 700;
   color: #ffffff;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.local-refresh-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.local-refresh-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.local-refresh-btn.spinning svg {
+  animation: spin 1s linear infinite;
+  color: #4ade80; /* Brighter green when active */
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .row-count {

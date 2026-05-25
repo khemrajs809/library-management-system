@@ -40,7 +40,7 @@
                <div class="review-card member-card">
                   <div class="card-tag">MEMBER IDENTITY</div>
                   <div class="card-main">
-                     <img [src]="scannedIssue.member_photo ? (uploadsBase + scannedIssue.member_photo) : 'assets/placeholder-user.png'" class="review-avatar">
+                     <img [src]="scannedIssue.member_photo ? (uploadsBase + scannedIssue.member_photo) : '/assets/placeholder-user.png'" class="review-avatar">
                      <div class="review-info">
                         <h3 class="name">{{ scannedIssue.member_name }}</h3>
                         <span class="id-pill">ID: {{ scannedIssue.member_id }}</span>
@@ -66,7 +66,7 @@
                <div class="review-card book-card">
                   <div class="card-tag">BOOK METADATA</div>
                   <div class="card-main">
-                     <img [src]="scannedIssue.book_cover ? (uploadsBase + scannedIssue.book_cover) : 'assets/cover-placeholder.png'" class="review-cover">
+                     <img [src]="scannedIssue.book_cover ? (uploadsBase + scannedIssue.book_cover) : '/assets/cover-placeholder.png'" class="review-cover">
                      <div class="review-info">
                         <h3 class="name">{{ scannedIssue.book_title }}</h3>
                         <div class="id-row">
@@ -105,9 +105,6 @@
             <div class="review-actions">
                <button class="btn-review btn-cancel" (click)="onCancelLookup.emit()">
                   <span class="icon">✕</span> Cancel
-               </button>
-               <button class="btn-review btn-renew" (click)="onConfirmRenew.emit()">
-                  <span class="icon">🔄</span> Renew Book
                </button>
                <button class="btn-review btn-confirm" (click)="onConfirmReturn.emit()">
                   <span class="icon">✓</span> Confirm Return

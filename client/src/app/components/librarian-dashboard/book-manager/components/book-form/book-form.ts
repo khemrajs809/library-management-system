@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, inject, OnInit, OnChanges, SimpleChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Book } from '../../../../../models/book.model';
 import { BookService } from '../../../../../services/book.service';
@@ -8,7 +8,7 @@ import { ToastService } from '../../../../../services/toast.service';
 @Component({
   selector: 'app-book-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [ReactiveFormsModule],
   templateUrl: './book-form.html',
   styleUrl: './book-form.css'
 })

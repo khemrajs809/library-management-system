@@ -1,5 +1,6 @@
-import { Component, signal, inject, OnInit, OnDestroy, NgZone } from '@angular/core';
+import { Component, signal, inject, OnInit, OnDestroy, NgZone, DestroyRef } from '@angular/core';
 import { RouterOutlet, Router, NavigationStart, NavigationEnd, NavigationCancel, NavigationError } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HeaderComponent } from './components/header/header';
 import { FooterComponent } from './components/footer/footer';
 
@@ -10,10 +11,12 @@ import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { RouteLoaderComponent } from './components/animations/route-loader/route-loader';
 import { IdleTimeoutService } from './services/idle-timeout.service';
+import { TopAnnouncementBarComponent } from './components/shared/top-announcement-bar/top-announcement-bar';
+import { AnnouncementService } from './services/announcement.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, HeaderComponent, FooterComponent, CommonModule, RouteLoaderComponent],
+  imports: [RouterOutlet, HeaderComponent, FooterComponent, CommonModule, RouteLoaderComponent, TopAnnouncementBarComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
@@ -21,16 +24,17 @@ export class App implements OnInit, OnDestroy {
   toastService = inject(ToastService);
   modalService = inject(ModalService);
   public authService = inject(AuthService);
+  public announcementService = inject(AnnouncementService);
   private router = inject(Router);
   public idleTimeoutService = inject(IdleTimeoutService);
-  private routerSub!: Subscription;
+  private destroyRef = inject(DestroyRef);
   protected readonly title = signal('client');
   isRouteLoading = signal<boolean>(false);
   private loaderTimer: any = null;
 
   ngOnInit() {
     // Listen to router events to show/hide the global full-screen loader
-    this.routerSub = this.router.events.subscribe(event => {
+    this.router.events.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(event => {
       if (event instanceof NavigationStart) {
         const fromLogin = this.router.url === '/login' || this.router.url === '/';
         if (fromLogin) return;
@@ -60,7 +64,6 @@ export class App implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.routerSub) this.routerSub.unsubscribe();
     this.idleTimeoutService.stopMonitoring();
   }
 }

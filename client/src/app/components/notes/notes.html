@@ -1,76 +1,82 @@
 <div class="notes-container">
   <!-- Locked State: Pattern Lock -->
-  <div class="lock-screen" *ngIf="!isUnlocked()">
-    <div class="lock-header">
-      <i class="fas fa-lock lock-icon"></i>
-      <h2>Access Project Notes</h2>
-      <p>Draw the unlock pattern to continue</p>
-    </div>
-    
-    <div class="pattern-grid" (mouseleave)="endPattern()" (mouseup)="endPattern()" (touchend)="endPattern()">
-      <div 
-        class="pattern-node" 
-        *ngFor="let node of patternGrid"
-        [class.active]="currentPattern().includes(node)"
-        (mousedown)="startPattern(node)"
-        (mouseenter)="enterNode(node)"
-        (touchstart)="startPattern(node)"
-        (touchmove)="enterNode(node)"
-      >
-        <div class="inner-dot"></div>
+  @if (!isUnlocked()) {
+    <div class="lock-screen">
+      <div class="lock-header">
+        <i class="fas fa-lock lock-icon"></i>
+        <h2>Access Project Notes</h2>
+        <p>Draw the unlock pattern to continue</p>
+      </div>
+      <div class="pattern-grid" (mouseleave)="endPattern()" (mouseup)="endPattern()" (touchend)="endPattern()">
+        @for (node of patternGrid; track node) {
+          <div
+            class="pattern-node"
+            [class.active]="currentPattern().includes(node)"
+            (mousedown)="startPattern(node)"
+            (mouseenter)="enterNode(node)"
+            (touchstart)="startPattern(node)"
+            (touchmove)="enterNode(node)"
+            >
+            <div class="inner-dot"></div>
+          </div>
+        }
+      </div>
+      <div class="lock-footer">
+        @if (currentPattern().length > 0) {
+          <button class="btn-clear" (click)="clearPattern()">
+            Clear
+          </button>
+        }
       </div>
     </div>
-    
-    <div class="lock-footer">
-      <button class="btn-clear" (click)="clearPattern()" *ngIf="currentPattern().length > 0">
-        Clear
-      </button>
-    </div>
-  </div>
+  }
 
   <!-- Unlocked State: Project Details -->
-  <div class="notes-content" *ngIf="isUnlocked()">
-    <div class="content-header">
-      <div class="title-group">
-        <i class="fas fa-book-open text-primary"></i>
-        <h2>{{ language() === 'en' ? 'Project Documentation' : 'Project Ki Jankari' }}</h2>
+  @if (isUnlocked()) {
+    <div class="notes-content">
+      <div class="content-header">
+        <div class="title-group">
+          <i class="fas fa-book-open text-primary"></i>
+          <h2>{{ language() === 'en' ? 'Project Documentation' : 'Project Ki Jankari' }}</h2>
+        </div>
+        <div  class="ds-style-61860508">
+          <button class="btn-toggle-lang" (click)="toggleLanguage()">
+            {{ language() === 'en' ? 'Switch to Hinglish' : 'Switch to English' }}
+          </button>
+          <button class="btn-lock" (click)="lockNotes()">
+            <i class="fas fa-lock"></i> Lock
+          </button>
+        </div>
       </div>
-      <div  class="ds-style-61860508">
-        <button class="btn-toggle-lang" (click)="toggleLanguage()">
-          {{ language() === 'en' ? 'Switch to Hinglish' : 'Switch to English' }}
-        </button>
-        <button class="btn-lock" (click)="lockNotes()">
-          <i class="fas fa-lock"></i> Lock
-        </button>
-      </div>
-    </div>
-
-    <div class="info-card">
-      <div class="card-header">
-        <i class="fas fa-layer-group"></i>
-        <h3>{{ language() === 'en' ? 'System Components Overview' : 'System Components ki Details' }}</h3>
-      </div>
-      <div class="card-body">
-        <p  class="ds-style-2579959f">
-          {{ language() === 'en' ? 'The Library Management System (LMS) is a comprehensive platform designed for efficient library operations. Below is a detailed breakdown of every component:' : 'Library Management System (LMS) ek bahut hi badiya platform hai jisse library ka kaam asaan ho jata hai. Niche har component ki puri details di gayi hai:' }}
-        </p>
-
-        <div class="component-list">
-          <ng-container *ngIf="language() === 'en'">
-            <div class="feature-item" *ngFor="let item of englishDetails">
-              <h4><i class="fas fa-check-circle text-success"></i> {{ item.title }}</h4>
-              <p>{{ item.desc }}</p>
-            </div>
-          </ng-container>
-          
-          <ng-container *ngIf="language() === 'hi'">
-            <div class="feature-item" *ngFor="let item of hinglishDetails">
-              <h4><i class="fas fa-check-circle text-success"></i> {{ item.title }}</h4>
-              <p>{{ item.desc }}</p>
-            </div>
-          </ng-container>
+      <div class="info-card">
+        <div class="card-header">
+          <i class="fas fa-layer-group"></i>
+          <h3>{{ language() === 'en' ? 'System Components Overview' : 'System Components ki Details' }}</h3>
+        </div>
+        <div class="card-body">
+          <p  class="ds-style-2579959f">
+            {{ language() === 'en' ? 'The Library Management System (LMS) is a comprehensive platform designed for efficient library operations. Below is a detailed breakdown of every component:' : 'Library Management System (LMS) ek bahut hi badiya platform hai jisse library ka kaam asaan ho jata hai. Niche har component ki puri details di gayi hai:' }}
+          </p>
+          <div class="component-list">
+            @if (language() === 'en') {
+              @for (item of englishDetails; track item) {
+                <div class="feature-item">
+                  <h4><i class="fas fa-check-circle text-success"></i> {{ item.title }}</h4>
+                  <p>{{ item.desc }}</p>
+                </div>
+              }
+            }
+            @if (language() === 'hi') {
+              @for (item of hinglishDetails; track item) {
+                <div class="feature-item">
+                  <h4><i class="fas fa-check-circle text-success"></i> {{ item.title }}</h4>
+                  <p>{{ item.desc }}</p>
+                </div>
+              }
+            }
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  }
 </div>

@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, inject, OnInit, OnChanges, SimpleChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { Member } from '../../../../../models/member.model';
 import { ToastService } from '../../../../../services/toast.service';
@@ -21,7 +21,7 @@ export function minAgeValidator(minAge: number): ValidatorFn {
 @Component({
   selector: 'app-member-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [ReactiveFormsModule],
   templateUrl: './member-form.html',
   styleUrl: './member-form.css'
 })

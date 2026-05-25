@@ -23,6 +23,7 @@ const initSessionDb = async () => {
                 status ENUM('successful', 'failed', 'blocked', 'suspicious') DEFAULT 'successful',
                 failure_reason VARCHAR(255) NULL,
                 session_status ENUM('online', 'offline', 'expired') DEFAULT 'online',
+                role VARCHAR(50) NULL,
                 risk_score INT DEFAULT 0,
                 risk_level VARCHAR(20) DEFAULT 'Low',
                 token VARCHAR(500) NULL,
@@ -31,6 +32,11 @@ const initSessionDb = async () => {
                 INDEX idx_status (status),
                 INDEX idx_ip_address (ip_address)
             );
+        `);
+
+        // Migration: Add role column if it doesn't exist
+        await pool.query(`
+            ALTER TABLE user_login_sessions ADD COLUMN IF NOT EXISTS role VARCHAR(50) NULL;
         `);
 
         await pool.query(`
@@ -61,7 +67,6 @@ const parseUserAgent = (ua) => {
     let os = 'Unknown';
     let device_type = 'Desktop';
 
-    // Device Type
     const uaLower = ua.toLowerCase();
     if (/mobi|android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(uaLower)) {
         if (/ipad|tablet/i.test(uaLower)) {
@@ -73,14 +78,12 @@ const parseUserAgent = (ua) => {
         device_type = 'Desktop';
     }
 
-    // OS
     if (/windows/i.test(ua)) os = 'Windows';
     else if (/macintosh|mac os x/i.test(ua)) os = 'macOS';
     else if (/linux/i.test(ua)) os = 'Linux';
     else if (/android/i.test(ua)) os = 'Android';
     else if (/iphone|ipad|ipod/i.test(ua)) os = 'iOS';
 
-    // Browser
     if (/edg/i.test(ua)) browser = 'Edge';
     else if (/chrome|crios/i.test(ua) && !/edge|edg|opr|opera/i.test(ua)) browser = 'Chrome';
     else if (/safari/i.test(ua) && !/chrome|crios|edge|edg|opr|opera/i.test(ua)) browser = 'Safari';
@@ -98,12 +101,10 @@ const getLocationFromIp = (ip) => {
     if (ip === '::1' || ip === '127.0.0.1' || ip.startsWith('192.168.') || ip.startsWith('10.')) {
         return 'Local Network (Intranet)';
     }
-    // Static mock list for demo/visual aesthetics
     const mocks = [
         'New York, USA', 'London, UK', 'Mumbai, India', 'New Delhi, India', 
         'Bengaluru, India', 'San Francisco, USA', 'Singapore', 'Sydney, Australia'
     ];
-    // Hash IP string to pick a mock location consistently
     let hash = 0;
     for (let i = 0; i < ip.length; i++) {
         hash = ip.charCodeAt(i) + ((hash << 5) - hash);
@@ -123,7 +124,8 @@ const logSession = async ({
     userAgent,
     status = 'successful',
     failureReason = null,
-    token = null
+    token = null,
+    role = null
 }) => {
     try {
         const { browser, os, device_type } = parseUserAgent(userAgent);
@@ -143,43 +145,21 @@ const logSession = async ({
             riskLevel = 'High';
         }
 
-        // Multi-device login detection:
-        // If there is already an active session for this user with a different device type or browser, elevate risk score
+        // Multi-device login detection
         if (userId && status === 'successful') {
-            const activeSessions = await pool.query(
-                'SELECT id FROM user_login_sessions WHERE user_id = ? AND session_status = "online" AND (device_type != ? OR browser != ?)',
-                [userId, device_type, browser]
-            );
+            const [activeSessions] = await pool.query('CALL proc_get_other_active_sessions(?, ?, ?)', [userId, device_type, browser]);
             if (activeSessions.length > 0) {
-                riskScore += 30; // Elevate risk score
+                riskScore += 30;
                 riskLevel = riskScore > 50 ? 'High' : 'Medium';
             }
         }
 
-        const result = await pool.query(
-            `INSERT INTO user_login_sessions 
-            (user_id, user_name, email, ip_address, user_agent, browser, os, device_type, location, status, failure_reason, session_status, risk_score, risk_level, token, login_time)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
-            [
-                userId,
-                userName,
-                email,
-                ipAddress,
-                userAgent,
-                browser,
-                os,
-                device_type,
-                location,
-                status,
-                failureReason,
-                status === 'successful' ? 'online' : 'offline',
-                riskScore,
-                riskLevel,
-                token
-            ]
+        const [result] = await pool.query(
+            'CALL proc_log_session(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [userId, userName, email, ipAddress, userAgent, browser, os, device_type, location, status, failureReason, status === 'successful' ? 'online' : 'offline', riskScore, riskLevel, token, role]
         );
         
-        return Number(result.insertId);
+        return Number(result[0].insert_id);
     } catch (err) {
         console.error('Error logging user session:', err);
         return null;
@@ -192,24 +172,11 @@ const logSession = async ({
 const logSessionAction = async (token, actionType, description, path = null) => {
     try {
         if (!token) return;
-        // Find active session
-        const session = await pool.query(
-            'SELECT id FROM user_login_sessions WHERE token = ? AND session_status = "online" LIMIT 1',
-            [token]
-        );
+        const [session] = await pool.query('CALL proc_find_active_session_by_token(?)', [token]);
         if (session.length === 0) return;
 
         const sessionId = session[0].id;
-        await pool.query(
-            'INSERT INTO user_session_actions (session_id, action_type, description, path) VALUES (?, ?, ?, ?)',
-            [sessionId, actionType, description, path]
-        );
-
-        // Update last activity time
-        await pool.query(
-            'UPDATE user_login_sessions SET last_activity_time = NOW() WHERE id = ?',
-            [sessionId]
-        );
+        await pool.query('CALL proc_log_session_action(?, ?, ?, ?)', [sessionId, actionType, description, path]);
     } catch (err) {
         console.error('Error logging session action:', err);
     }
@@ -221,10 +188,7 @@ const logSessionAction = async (token, actionType, description, path = null) => 
 const revokeSession = async (sessionId, isExpired = false) => {
     try {
         const sessionStatus = isExpired ? 'expired' : 'offline';
-        await pool.query(
-            'UPDATE user_login_sessions SET session_status = ?, logout_time = NOW() WHERE id = ?',
-            [sessionStatus, sessionId]
-        );
+        await pool.query('CALL proc_revoke_session(?, ?)', [sessionId, sessionStatus]);
     } catch (err) {
         console.error('Error revoking session:', err);
     }

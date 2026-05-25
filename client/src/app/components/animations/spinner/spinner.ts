@@ -1,5 +1,5 @@
 import { Component, Input, HostBinding } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 /**
  * Reusable spinning circle indicator.
@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-spinner',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './spinner.html',
   styleUrl: './spinner.css'
 })

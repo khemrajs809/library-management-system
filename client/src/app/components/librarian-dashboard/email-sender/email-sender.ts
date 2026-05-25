@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ToastService } from '../../../services/toast.service';
@@ -8,7 +8,7 @@ import { API_BASE } from '../../../core/api.config';
 @Component({
   selector: 'app-email-sender',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './email-sender.html',
   styleUrl: './email-sender.css'
 })

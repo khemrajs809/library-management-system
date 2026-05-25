@@ -1,5 +1,5 @@
-import { Component, inject, signal, computed, ViewChild, ElementRef, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, signal, computed, ViewChild, ElementRef, OnInit, OnDestroy } from '@angular/core';
+
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { BookService } from '../../../services/book.service';
 import { ToastService } from '../../../services/toast.service';
@@ -11,26 +11,29 @@ import { BookFormComponent } from './components/book-form/book-form';
 import { BookTableComponent } from './components/book-list/book-list';
 import { BookCopiesModalComponent } from './components/book-copies-modal/book-copies-modal';
 import { BookDetailsModalComponent } from './components/book-details-modal/book-details-modal';
+import { RefreshService } from '../../../services/refresh.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-book-manager',
   standalone: true,
   imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
+    ReactiveFormsModule,
     BookFormComponent,
     BookTableComponent,
     BookCopiesModalComponent,
     BookDetailsModalComponent
-  ],
+],
   templateUrl: './book-manager.html',
   styleUrl: './book-manager.css'
 })
-export class BookManagerComponent implements OnInit {
+export class BookManagerComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private bookService = inject(BookService);
   private toastService = inject(ToastService);
   private modalService = inject(ModalService);
+  public refreshService = inject(RefreshService);
+  private refreshSub?: Subscription;
 
   books        = signal<Book[]>([]);
   pagination   = signal<any>({ page: 1, limit: 8, totalPages: 1, total: 0 });
@@ -73,6 +76,10 @@ export class BookManagerComponent implements OnInit {
   constructor() { this.loadBooks(); }
 
   ngOnInit() {
+    this.refreshSub = this.refreshService.refresh$.subscribe(() => {
+      this.refreshData();
+    });
+
     this.form.valueChanges.subscribe(val => {
       // If the user has typed anything into any field and it's a new book without an ID yet
       const hasValue = !!(val.title || val.author || val.stream || val.publication_year || val.publisher || val.edition || val.shelf_location || val.price || val.quantity || val.isbn);
@@ -80,6 +87,15 @@ export class BookManagerComponent implements OnInit {
         this.generateIds();
       }
     });
+  }
+
+  refreshData() {
+    this.loadBooks();
+    setTimeout(() => this.refreshService.completeRefresh(), 800);
+  }
+
+  ngOnDestroy() {
+    if (this.refreshSub) this.refreshSub.unsubscribe();
   }
 
   private checkAndGenerateIds() {
@@ -209,7 +225,9 @@ export class BookManagerComponent implements OnInit {
             this.loadBooks(this.bookSearch()); 
           },
           error: (e) => {
-            this.addActivity(`Failed to delete book: ${book.title}`, 'error');
+            const msg = e.error?.message || 'Failed to delete book';
+            this.toastService.error(msg);
+            this.addActivity(`Failed to delete book: ${book.title} (${msg})`, 'error');
           }
         });
       }

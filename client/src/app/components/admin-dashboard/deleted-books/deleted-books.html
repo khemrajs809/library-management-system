@@ -22,17 +22,18 @@
             <th>Author</th>
             <th>Category</th>
             <th>Year</th>
+            <th>Deleted At</th>
             <th class="text-right">Actions</th>
           </tr>
         </thead>
         <tbody>
           @if (loading()) {
             <tr>
-              <td colspan="6" class="loading-state">⏳ Loading deleted books...</td>
+              <td colspan="7" class="loading-state">⏳ Loading deleted books...</td>
             </tr>
           } @else if (deletedBooks().length === 0) {
             <tr>
-              <td colspan="6" class="empty-state">
+              <td colspan="7" class="empty-state">
                 <div class="empty-icon">✅</div>
                 <div>No deleted books in archive.</div>
               </td>
@@ -61,6 +62,10 @@
                   } @else { — }
                 </td>
                 <td>{{ book.publication_year || '—' }}</td>
+                <td class="date-cell">
+                  <div class="del-date">{{ book.deleted_at | date:'dd MMM yyyy' }}</div>
+                  <div class="del-time text-muted small">{{ book.deleted_at | date:'hh:mm a' }}</div>
+                </td>
                 <td class="text-right">
                   <div class="action-buttons">
                     <button class="btn btn-restore" (click)="restoreBook(book.book_id)">

@@ -1,10 +1,10 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'app-fade-in',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   template: `
     <div class="fade-in-container" [style.animation-delay]="delay + 'ms'">
       <ng-content></ng-content>

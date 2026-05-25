@@ -12,76 +12,44 @@ const getSessions = async (req, res) => {
 
         const { startDate, endDate, user, status, deviceType, browser, search } = req.query;
 
-        let query = `
-            SELECT s.*, 
-            (SELECT COUNT(*) FROM user_session_actions WHERE session_id = s.id) as action_count
-            FROM user_login_sessions s 
-            WHERE 1=1
-        `;
-        let countQuery = `SELECT COUNT(*) as total FROM user_login_sessions s WHERE 1=1`;
-        const params = [];
-        const countParams = [];
+        const results = await pool.query('CALL proc_get_sessions_filtered(?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+            startDate ? `${startDate} 00:00:00` : null,
+            endDate ? `${endDate} 23:59:59` : null,
+            user || null,
+            status || null,
+            deviceType || null,
+            browser || null,
+            search || null,
+            limit,
+            offset
+        ]);
 
-        // Apply filters
-        if (startDate) {
-            query += ` AND s.login_time >= ?`;
-            countQuery += ` AND s.login_time >= ?`;
-            params.push(`${startDate} 00:00:00`);
-            countParams.push(`${startDate} 00:00:00`);
-        }
-        if (endDate) {
-            query += ` AND s.login_time <= ?`;
-            countQuery += ` AND s.login_time <= ?`;
-            params.push(`${endDate} 23:59:59`);
-            countParams.push(`${endDate} 23:59:59`);
-        }
-        if (status) {
-            query += ` AND s.status = ?`;
-            countQuery += ` AND s.status = ?`;
-            params.push(status);
-            countParams.push(status);
-        }
-        if (deviceType) {
-            query += ` AND s.device_type = ?`;
-            countQuery += ` AND s.device_type = ?`;
-            params.push(deviceType);
-            countParams.push(deviceType);
-        }
-        if (browser) {
-            query += ` AND s.browser = ?`;
-            countQuery += ` AND s.browser = ?`;
-            params.push(browser);
-            countParams.push(browser);
-        }
-        if (user) {
-            query += ` AND (s.email LIKE ? OR s.user_name LIKE ?)`;
-            countQuery += ` AND (s.email LIKE ? OR s.user_name LIKE ?)`;
-            params.push(`%${user}%`, `%${user}%`);
-            countParams.push(`%${user}%`, `%${user}%`);
-        }
-        if (search) {
-            query += ` AND (s.email LIKE ? OR s.user_name LIKE ? OR s.ip_address LIKE ? OR s.location LIKE ?)`;
-            countQuery += ` AND (s.email LIKE ? OR s.user_name LIKE ? OR s.ip_address LIKE ? OR s.location LIKE ?)`;
-            params.push(`%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`);
-            countParams.push(`%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`);
-        }
-
-        // Sorting
-        query += ` ORDER BY s.login_time DESC LIMIT ? OFFSET ?`;
-        params.push(limit, offset);
-
-        const countResult = await pool.query(countQuery, countParams);
-        const total = Number(countResult[0].total);
-
-        const rows = await pool.query(query, params);
+        const rows = results[0];
+        const totalCountRow = results[1] ? results[1][0] : null;
+        const total = totalCountRow ? Number(totalCountRow.total) : 0;
 
         // Convert bigints / dates to standard JSON formats
-        const data = rows.map(row => ({
-            ...row,
-            id: Number(row.id),
-            risk_score: Number(row.risk_score),
-            action_count: Number(row.action_count)
-        }));
+        const data = rows.map(row => {
+            // Determine real-time status based on last activity
+            const lastActivity = new Date(row.last_activity_time).getTime();
+            const now = Date.now();
+            const diffMins = (now - lastActivity) / (1000 * 60);
+
+            let realtimeStatus = row.session_status;
+            if (row.session_status === 'online') {
+                if (diffMins > 30) realtimeStatus = 'offline'; // Abandoned
+                else if (diffMins > 10) realtimeStatus = 'idle';
+            }
+
+            return {
+                ...row,
+                id: Number(row.id),
+                risk_score: Number(row.risk_score),
+                action_count: Number(row.action_count),
+                realtime_status: realtimeStatus,
+                is_current: row.token === req.header('Authorization')?.split(' ')[1] || row.token === req.header('x-auth-token')
+            };
+        });
 
         res.status(200).json({
             success: true,
@@ -94,8 +62,12 @@ const getSessions = async (req, res) => {
             }
         });
     } catch (err) {
-        console.error('Error fetching sessions:', err);
-        res.status(500).json({ success: false, message: 'Server error' });
+        console.error('Error fetching sessions:', {
+            message: err.message,
+            stack: err.stack,
+            query: req.query
+        });
+        res.status(500).json({ success: false, message: 'Server error: ' + err.message });
     }
 };
 
@@ -105,10 +77,7 @@ const getSessions = async (req, res) => {
 const getSessionActions = async (req, res) => {
     const { id } = req.params;
     try {
-        const actions = await pool.query(
-            'SELECT * FROM user_session_actions WHERE session_id = ? ORDER BY created_at ASC',
-            [id]
-        );
+        const [actions] = await pool.query('CALL proc_get_session_actions(?)', [id]);
         res.status(200).json({
             success: true,
             data: actions.map(act => ({
@@ -129,7 +98,7 @@ const getSessionActions = async (req, res) => {
 const terminateSession = async (req, res) => {
     const { id } = req.params;
     try {
-        const session = await pool.query('SELECT token, session_status FROM user_login_sessions WHERE id = ?', [id]);
+        const [session] = await pool.query('CALL proc_get_session_for_termination(?)', [id]);
         if (session.length === 0) {
             return res.status(404).json({ success: false, message: 'Session not found' });
         }
@@ -141,10 +110,7 @@ const terminateSession = async (req, res) => {
 
         // blacklist token if active
         if (token) {
-            await pool.query(
-                'UPDATE token_blacklist SET status = "inactive", logout_time = NOW() WHERE token = ?',
-                [token]
-            );
+            await pool.query('CALL proc_terminate_session_blacklist(?)', [token]);
         }
 
         // Revoke session
@@ -162,59 +128,34 @@ const terminateSession = async (req, res) => {
  */
 const getSessionStats = async (req, res) => {
     try {
-        // KPI metrics
-        const [
-            totalCount, successfulCount, failedCount, blockedCount, onlineCount, highRiskCount
-        ] = await Promise.all([
-            pool.query('SELECT COUNT(*) as count FROM user_login_sessions'),
-            pool.query('SELECT COUNT(*) as count FROM user_login_sessions WHERE status = "successful"'),
-            pool.query('SELECT COUNT(*) as count FROM user_login_sessions WHERE status = "failed"'),
-            pool.query('SELECT COUNT(*) as count FROM user_login_sessions WHERE status = "blocked"'),
-            pool.query('SELECT COUNT(*) as count FROM user_login_sessions WHERE session_status = "online"'),
-            pool.query('SELECT COUNT(*) as count FROM user_login_sessions WHERE risk_level = "High"')
+        // Fetch all stats in parallel using procedural calls
+        const [kpiRes, deviceRes, browserRes, weeklyRes, alertRes] = await Promise.all([
+            pool.query('CALL proc_get_session_stats_kpis()'),
+            pool.query('CALL proc_get_session_stats_devices()'),
+            pool.query('CALL proc_get_session_stats_browsers()'),
+            pool.query('CALL proc_get_session_stats_weekly()'),
+            pool.query('CALL proc_get_session_alerts()')
         ]);
 
-        // Device Type stats
-        const deviceStats = await pool.query(
-            'SELECT device_type, COUNT(*) as count FROM user_login_sessions WHERE status = "successful" GROUP BY device_type'
-        );
-
-        // Browser stats
-        const browserStats = await pool.query(
-            'SELECT browser, COUNT(*) as count FROM user_login_sessions WHERE status = "successful" GROUP BY browser'
-        );
-
-        // Weekly Trends (Last 7 Days)
-        const weeklyTrends = await pool.query(`
-            SELECT DATE(login_time) as date, status, COUNT(*) as count 
-            FROM user_login_sessions 
-            WHERE login_time >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
-            GROUP BY DATE(login_time), status
-            ORDER BY DATE(login_time) ASC
-        `);
-
-        // Recent alerts / suspicious attempts
-        const alerts = await pool.query(`
-            SELECT id, email, user_name, ip_address, browser, device_type, login_time, status, failure_reason, risk_level, risk_score
-            FROM user_login_sessions 
-            WHERE status IN ('blocked', 'suspicious') OR risk_level = 'High'
-            ORDER BY login_time DESC 
-            LIMIT 5
-        `);
+        const kpis = kpiRes[0][0];
+        const devices = deviceRes[0];
+        const browsers = browserRes[0];
+        const weeklyTrends = weeklyRes[0];
+        const alerts = alertRes[0];
 
         res.status(200).json({
             success: true,
             data: {
                 kpi: {
-                    totalLogins: Number(totalCount[0].count),
-                    successful: Number(successfulCount[0].count),
-                    failed: Number(failedCount[0].count),
-                    blocked: Number(blockedCount[0].count),
-                    online: Number(onlineCount[0].count),
-                    highRisk: Number(highRiskCount[0].count)
+                    totalLogins: Number(kpis.total_logins),
+                    successful: Number(kpis.successful),
+                    failed: Number(kpis.failed),
+                    blocked: Number(kpis.blocked),
+                    online: Number(kpis.online_count),
+                    highRisk: Number(kpis.high_risk)
                 },
-                devices: deviceStats.map(d => ({ device: d.device_type || 'Unknown', count: Number(d.count) })),
-                browsers: browserStats.map(b => ({ browser: b.browser || 'Unknown', count: Number(b.count) })),
+                devices: devices.map(d => ({ device: d.device || 'Unknown', count: Number(d.count) })),
+                browsers: browsers.map(b => ({ browser: b.browser || 'Unknown', count: Number(b.count) })),
                 weeklyTrends: weeklyTrends.map(t => ({
                     date: t.date,
                     status: t.status,
@@ -228,8 +169,11 @@ const getSessionStats = async (req, res) => {
             }
         });
     } catch (err) {
-        console.error('Error fetching session stats:', err);
-        res.status(500).json({ success: false, message: 'Server error' });
+        console.error('Error fetching session stats:', {
+            message: err.message,
+            stack: err.stack
+        });
+        res.status(500).json({ success: false, message: 'Server error: ' + err.message });
     }
 };
 

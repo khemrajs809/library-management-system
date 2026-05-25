@@ -24,4 +24,8 @@ async function getConnection() {
 
 getConnection();
 
+pool.on('error', (err) => {
+    console.error('❌ Unexpected error on idle MariaDB client', err);
+});
+
 module.exports = pool;

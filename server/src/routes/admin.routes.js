@@ -16,8 +16,9 @@ const {
     getAuditLogs,
     updateLibrarianStatus
 } = require('../controllers/admin.controller');
+const announcementController = require('../controllers/announcement.controller');
 const authController = require('../controllers/auth.controller');
-const { authLimiter } = require('../middlewares/security.middleware');
+const { authLimiter } = require('../middlewares/rateLimiter.middleware');
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -61,5 +62,11 @@ router.post('/sessions/:id/terminate', verifyToken, checkRole(['admin']), auditL
 
 // Client-side Session Activity Logging (ADMIN/LIBRARIAN)
 router.post('/sessions/log-action', verifyToken, logClientAction);
+
+// --- ANNOUNCEMENT MANAGEMENT (ADMIN ONLY) ---
+router.get('/announcements', verifyToken, checkRole(['admin']), announcementController.getAllAnnouncements);
+router.post('/announcements', verifyToken, checkRole(['admin']), auditLog('Create Announcement'), announcementController.createAnnouncement);
+router.patch('/announcements/:id/status', verifyToken, checkRole(['admin']), auditLog('Toggle Announcement Status'), announcementController.toggleStatus);
+router.delete('/announcements/:id', verifyToken, checkRole(['admin']), auditLog('Delete Announcement'), announcementController.deleteAnnouncement);
 
 module.exports = router;
