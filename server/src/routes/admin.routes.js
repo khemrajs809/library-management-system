@@ -16,7 +16,7 @@ const {
     getAuditLogs,
     updateLibrarianStatus
 } = require('../controllers/admin.controller');
-const announcementController = require('../controllers/announcement.controller');
+const announcementController = require('../features/announcements/announcement.controller');
 const authController = require('../controllers/auth.controller');
 const { authLimiter } = require('../middlewares/rateLimiter.middleware');
 const multer = require('multer');

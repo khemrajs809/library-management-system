@@ -13,10 +13,10 @@ const adminRoutes = require('./routes/admin.routes');
 const bookRoutes = require('./routes/book.routes');
 const memberRoutes = require('./routes/member.routes');
 const issueRoutes = require('./routes/issue.routes');
-const notesRoutes = require('./routes/notes.routes');
+const notesRoutes = require('./features/notes/notes.routes');
 const authController = require('./controllers/auth.controller');
 const captchaRoutes = require('./features/captcha/captcha.routes');
-const publicRoutes = require('./routes/public.routes');
+const publicRoutes = require('./features/announcements/announcement.routes');
 
 const app = express();
 
