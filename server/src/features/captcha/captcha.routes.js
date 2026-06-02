@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const captchaController = require('../controllers/captcha.controller');
+const captchaController = require('./captcha.controller');
 
 router.get('/generate', captchaController.generateCaptcha);
 

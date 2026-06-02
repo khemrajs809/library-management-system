@@ -15,7 +15,7 @@ const memberRoutes = require('./routes/member.routes');
 const issueRoutes = require('./routes/issue.routes');
 const notesRoutes = require('./routes/notes.routes');
 const authController = require('./controllers/auth.controller');
-const captchaRoutes = require('./routes/captcha.routes');
+const captchaRoutes = require('./features/captcha/captcha.routes');
 const publicRoutes = require('./routes/public.routes');
 
 const app = express();
