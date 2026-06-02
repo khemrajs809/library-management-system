@@ -3,13 +3,19 @@
 <head>
   <meta charset="utf-8">
   <title>LMS - Library Management System</title>
+  <meta name="description" content="LMS - A comprehensive Library Management System for managing books, members, and circulation.">
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="logolms.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+  <link rel="preconnect" href="http://localhost:3000">
+  <link rel="icon" type="image/x-icon" href="logolms.webp">
+  <link rel="preload" as="image" href="/logolms.webp">
+  <link rel="stylesheet" href="loader.css">
 </head>
 <body>
-  <link rel="stylesheet" href="loader.css">
-
   <app-root></app-root>
 
   <!-- Standalone loader rendered outside app-root so Angular doesn't destroy it prematurely -->
@@ -18,6 +24,6 @@
     <div class="lms-loader-text">Loading LMS...</div>
   </div>
 
-  <script src="loader.js"></script>
+  <script src="loader.js" defer></script>
 </body>
 </html>

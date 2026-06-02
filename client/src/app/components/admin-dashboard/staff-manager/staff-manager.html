@@ -14,7 +14,7 @@
     <form [formGroup]="libForm" (ngSubmit)="onSubmit()" class="librarian-form">
         <div class="form-row">
             <div class="form-group">
-                <label for="lib_id">Librarian ID</label>
+                <label>Librarian ID</label>
                 <div class="member-id-auto">
                   @if (generatedId()) {
                     <span class="id-value-badge">
@@ -85,41 +85,49 @@
                 </tr>
             </thead>
             <tbody>
-                @for (lib of librarians(); track lib.lib_id) {
-                    <tr>
-                        <td><span class="id-badge">{{ lib.lib_id }}</span></td>
-                        <td>{{ lib.name }}</td>
-                        <td>{{ lib.email }}</td>
-                        <td>
-                            <span class="status-badge" [class]="lib.status">
-                                {{ lib.status | titlecase }}
-                            </span>
-                        </td>
-                        <td>{{ lib.created_at | date:'dd/MM/yyyy' }}</td>
-                        <td class="text-right">
-                            <div class="action-buttons">
-                                @if (editingLibId() === lib.lib_id) {
-                                    <div class="inline-edit">
-                                        <input #passInput type="password" placeholder="New Password" class="small-input">
-                                        <button class="btn btn-green btn-icon" (click)="onUpdatePassword(lib.lib_id, passInput.value)" [disabled]="passwordUpdateLoading()">✔</button>
-                                        <button class="btn btn-gray btn-icon" (click)="toggleEdit(null)">✖</button>
-                                    </div>
-                                } @else {
-                                    <button class="btn btn-sm" [class]="lib.status === 'active' ? 'btn-warn-outline' : 'btn-green-outline'" (click)="toggleStatus(lib.lib_id, lib.status)">
-                                        {{ lib.status === 'active' ? 'Deactivate' : 'Activate' }}
-                                    </button>
-                                    <button class="btn btn-outline btn-sm" (click)="toggleEdit(lib.lib_id)">Change Pass</button>
-                                    <button class="btn btn-icon-delete btn-sm" (click)="deleteLibrarian(lib.lib_id)">🗑️ Delete</button>
-                                }
-                            </div>
-                        </td>
-                    </tr>
+                @if (fetchingData()) {
+                    <tr><td colspan="6"><div class="skeleton-line"></div></td></tr>
+                    <tr><td colspan="6"><div class="skeleton-line"></div></td></tr>
+                    <tr><td colspan="6"><div class="skeleton-line"></div></td></tr>
+                    <tr><td colspan="6"><div class="skeleton-line"></div></td></tr>
+                    <tr><td colspan="6"><div class="skeleton-line"></div></td></tr>
+                } @else {
+                    @for (lib of librarians(); track lib.libId) {
+                        <tr>
+                            <td><span class="id-badge">{{ lib.libId }}</span></td>
+                            <td>{{ lib.name }}</td>
+                            <td>{{ lib.email }}</td>
+                            <td>
+                                <span class="status-badge" [class]="lib.status">
+                                    {{ lib.status | titlecase }}
+                                </span>
+                            </td>
+                            <td>{{ lib.createdAt | date:'dd/MM/yyyy' }}</td>
+                            <td class="text-right">
+                                <div class="action-buttons">
+                                    @if (editingLibId() === lib.libId) {
+                                        <div class="inline-edit">
+                                            <input #passInput type="password" aria-label="New Password" placeholder="New Password" class="small-input">
+                                            <button class="btn btn-green btn-icon" (click)="onUpdatePassword(lib.libId, passInput.value)" [disabled]="passwordUpdateLoading()">✔</button>
+                                            <button class="btn btn-gray btn-icon" (click)="toggleEdit(null)">✖</button>
+                                        </div>
+                                    } @else {
+                                        <button class="btn btn-sm" [class]="lib.status === 'active' ? 'btn-warn-outline' : 'btn-green-outline'" (click)="toggleStatus(lib.libId, lib.status)">
+                                            {{ lib.status === 'active' ? 'Deactivate' : 'Activate' }}
+                                        </button>
+                                        <button class="btn btn-outline btn-sm" (click)="toggleEdit(lib.libId)">Change Pass</button>
+                                        <button class="btn btn-icon-delete btn-sm" (click)="deleteLibrarian(lib.libId)">🗑️ Delete</button>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
 
-                }
-                @if (librarians().length === 0) {
-                    <tr>
-                        <td colspan="5" class="empty-msg">No librarian accounts found.</td>
-                    </tr>
+                    }
+                    @if (librarians().length === 0) {
+                        <tr>
+                            <td colspan="6" class="empty-msg">No librarian accounts found.</td>
+                        </tr>
+                    }
                 }
             </tbody>
         </table>

@@ -380,3 +380,6 @@
 @media (max-width: 1400px) {
   .desk-grid { grid-template-columns: 1fr; }
 }
+
+/* Utilities for extraction */
+.search-w-320 { width: 320px; }

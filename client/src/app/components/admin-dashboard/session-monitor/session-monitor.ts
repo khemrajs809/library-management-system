@@ -112,6 +112,7 @@ export class SessionMonitorComponent implements OnInit, OnDestroy {
     this.http.get<any>(url).subscribe({
       next: (res) => {
         if (res.success) {
+          console.log('DEBUG FRONTEND SESSIONS:', res.data);
           this.sessions.set(res.data);
           if (res.pagination) {
             this.pagination.set(res.pagination);
@@ -268,20 +269,20 @@ export class SessionMonitorComponent implements OnInit, OnDestroy {
       const headers = ['Session ID', 'User ID', 'Name', 'Email', 'Role', 'Login Time', 'Logout Time', 'Status', 'IP Address', 'Browser', 'OS', 'Device Type', 'Location', 'Risk Level', 'Risk Score'];
       const rows = this.sessions().map(s => [
         s.id,
-        s.user_id || 'N/A',
-        s.user_name || 'N/A',
+        s.userId || 'N/A',
+        s.userName || 'N/A',
         s.email,
         s.role || 'N/A',
-        s.login_time,
-        s.logout_time || 'N/A',
+        this.safeDate(s.loginTime),
+        s.logoutTime ? this.safeDate(s.logoutTime) : 'N/A',
         s.status,
-        s.ip_address,
+        s.ipAddress,
         s.browser,
         s.os,
-        s.device_type,
+        s.deviceType,
         s.location,
-        s.risk_level,
-        s.risk_score
+        s.riskLevel,
+        s.riskScore
       ]);
 
       const csvContent = [headers.join(','), ...rows.map(e => e.map(val => `"${String(val).replace(/"/g, '""')}"`).join(','))].join('\n');
@@ -313,8 +314,16 @@ export class SessionMonitorComponent implements OnInit, OnDestroy {
   }
 
   // Calculations
+  safeDate(dateStr: string | null): string {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    return isNaN(d.getTime()) ? dateStr : d.toLocaleString();
+  }
+
   formatDuration(login: string, logout: string | null, status: string, realtimeStatus: string): string {
+    if (!login) return 'N/A';
     const start = new Date(login).getTime();
+    if (isNaN(start)) return 'Invalid Date';
     
     if (status !== 'successful' && !logout) {
       return 'N/A';

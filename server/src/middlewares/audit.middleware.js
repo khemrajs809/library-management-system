@@ -1,4 +1,4 @@
-const pool = require('../db');
+const { logSystemAction } = require('../services/audit.service');
 const { logSessionAction } = require('../services/session.service');
 
 /**
@@ -23,16 +23,13 @@ const auditLog = (actionDescription) => {
                     ip: req.ip
                 };
 
-                // Non-blocking log to DB using stored procedure
-                pool.query(
-                    'CALL proc_log_audit_action(?, ?, ?, ?)',
-                    [
-                        user.id || user.email || 'unknown', 
-                        user.role, 
-                        actionDescription, 
-                        JSON.stringify(details)
-                    ]
-                ).catch(err => console.error('Audit Log Error:', err.message));
+                // Non-blocking log to DB using centralized audit service
+                logSystemAction(
+                    user.id || user.email,
+                    user.role,
+                    actionDescription,
+                    details
+                );
 
                 // Also log to user_session_actions if token is available
                 const token = req.header('Authorization')?.split(' ')[1] || req.header('x-auth-token');

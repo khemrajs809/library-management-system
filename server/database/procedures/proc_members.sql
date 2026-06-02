@@ -113,7 +113,8 @@ BEGIN
     SELECT i.issue_id, i.issue_date, i.due_date, i.return_date, i.status, i.fine_amount, i.fine_paid,
            b.book_id, b.title as book_title, b.isbn
     FROM issues i
-    JOIN books b ON i.book_id = b.book_id
+    JOIN book_copies bc ON i.book_id = bc.copy_id
+    JOIN books b ON bc.book_id = b.book_id
     WHERE i.member_id = p_id
     ORDER BY i.issue_date DESC;
 END;

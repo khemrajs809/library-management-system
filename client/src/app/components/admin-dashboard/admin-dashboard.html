@@ -1,39 +1,50 @@
-<div class="dashboard-container ds-style-4abf96d6" >
-    <!-- Tab Navigation -->
-    <nav class="tabs-container no-print ds-style-8a08d99f" >
-      <ul class="tabs-list ds-style-35d35f28" >
+<div class="dashboard-container ds-style-4abf96d6">
+  <!-- Tab Navigation -->
+  <nav class="tabs-container no-print ds-style-8a08d99f">
+    <ul class="tabs-list ds-style-35d35f28">
 
-        <li [class.active]="activeTab === 'staff'" (click)="setTab('staff')" class="admin-tab ds-style-e9e32f30">Staff Management</li>
-        <li [class.active]="activeTab === 'broadcast'" (click)="setTab('broadcast')" class="admin-tab ds-style-e9e32f30">Broadcast Management</li>
-        <li [class.active]="activeTab === 'sessions'" (click)="setTab('sessions')" class="admin-tab ds-style-e9e32f30">Session Monitor</li>
-        <li [class.active]="activeTab === 'audit'" (click)="setTab('audit')" class="admin-tab ds-style-e9e32f30">Audit Logs</li>
-        <li [class.active]="activeTab === 'deleted-books'" (click)="setTab('deleted-books')" class="admin-tab ds-style-e9e32f30">Deleted Books</li>
-        <li [class.active]="activeTab === 'deleted-members'" (click)="setTab('deleted-members')" class="admin-tab ds-style-e9e32f30">Deleted Members</li>
-      </ul>
-    </nav>
+      <li [class.active]="activeTab === 'staff'" (click)="setTab('staff')" class="admin-tab ds-style-e9e32f30">Staff
+        Management</li>
+      <li [class.active]="activeTab === 'broadcast'" (click)="setTab('broadcast')" class="admin-tab ds-style-e9e32f30">
+        Broadcast Management</li>
+      <li [class.active]="activeTab === 'sessions'" (click)="setTab('sessions')" class="admin-tab ds-style-e9e32f30">
+        Session Monitor</li>
+      <li [class.active]="activeTab === 'security'" (click)="setTab('security')" class="admin-tab ds-style-e9e32f30">
+        Security Incidents</li>
+      <li [class.active]="activeTab === 'audit'" (click)="setTab('audit')" class="admin-tab ds-style-e9e32f30">Audit
+        Logs</li>
+      <li [class.active]="activeTab === 'deleted-books'" (click)="setTab('deleted-books')"
+        class="admin-tab ds-style-e9e32f30">Deleted Books</li>
+      <li [class.active]="activeTab === 'deleted-members'" (click)="setTab('deleted-members')"
+        class="admin-tab ds-style-e9e32f30">Deleted Members</li>
+    </ul>
+  </nav>
 
-    <!-- Main Content -->
-    <div  class="ds-style-d0aaa224">
-        <div  class="ds-style-a46c2e6a">
+  <!-- Main Content -->
+  <div class="ds-style-d0aaa224">
+    <div class="ds-style-a46c2e6a">
 
-            @if (activeTab === 'staff') {
-              <app-staff-manager></app-staff-manager>
-            }
-            @if (activeTab === 'broadcast') {
-              <app-announcement-manager></app-announcement-manager>
-            }
-            @if (activeTab === 'sessions') {
-              <app-session-monitor></app-session-monitor>
-            }
-            @if (activeTab === 'audit') {
-              <app-audit-log-viewer></app-audit-log-viewer>
-            }
-            @if (activeTab === 'deleted-books') {
-              <app-deleted-books></app-deleted-books>
-            }
-            @if (activeTab === 'deleted-members') {
-              <app-deleted-members></app-deleted-members>
-            }
-        </div>
+      @if (activeTab === 'staff') {
+      @defer { <app-staff-manager></app-staff-manager> }
+      }
+      @if (activeTab === 'broadcast') {
+      @defer { <app-announcement-manager></app-announcement-manager> }
+      }
+      @if (activeTab === 'sessions') {
+      @defer { <app-session-monitor></app-session-monitor> }
+      }
+      @if (activeTab === 'security') {
+      @defer { <app-security-incidents></app-security-incidents> }
+      }
+      @if (activeTab === 'audit') {
+      @defer { <app-audit-log-viewer></app-audit-log-viewer> }
+      }
+      @if (activeTab === 'deleted-books') {
+      @defer { <app-deleted-books></app-deleted-books> }
+      }
+      @if (activeTab === 'deleted-members') {
+      @defer { <app-deleted-members></app-deleted-members> }
+      }
     </div>
+  </div>
 </div>

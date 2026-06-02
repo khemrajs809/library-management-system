@@ -21,6 +21,9 @@ export class ForgotPasswordComponent {
   step = signal<number>(1); // 1: Email, 2: OTP & New Password
   isLoading = signal<boolean>(false);
   error = signal<string>('');
+  
+  showPassword = signal<boolean>(false);
+  showConfirmPassword = signal<boolean>(false);
 
   data = {
     email: '',
@@ -82,5 +85,13 @@ export class ForgotPasswordComponent {
     this.data.otp = '';
     this.data.newPassword = '';
     this.data.confirmPassword = '';
+  }
+
+  togglePassword() {
+    this.showPassword.update(v => !v);
+  }
+
+  toggleConfirmPassword() {
+    this.showConfirmPassword.update(v => !v);
   }
 }

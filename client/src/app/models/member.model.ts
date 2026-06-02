@@ -1,51 +1,51 @@
 export interface Member {
-  member_id: string;
+  memberId: string;
   name: string;
   dob: string;
   gender?: 'Male' | 'Female' | 'Other';
   phone?: string;
   email?: string;
-  permanent_address?: string;
-  current_address?: string;
+  permanentAddress?: string;
+  currentAddress?: string;
   // Structured Address Fields
-  curr_house?: string;
-  curr_street?: string;
-  curr_area?: string;
-  curr_city?: string;
-  curr_state?: string;
-  curr_pincode?: string;
-  perm_house?: string;
-  perm_street?: string;
-  perm_area?: string;
-  perm_city?: string;
-  perm_state?: string;
-  perm_pincode?: string;
+  currHouse?: string;
+  currStreet?: string;
+  currArea?: string;
+  currCity?: string;
+  currState?: string;
+  currPincode?: string;
+  permHouse?: string;
+  permStreet?: string;
+  permArea?: string;
+  permCity?: string;
+  permState?: string;
+  permPincode?: string;
   course?: string;
   department?: string;
-  year_semester?: string;
-  membership_type?: 'Student' | 'Faculty' | 'Research Scholar' | 'Other';
-  roll_number?: string;
-  academic_session?: string;
-  hod_name?: string;
-  guardian_name?: string;
-  guardian_phone?: string;
-  blood_group?: string;
-  membership_expiry?: string;
-  max_book_limit?: number;
-  account_status?: 'Active' | 'Suspended' | 'Blacklisted';
-  no_dues_status?: number;
-  photo_url?: string;
-  govt_id_url?: string;
-  admission_receipt_url?: string;
-  security_deposit_url?: string;
-  created_at?: string;
+  yearSemester?: string;
+  membershipType?: 'Student' | 'Faculty' | 'Research Scholar' | 'Other';
+  rollNumber?: string;
+  academicSession?: string;
+  hodName?: string;
+  guardianName?: string;
+  guardianPhone?: string;
+  bloodGroup?: string;
+  membershipExpiry?: string;
+  maxBookLimit?: number;
+  accountStatus?: 'Active' | 'Suspended' | 'Blacklisted';
+  noDuesStatus?: number;
+  photoUrl?: string;
+  govtIdUrl?: string;
+  admissionReceiptUrl?: string;
+  securityDepositUrl?: string;
+  createdAt?: string;
 }
 
 export interface MemberStats {
-  total_borrowed: number;
-  active_issues: number;
+  totalBorrowed: number;
+  activeIssues: number;
   overdue: number;
-  total_fines: number;
+  totalFines: number;
 }
 
 export interface MemberProfile {
@@ -55,15 +55,15 @@ export interface MemberProfile {
 }
 
 export interface IssueHistoryItem {
-  issue_id: number;
-  book_id: string;
-  book_title: string;
+  issueId: number;
+  bookId: string;
+  bookTitle: string;
   isbn: string;
-  issue_date: string;
-  due_date: string;
-  return_date?: string;
+  issueDate: string;
+  dueDate: string;
+  returnDate?: string;
   status: 'issued' | 'returned' | 'lost';
-  fine_amount: number;
-  fine_paid: number;
-  created_at?: string;
+  fineAmount: number;
+  finePaid: number;
+  createdAt?: string;
 }

@@ -30,8 +30,8 @@
         <div class="ds-style-518067f9">
           <!-- Large Cover Image -->
           <div class="ds-style-121c25b3">
-            @if (book.cover_url) {
-            <img [src]="book.cover_url" class="ds-style-363d597c" crossorigin="anonymous">
+            @if (book.coverUrl) {
+            <img [src]="book.coverUrl" class="ds-style-363d597c" crossorigin="anonymous">
             } @else {
             <div class="ds-style-f8af320">Book Profile</div>
             }
@@ -40,7 +40,7 @@
           <!-- Book Title & Basic Info -->
           <div class="ds-style-5b86a960">
             <div class="ds-style-1d9bd0a8">
-              <span class="ds-style-69f7b4d">ID: {{ book.book_id }}</span>
+              <span class="ds-style-69f7b4d">ID: {{ book.bookId }}</span>
               <span class="ds-style-11cee849">{{ book.stream || 'GENERAL' }}</span>
             </div>
             <h1 class="ds-style-211ea408">{{ book.title }}</h1>
@@ -57,11 +57,11 @@
             <div class="ds-style-4bd115fd">
               <div class="ds-style-55738656">
                 <div class="ds-style-12ebe74">Total Stock</div>
-                <div class="ds-style-7466aaea">{{ book.total_copies }}</div>
+                <div class="ds-style-7466aaea">{{ book.totalCopies }}</div>
               </div>
               <div class="ds-style-55738656">
                 <div class="ds-style-12ebe74">Available</div>
-                <div class="ds-style-26c67fd0">{{ book.available_copies }}</div>
+                <div class="ds-style-26c67fd0">{{ book.availableCopies }}</div>
               </div>
             </div>
           </div>
@@ -113,8 +113,8 @@
                       <span class="ds-style-1be5e0b9">
                         <span class="ds-style-316f55e4"></span> Shelf Location
                       </span>
-                      @if (book.shelf_location) {
-                        <span class="ds-style-6a909415">{{ book.shelf_location }}</span>
+                      @if (book.shelfLocation) {
+                        <span class="ds-style-6a909415">{{ book.shelfLocation }}</span>
                       } @else {
                         <span class="ds-style-27cc65db">Unassigned</span>
                       }
@@ -137,14 +137,14 @@
                 <h4 class="ds-style-47ba3246">Physical Stock Status</h4>
                 <div class="ds-style-3fdf9bd6">
                   <div class="ds-style-4bddcbbf">
-                    @for (copy of getPaginatedCopies(); track copy.copy_id) {
+                    @for (copy of getPaginatedCopies(); track copy.copyId) {
                     <div [class.copy-status-available]="copy.status === 'available'" [class.copy-status-issued]="copy.status !== 'available'" class="ds-style-745b0118">
                       <!-- Actual Barcode Strip -->
                       <div class="ds-style-ec19048">
                         <img [src]="copy.barcodeBase64" alt="Barcode" class="ds-style-6de93184">
                       </div>
                       <div class="ds-style-26beee05">{{ copy.status }}</div>
-                      <div class="ds-style-41bfd566">{{ copy.copy_id }}</div>
+                      <div class="ds-style-41bfd566">{{ copy.copyId }}</div>
                       <!-- Status Dot -->
                       <div [class]="'status-dot ' + copy.status" class="ds-style-33c87ad7"></div>
                     </div>
@@ -193,31 +193,31 @@
                     </tr>
                   </thead>
                   <tbody>
-                    @for (row of history; track row.issue_id) {
+                    @for (row of history; track row.issueId) {
                     <tr class="ds-style-5099fc0b">
                       <td class="ds-style-43d506b9">
                         <div class="ds-style-244d1a4e">
-                          <span class="ds-style-211eb661">{{ row.member_name }}</span>
-                          <span class="ds-style-7a033ae3">ID: {{ row.member_id }}</span>
+                          <span class="ds-style-211eb661">{{ row.memberName }}</span>
+                          <span class="ds-style-7a033ae3">ID: {{ row.memberId }}</span>
                         </div>
                       </td>
                       <td class="ds-style-43d506b9">
-                        <span class="ds-style-3826b3cc">#{{ row.copy_id.split('-').pop() }}</span>
+                        <span class="ds-style-3826b3cc">#{{ row.copyId.split('-').pop() }}</span>
                       </td>
                       <td class="ds-style-43d506b9">
                         <div class="ds-style-6984da57">
                           <div class="ds-style-7f932121">
                             <span class="ds-style-779bbb19">Iss:</span> 
-                            <span>{{ row.issue_date | date:'dd/MM/yyyy' }}</span>
+                            <span>{{ row.issueDate | date:'dd/MM/yyyy' }}</span>
                           </div>
                           <div class="ds-style-4767995a">
                             <span class="ds-style-779bbb19">Due:</span> 
-                            <span>{{ row.due_date | date:'dd/MM/yyyy' }}</span>
+                            <span>{{ row.dueDate | date:'dd/MM/yyyy' }}</span>
                           </div>
-                          @if (row.return_date) {
+                          @if (row.returnDate) {
                             <div class="ds-style-506e5899">
                               <span class="ds-style-779bbb19">Ret:</span> 
-                              <span>{{ row.return_date | date:'dd/MM/yyyy' }}</span>
+                              <span>{{ row.returnDate | date:'dd/MM/yyyy' }}</span>
                             </div>
                           }
                         </div>
@@ -225,8 +225,8 @@
                       <td class="ds-style-43d506b9">
                         <div class="ds-style-655c7fc8">
                           <span class="status-badge ds-style-68fad683" [class]="row.status">{{ row.status }}</span>
-                          @if (row.fine_amount > 0) {
-                            <span class="ds-style-122b39c">Fine: ₹{{ row.fine_amount }}</span>
+                          @if (row.fineAmount > 0) {
+                            <span class="ds-style-122b39c">Fine: ₹{{ row.fineAmount }}</span>
                           }
                         </div>
                       </td>

@@ -58,7 +58,9 @@ export class App implements OnInit, OnDestroy {
       'library_books', 'library_records', 'library_students',
       'name', 'role', 'token', 'isLoggedIn', 'rememberMe'
     ];
-    legacyKeys.forEach(key => localStorage.removeItem(key));
+    if (typeof localStorage !== 'undefined') {
+      legacyKeys.forEach(key => localStorage.removeItem(key));
+    }
 
     this.idleTimeoutService.startMonitoring();
   }

@@ -5,22 +5,8 @@ import { Component, Input } from '@angular/core';
   selector: 'app-fade-in',
   standalone: true,
   imports: [],
-  template: `
-    <div class="fade-in-container" [style.animation-delay]="delay + 'ms'">
-      <ng-content></ng-content>
-    </div>
-  `,
-  styles: [`
-    .fade-in-container {
-      animation: fadeIn 0.5s ease-in-out forwards;
-      width: 100%;
-      opacity: 0;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  `]
+  templateUrl: './fade-in.component.html',
+  styleUrls: ['./fade-in.component.css']
 })
 export class FadeInComponent {
   @Input() delay = 0;

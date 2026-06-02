@@ -39,18 +39,18 @@
               </td>
             </tr>
           } @else {
-            @for (book of deletedBooks(); track book.book_id) {
+            @for (book of deletedBooks(); track book.bookId) {
               <tr>
                 <td>
                   <div class="book-cell">
-                    @if (book.cover_url) {
-                      <img [src]="uploadsBase + book.cover_url" class="book-cover">
+                    @if (book.coverUrl) {
+                      <img [src]="uploadsBase + book.coverUrl" class="book-cover">
                     } @else {
                       <div class="cover-placeholder">📖</div>
                     }
                     <div>
                       <strong class="book-title">{{ book.title }}</strong>
-                      <span class="id-badge">{{ book.book_id }}</span>
+                      <span class="id-badge">{{ book.bookId }}</span>
                     </div>
                   </div>
                 </td>
@@ -61,17 +61,17 @@
                     <span class="category-tag">{{ book.category }}</span>
                   } @else { — }
                 </td>
-                <td>{{ book.publication_year || '—' }}</td>
+                <td>{{ book.publicationYear || '—' }}</td>
                 <td class="date-cell">
-                  <div class="del-date">{{ book.deleted_at | date:'dd MMM yyyy' }}</div>
-                  <div class="del-time text-muted small">{{ book.deleted_at | date:'hh:mm a' }}</div>
+                  <div class="del-date">{{ book.deletedAt | date:'dd MMM yyyy' }}</div>
+                  <div class="del-time text-muted small">{{ book.deletedAt | date:'hh:mm a' }}</div>
                 </td>
                 <td class="text-right">
                   <div class="action-buttons">
-                    <button class="btn btn-restore" (click)="restoreBook(book.book_id)">
+                    <button class="btn btn-restore" (click)="restoreBook(book.bookId)">
                       ♻️ Restore
                     </button>
-                    <button class="btn btn-perm-delete" (click)="permanentDeleteBook(book.book_id)">
+                    <button class="btn btn-perm-delete" (click)="permanentDeleteBook(book.bookId)">
                       🗑️ Delete
                     </button>
                   </div>

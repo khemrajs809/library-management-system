@@ -15,9 +15,9 @@
           </tr>
         </thead>
         <tbody>
-          @for (copy of copies; track copy.copy_id) {
+          @for (copy of copies; track copy.copyId) {
           <tr>
-            <td><span class="id-badge">{{ copy.copy_id }}</span></td>
+            <td><span class="id-badge">{{ copy.copyId }}</span></td>
             <td>
               <span class="status-badge" [class]="copy.status">{{ copy.status | uppercase }}</span>
             </td>

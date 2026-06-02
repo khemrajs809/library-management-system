@@ -35,19 +35,19 @@ export class FineManagerComponent implements OnInit {
     if (this.filterType() === 'lost') {
       filtered = filtered.filter(r => r.status === 'lost');
     } else if (this.filterType() === 'fine') {
-      filtered = filtered.filter(r => r.dynamic_fine > 0);
+      filtered = filtered.filter(r => r.dynamicFine > 0);
     } else if (this.filterType() === 'unpaid') {
-      filtered = filtered.filter(r => r.dynamic_fine > 0 && r.fine_paid === 0);
+      filtered = filtered.filter(r => r.dynamicFine > 0 && r.finePaid === 0);
     } else if (this.filterType() === 'paid') {
-      filtered = filtered.filter(r => r.fine_paid === 1);
+      filtered = filtered.filter(r => r.finePaid === 1);
     }
 
     // Filter by search
     if (q) {
       filtered = filtered.filter(r => 
-        r.member_name.toLowerCase().includes(q) ||
-        r.book_title.toLowerCase().includes(q) ||
-        r.member_id.toLowerCase().includes(q)
+        r.memberName.toLowerCase().includes(q) ||
+        r.bookTitle.toLowerCase().includes(q) ||
+        r.memberId.toLowerCase().includes(q)
       );
     }
     
@@ -85,8 +85,8 @@ export class FineManagerComponent implements OnInit {
 
   totalUnpaid = computed(() => {
     return this.records()
-      .filter(r => r.fine_paid === 0 && r.dynamic_fine > 0)
-      .reduce((sum, r) => sum + Number(r.dynamic_fine), 0);
+      .filter(r => r.finePaid === 0 && r.dynamicFine > 0)
+      .reduce((sum, r) => sum + Number(r.dynamicFine), 0);
   });
 
   ngOnInit() {
@@ -107,7 +107,7 @@ export class FineManagerComponent implements OnInit {
     });
   }
 
-  payFine(issue_id: number, amount: number) {
+  payFine(issueId: number, amount: number) {
     this.modalService.show({
       title: 'Confirm Payment',
       message: `Mark the fine of ₹${amount} as paid?`,
@@ -115,7 +115,7 @@ export class FineManagerComponent implements OnInit {
       confirmText: 'Mark Paid',
       cancelText: 'Cancel',
       onConfirm: () => {
-        this.issueService.payFine(issue_id).subscribe({
+        this.issueService.payFine(issueId).subscribe({
           next: () => {
             this.toastService.success('Fine marked as paid successfully');
             this.loadData();
@@ -128,9 +128,9 @@ export class FineManagerComponent implements OnInit {
     });
   }
 
-  sendReminder(issue_id: number) {
+  sendReminder(issueId: number) {
     this.toastService.info('Sending reminder email...');
-    this.issueService.sendFineReminder(issue_id).subscribe({
+    this.issueService.sendFineReminder(issueId).subscribe({
       next: (r) => {
         this.toastService.success(r.message || 'Reminder sent');
       },

@@ -1,0 +1,73 @@
+name: LMS CI Pipeline (Staging)
+
+# Trigger this workflow on every pull request to the main branch
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  security-audit:
+    name: 🔒 Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: |
+            client/package-lock.json
+            server/package-lock.json
+
+      - name: Run npm audit (Client)
+        working-directory: ./client
+        # We allow moderate vulnerabilities, but fail on high/critical
+        run: npm audit --audit-level=high
+
+      - name: Run npm audit (Server)
+        working-directory: ./server
+        run: npm audit --audit-level=high
+
+  build-verification:
+    name: 🏗️ Build Verification
+    needs: security-audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install Dependencies (Client)
+        working-directory: ./client
+        run: npm ci
+
+      - name: Compile Angular (Production)
+        working-directory: ./client
+        # If there are any ESBuild errors, the PR will fail instantly
+        run: npm run build
+
+      - name: Install Dependencies (Server)
+        working-directory: ./server
+        run: npm ci
+
+  docker-test:
+    name: 🐳 Docker Container Build Test
+    needs: build-verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Test Backend Docker Build
+        run: docker build -t lms-backend:test ./server
+
+      - name: Test Frontend Docker Build
+        run: docker build -t lms-frontend:test ./client

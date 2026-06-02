@@ -1,11 +1,11 @@
 @if (isVisible()) {
   <div class="marquee-wrapper"
-    [style.background]="announcements()[0]?.background_color"
-    [style.color]="announcements()[0]?.text_color"
-    [style.border-bottom-color]="announcements()[0]?.border_color">
+    [style.background]="announcements()[0]?.backgroundColor"
+    [style.color]="announcements()[0]?.textColor"
+    [style.border-bottom-color]="announcements()[0]?.borderColor">
     <div class="marquee-container" (mouseenter)="pauseAnimation = true" (mouseleave)="pauseAnimation = false">
       <!-- Status Icon -->
-      @if (announcements()[0]?.show_icon) {
+      @if (announcements()[0]?.showIcon) {
         <div class="marquee-prefix">
           @if (announcements()[0]?.priority === 'critical') {
             <span class="live-dot"></span>
@@ -14,8 +14,8 @@
         </div>
       }
       <!-- The Scrolling Content -->
-      <div class="marquee-content" [class.paused]="announcements()[0]?.pause_on_hover && pauseAnimation">
-        <div class="marquee-track" [style.animation-duration]="(announcements()[0]?.scroll_speed || 20) + 's'">
+      <div class="marquee-content" [class.paused]="announcements()[0]?.pauseOnHover && pauseAnimation">
+        <div class="marquee-track" [style.animation-duration]="(announcements()[0]?.scrollSpeed || 20) + 's'">
           @for (ann of announcements(); track ann.id) {
             <span class="announcement-item">
               @if (ann.priority === 'critical') {
@@ -29,7 +29,7 @@
         </div>
       </div>
       <!-- Close Button -->
-      @if (announcements()[0]?.show_close_button) {
+      @if (announcements()[0]?.showCloseButton) {
         <button class="close-btn" (click)="close()">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>

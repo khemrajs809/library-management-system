@@ -47,10 +47,14 @@ const getSessions = async (req, res) => {
                 risk_score: Number(row.risk_score),
                 action_count: Number(row.action_count),
                 realtime_status: realtimeStatus,
-                is_current: row.token === req.header('Authorization')?.split(' ')[1] || row.token === req.header('x-auth-token')
+                is_current: row.token === req.header('Authorization')?.split(' ')[1] || row.token === req.header('x-auth-token'),
+                login_time: row.login_time ? new Date(row.login_time).toISOString() : null,
+                logout_time: row.logout_time ? new Date(row.logout_time).toISOString() : null,
+                last_activity_time: row.last_activity_time ? new Date(row.last_activity_time).toISOString() : null
             };
         });
 
+        console.log("DEBUG FIRST SESSION ROW:", data[0]);
         res.status(200).json({
             success: true,
             data,

@@ -93,24 +93,41 @@ const parseUserAgent = (ua) => {
     return { browser, os, device_type };
 };
 
+const geoip = require('geoip-lite');
+
 /**
- * Helper to get simple Location from IP
+ * Helper to get Real Location from IP
  */
-const getLocationFromIp = (ip) => {
-    if (!ip) return 'Unknown Location';
+const getLocationFromIp = async (ip) => {
+    let finalIp = ip;
+    let location = 'Unknown Location';
+
+    if (!ip) return { location, realIp: finalIp };
+
+    // If local network, fetch actual public IP for demo/testing purposes
     if (ip === '::1' || ip === '127.0.0.1' || ip.startsWith('192.168.') || ip.startsWith('10.')) {
-        return 'Local Network (Intranet)';
+        try {
+            const response = await fetch('http://ip-api.com/json/');
+            const data = await response.json();
+            if (data && data.status === 'success') {
+                finalIp = data.query;
+                location = `${data.city}, ${data.country}`;
+                return { location, realIp: finalIp };
+            }
+        } catch (error) {
+            console.error('Localhost IP fetch failed:', error.message);
+            return { location: 'Local Network (Intranet)', realIp: finalIp };
+        }
     }
-    const mocks = [
-        'New York, USA', 'London, UK', 'Mumbai, India', 'New Delhi, India', 
-        'Bengaluru, India', 'San Francisco, USA', 'Singapore', 'Sydney, Australia'
-    ];
-    let hash = 0;
-    for (let i = 0; i < ip.length; i++) {
-        hash = ip.charCodeAt(i) + ((hash << 5) - hash);
+
+    // For real public IPs, use local geoip-lite database
+    const geo = geoip.lookup(finalIp);
+    if (geo) {
+        location = `${geo.city}, ${geo.country}`;
+        if (location === ', ') location = geo.country;
     }
-    const index = Math.abs(hash) % mocks.length;
-    return mocks[index];
+
+    return { location, realIp: finalIp };
 };
 
 /**
@@ -129,7 +146,7 @@ const logSession = async ({
 }) => {
     try {
         const { browser, os, device_type } = parseUserAgent(userAgent);
-        const location = getLocationFromIp(ipAddress);
+        const { location, realIp } = await getLocationFromIp(ipAddress);
         
         let riskScore = 0;
         let riskLevel = 'Low';
@@ -156,7 +173,7 @@ const logSession = async ({
 
         const [result] = await pool.query(
             'CALL proc_log_session(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [userId, userName, email, ipAddress, userAgent, browser, os, device_type, location, status, failureReason, status === 'successful' ? 'online' : 'offline', riskScore, riskLevel, token, role]
+            [userId, userName, email, realIp, userAgent, browser, os, device_type, location, status, failureReason, status === 'successful' ? 'online' : 'offline', riskScore, riskLevel, token, role]
         );
         
         return Number(result[0].insert_id);

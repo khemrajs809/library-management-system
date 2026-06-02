@@ -62,10 +62,10 @@ export class MemberTableComponent {
   }
 
   getEffectiveStatus(member: Member): string {
-    if (this.isExpired(member.membership_expiry)) {
+    if (this.isExpired(member.membershipExpiry)) {
       return 'Suspended';
     }
-    return member.account_status || 'Active';
+    return member.accountStatus || 'Active';
   }
 
   prevPage() {

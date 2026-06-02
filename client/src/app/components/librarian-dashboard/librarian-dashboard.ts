@@ -34,7 +34,7 @@ export class LibrarianDashboardComponent implements OnInit, OnDestroy {
   public toastService   = inject(ToastService);
   private modalService   = inject(ModalService);
   private refreshService = inject(RefreshService);
-  private socket: Socket;
+  private socket?: Socket;
   private routerSub: Subscription;
   private refreshSub: Subscription | undefined;
 
@@ -50,19 +50,21 @@ export class LibrarianDashboardComponent implements OnInit, OnDestroy {
 
   constructor() {
     // Connect socket with authentication token
-    this.socket = io(UPLOADS_BASE, {
-      closeOnBeforeunload: false,
-      auth: {
-        token: localStorage.getItem('lib_token')
-      }
-    });
-    this.setupSocketListeners();
+    if (typeof window !== 'undefined') {
+      this.socket = io(UPLOADS_BASE, {
+        closeOnBeforeunload: false,
+        auth: {
+          token: localStorage.getItem('lib_token')
+        }
+      });
+      this.setupSocketListeners();
+    }
     this.loadStats();
 
     // Disconnect socket cleanly before any navigation to prevent browser warning
     this.routerSub = this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
-        this.socket.disconnect();
+        if (this.socket) this.socket.disconnect();
       }
     });
   }
@@ -75,7 +77,7 @@ export class LibrarianDashboardComponent implements OnInit, OnDestroy {
   }
 
   setupSocketListeners() {
-    this.socket.on('bookOverdue', (data: any) => {
+    this.socket?.on('bookOverdue', (data: any) => {
       this.toastService.error(`NOTICE: ${data.message}`);
     });
   }
@@ -95,10 +97,10 @@ export class LibrarianDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  openProfile(member_id: string) {
+  openProfile(memberId: string) {
     this.isProfileLoading.set(true);
-    this.viewingMember.set({ member: { member_id, name: '' } as any, history: [], stats: { total_borrowed: 0, active_issues: 0, overdue: 0, total_fines: 0 } });
-    this.memberService.getMemberProfile(member_id).subscribe({
+    this.viewingMember.set({ member: { memberId, name: '' } as any, history: [], stats: { totalBorrowed: 0, activeIssues: 0, overdue: 0, totalFines: 0 } });
+    this.memberService.getMemberProfile(memberId).subscribe({
       next: (res) => { 
         this.viewingMember.set(res.data); 
         this.isProfileLoading.set(false); 
@@ -119,11 +121,11 @@ export class LibrarianDashboardComponent implements OnInit, OnDestroy {
     event.stopPropagation();
   }
 
-  payFineFromProfile(issue_id: number) {
-    this.issueService.payFine(issue_id).subscribe({
+  payFineFromProfile(issueId: number) {
+    this.issueService.payFine(issueId).subscribe({
       next: (res) => {
         this.toastService.success(res.message);
-        if (this.viewingMember()) this.openProfile(this.viewingMember()!.member.member_id);
+        if (this.viewingMember()) this.openProfile(this.viewingMember()!.member.memberId);
       },
       error: (e) => this.toastService.error(e.error?.message || 'Failed to process payment')
     });

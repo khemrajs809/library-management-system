@@ -35,13 +35,13 @@ export class AnnouncementManagerComponent implements OnInit {
       message: ['', [Validators.required]],
       type: ['info'],
       priority: ['medium'],
-      is_active: [true],
-      scroll_speed: [25],
-      background_color: ['#b91c1c'],
-      text_color: ['#ffffff'],
-      show_icon: [true],
-      show_close_button: [true],
-      pause_on_hover: [true]
+      isActive: [true],
+      scrollSpeed: [25],
+      backgroundColor: ['#b91c1c'],
+      textColor: ['#ffffff'],
+      showIcon: [true],
+      showCloseButton: [true],
+      pauseOnHover: [true]
     });
   }
 
@@ -66,8 +66,8 @@ export class AnnouncementManagerComponent implements OnInit {
 
   applyPreset(bg: string, text: string) {
     this.annForm.patchValue({
-      background_color: bg,
-      text_color: text
+      backgroundColor: bg,
+      textColor: text
     });
   }
 
@@ -78,16 +78,16 @@ export class AnnouncementManagerComponent implements OnInit {
     const formData = { ...this.annForm.value };
     
     // Automate scheduling since manual pickers are removed
-    // start_time = Now, end_time = Far Future (2099)
+    // startTime = Now, endTime = Far Future (2099)
     const now = new Date();
     const farFuture = new Date('2099-12-31T23:59:59');
 
-    formData.start_time = now.toISOString().slice(0, 19).replace('T', ' ');
-    formData.end_time = farFuture.toISOString().slice(0, 19).replace('T', ' ');
+    formData.startTime = now.toISOString().slice(0, 19).replace('T', ' ');
+    formData.endTime = farFuture.toISOString().slice(0, 19).replace('T', ' ');
 
-    // Ensure border_color is set (default to background_color if missing)
-    if (!formData.border_color) {
-        formData.border_color = formData.background_color;
+    // Ensure borderColor is set (default to backgroundColor if missing)
+    if (!formData.borderColor) {
+        formData.borderColor = formData.backgroundColor;
     }
 
     this.announcementService.createAnnouncement(formData).subscribe({
@@ -96,12 +96,12 @@ export class AnnouncementManagerComponent implements OnInit {
         this.annForm.reset({
             type: 'info',
             priority: 'medium',
-            scroll_speed: 25,
-            background_color: '#b91c1c',
-            text_color: '#ffffff',
-            show_icon: true,
-            show_close_button: true,
-            pause_on_hover: true
+            scrollSpeed: 25,
+            backgroundColor: '#b91c1c',
+            textColor: '#ffffff',
+            showIcon: true,
+            showCloseButton: true,
+            pauseOnHover: true
         });
         this.showForm.set(false);
         this.loadAnnouncements();

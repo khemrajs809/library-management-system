@@ -6,7 +6,7 @@
       <div class="side-panel">
         <app-issue-form
           [recentActivity]="recentActivity()"
-          (onIssue)="executeIssue($event.member_id, $event.book_id)">
+          (onIssue)="executeIssue($event.memberId, $event.bookId)">
         </app-issue-form>
       </div>
     }
@@ -27,7 +27,7 @@
               </div>
             </div>
             <div class="header-search">
-              <input type="search" class="custom-input" style="width: 320px;"
+              <input type="search" class="custom-input search-w-320"
                 placeholder="Search active records..." [value]="issuesQuery()" (input)="onIssuesSearch($any($event.target).value)">
             </div>
           </div>
@@ -88,15 +88,15 @@
 
       <div class="preview-details">
         <div class="member-box">
-          <img [src]="issuePreview()?.member?.photo_url ? (uploadsBase + issuePreview()?.member?.photo_url) : '/assets/placeholder-user.png'" class="avatar">
+          <img [src]="issuePreview()?.member?.photoUrl ? (uploadsBase + issuePreview()?.member?.photoUrl) : '/assets/placeholder-user.png'" class="avatar">
           <div class="info">
             <strong>{{ issuePreview()?.member?.name }}</strong>
-            <span>ID: {{ issuePreview()?.member?.member_id }}</span>
+            <span>ID: {{ issuePreview()?.member?.memberId }}</span>
           </div>
         </div>
 
         <div class="book-box">
-          <img [src]="issuePreview()?.book?.cover_url || '/assets/cover-placeholder.png'" class="cover">
+          <img [src]="issuePreview()?.book?.coverUrl || '/assets/cover-placeholder.png'" class="cover">
           <div class="info">
             <strong>{{ issuePreview()?.book?.title }}</strong>
             <span>ISBN: {{ issuePreview()?.book?.isbn || 'N/A' }}</span>

@@ -31,7 +31,7 @@ export class ReturnScannerComponent implements OnDestroy {
 
   isOverdue(issue: any): boolean {
     if (!issue) return false;
-    const due = new Date(issue.due_date);
+    const due = new Date(issue.dueDate);
     const today = new Date();
     today.setHours(0,0,0,0);
     return due < today;
@@ -67,6 +67,10 @@ export class ReturnScannerComponent implements OnDestroy {
       this.onBookScan.emit(val);
       if (event.target) event.target.value = '';
     }
+  }
+
+  focusBookInput() {
+    setTimeout(() => this.bookIdInput?.nativeElement.focus(), 50);
   }
 
   ngOnDestroy() {

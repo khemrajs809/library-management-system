@@ -9,7 +9,7 @@
       <div class="ds-style-232047d2">
         <label class="ds-style-604acad7">Book ID</label>
         <div class="ds-style-ebb7825">
-          @if (form.get('book_id')?.value; as bookId) {
+          @if (form.get('bookId')?.value; as bookId) {
           <span class="ds-style-619cae7d">
             BK-{{ bookId.toString().split('-').pop() }}
           </span>
@@ -59,8 +59,8 @@
       </div>
       <div class="ds-style-232047d2">
         <label class="ds-style-113527d1">Year<span class="ds-style-33f35e13">*</span></label>
-        <input type="number" formControlName="publication_year" placeholder="YYYY" class="ds-style-63628e6b"
-          [class.input-error]="form.get('publication_year')?.invalid && form.get('publication_year')?.touched">
+        <input type="number" formControlName="publicationYear" placeholder="YYYY" class="ds-style-63628e6b"
+          [class.input-error]="form.get('publicationYear')?.invalid && form.get('publicationYear')?.touched">
       </div>
     </div>
 
@@ -80,8 +80,8 @@
       </div>
       <div class="ds-style-232047d2">
         <label class="ds-style-113527d1">Shelf<span class="ds-style-33f35e13">*</span></label>
-        <input type="text" formControlName="shelf_location" placeholder="Rack" class="ds-style-6752eb66"
-          [class.input-error]="form.get('shelf_location')?.invalid && form.get('shelf_location')?.touched">
+        <input type="text" formControlName="shelfLocation" placeholder="Rack" class="ds-style-6752eb66"
+          [class.input-error]="form.get('shelfLocation')?.invalid && form.get('shelfLocation')?.touched">
       </div>
     </div>
 

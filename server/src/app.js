@@ -4,8 +4,9 @@ const path = require('path');
 
 // --- Security & Middleware ---
 const { helmetConfig, corsConfig, hppConfig } = require('./middlewares/security.middleware');
-const { dynamicRateLimiter, authLimiter } = require('./middlewares/rateLimiter.middleware');
+const { adminLimiter, bookLimiter, memberLimiter, issueLimiter, notesLimiter, publicLimiter, authLimiter } = require('./middlewares/rateLimiter.middleware');
 const { validateResult, loginValidation } = require('./middlewares/validation.middleware');
+const caseConverter = require('./middlewares/caseConverter.middleware');
 
 // --- Routes ---
 const adminRoutes = require('./routes/admin.routes');
@@ -25,13 +26,14 @@ const app = express();
 app.use(helmetConfig);
 app.use(corsConfig);
 app.use(express.json());
+app.use(caseConverter);
 app.use(cookieParser());
 app.use(hppConfig); // Prevents HTTP Parameter Pollution
 app.use((req, res, next) => {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.originalUrl}`);
     next();
 });
-app.use('/api', dynamicRateLimiter);
+// Removed global dynamicRateLimiter in favor of module-specific limiters
 
 // Static file serving for uploaded images
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
@@ -60,12 +62,12 @@ app.post('/api/logout', authController.logout);
 app.use('/api/captcha', captchaRoutes);
 
 // Feature routes
-app.use('/api/admin', adminRoutes);
-app.use('/api/books', bookRoutes);
-app.use('/api/members', memberRoutes);
-app.use('/api/issues', issueRoutes);
-app.use('/api/notes', notesRoutes);
-app.use('/api/announcements', publicRoutes);
+app.use('/api/admin', adminLimiter, adminRoutes);
+app.use('/api/books', bookLimiter, bookRoutes);
+app.use('/api/members', memberLimiter, memberRoutes);
+app.use('/api/issues', issueLimiter, issueRoutes);
+app.use('/api/notes', notesLimiter, notesRoutes);
+app.use('/api/announcements', publicLimiter, publicRoutes);
 
 // 404 handler
 app.use((req, res) => {

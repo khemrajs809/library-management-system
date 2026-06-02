@@ -1,7 +1,7 @@
 <div class="list-card ds-premium-shadow">
-  <div class="list-header" style="border: none; padding-bottom: 0; display: flex; justify-content: space-between; align-items: center;">
+  <div class="list-header rh-header-flex">
     <div class="header-main">
-      <h3 style="color: #b91c1c; font-size: 1.5rem; font-weight: 800; margin-bottom: 0;">Return History</h3>
+      <h3 class="rh-title">Return History</h3>
     </div>
     <div class="header-actions">
       <input type="search" class="search-input ds-input-focus" placeholder="Search history..." [value]="query" (input)="onSearch.emit($any($event.target).value)">
@@ -14,7 +14,7 @@
       <p>Loading history records...</p>
     </div>
   } @else {
-    <div class="table-container" style="margin-top: 1rem;">
+    <div class="table-container mt-1rem">
       <table class="ds-admin-table">
         <thead>
           <tr>
@@ -28,58 +28,58 @@
           </tr>
         </thead>
         <tbody>
-          @for (row of paginatedHistory(); track row.issue_id) {
+          @for (row of paginatedHistory(); track row.issueId) {
             <tr class="ds-lift-hover">
               <td>
                 <div class="ds-v-stack">
-                  <span class="ds-data-value" style="font-size: 0.95rem;">{{ row.member_name }}</span>
-                  <span class="ds-id-pill" style="background: #f1f5f9; color: #475569; border-color: #cbd5e1; font-size: 0.65rem;">{{ row.member_id }}</span>
+                  <span class="ds-data-value font-095">{{ row.memberName }}</span>
+                  <span class="ds-id-pill pill-gray">{{ row.memberId }}</span>
                 </div>
               </td>
               <td>
                 <div class="ds-contact-list">
                   <div class="ds-contact-item">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                    <span class="meta" style="font-weight: 800; margin-left: 6px; font-size: 0.75rem; color: #0f172a;">{{ row.member_phone || 'N/A' }}</span>
+                    <span class="meta meta-phone">{{ row.memberPhone || 'N/A' }}</span>
                   </div>
                   <div class="ds-contact-item mt-1">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                    <span class="meta" style="font-size: 0.7rem; margin-left: 6px; color: #334155; text-transform: lowercase;">{{ row.member_email || 'No Email' }}</span>
+                    <span class="meta meta-email">{{ row.memberEmail || 'No Email' }}</span>
                   </div>
                   <div class="ds-contact-item mt-1">
-                    <span class="ds-id-pill" style="font-size: 0.65rem; background: #f8fafc; color: #475569; border: 1px solid #e2e8f0;">{{ row.member_dept || 'Gen' }}</span>
-                    <span class="ds-id-pill" style="background: #eff6ff; color: #1e40af; border-color: #bfdbfe; margin-left: 4px; font-size: 0.6rem;">{{ row.membership_type || 'Student' }}</span>
+                    <span class="ds-id-pill pill-dept">{{ row.memberDept || 'Gen' }}</span>
+                    <span class="ds-id-pill pill-type">{{ row.membershipType || 'Student' }}</span>
                   </div>
                 </div>
               </td>
               <td>
                 <div class="ds-v-stack">
-                  <span class="ds-data-value" style="font-size: 0.95rem;">{{ row.book_title }}</span>
+                  <span class="ds-data-value font-095">{{ row.bookTitle }}</span>
                   <div class="ds-history-point mt-1">
-                    <span class="ds-id-pill" style="background: #f1f5f9; color: #475569; border-color: #cbd5e1; font-size: 0.65rem;">{{ row.book_id }}</span>
-                    <span class="ds-price-tag" style="margin-left: 8px; font-size: 0.75rem; color: #64748b;">₹{{ row.book_price || 0 | number:'1.2-2' }}</span>
+                    <span class="ds-id-pill pill-gray">{{ row.bookId }}</span>
+                    <span class="ds-price-tag price-tag-sm">₹{{ row.bookPrice || 0 | number:'1.2-2' }}</span>
                   </div>
                 </div>
               </td>
               <td>
                 <div class="ds-v-stack">
-                  <span class="ds-data-value" style="font-size: 0.75rem; color: #1e293b;">{{ row.book_author || 'N/A' }}</span>
-                  <span class="meta" style="font-size: 0.65rem; color: #94a3b8;">ISBN: {{ row.isbn || 'N/A' }}</span>
+                  <span class="ds-data-value author-text">{{ row.bookAuthor || 'N/A' }}</span>
+                  <span class="meta isbn-text">ISBN: {{ row.isbn || 'N/A' }}</span>
                 </div>
               </td>
               <td>
-                <div class="ds-history-timeline" style="border-left: 1px dashed #e2e8f0; padding-left: 15px;">
+                <div class="ds-history-timeline timeline-dashed">
                   <div class="ds-history-point">
-                    <span class="ds-history-label" style="font-size: 0.65rem; width: 60px;">ISSUED:</span>
-                    <span class="ds-history-date" style="font-size: 0.8rem;">{{ row.issue_date | date:'M/d/yy' }}</span>
+                    <span class="ds-history-label tl-label">ISSUED:</span>
+                    <span class="ds-history-date tl-date">{{ row.issueDate | date:'M/d/yy' }}</span>
                   </div>
                   <div class="ds-history-point">
-                    <span class="ds-history-label" style="font-size: 0.65rem; width: 60px; color: #dc2626;">DUE:</span>
-                    <span class="ds-history-date" style="font-size: 0.8rem; color: #dc2626;">{{ row.due_date | date:'M/d/yy' }}</span>
+                    <span class="ds-history-label tl-label-red">DUE:</span>
+                    <span class="ds-history-date tl-date-red">{{ row.dueDate | date:'M/d/yy' }}</span>
                   </div>
                   <div class="ds-history-point">
-                    <span class="ds-history-label" style="font-size: 0.65rem; width: 60px; color: #16a34a;">{{ row.status === 'lost' ? 'LOST:' : 'RETURN:' }}</span>
-                    <span class="ds-history-date" style="font-size: 0.8rem; color: #16a34a;">{{ row.return_date | date:'M/d/yy' }}</span>
+                    <span class="ds-history-label tl-label-green">{{ row.status === 'lost' ? 'LOST:' : 'RETURN:' }}</span>
+                    <span class="ds-history-date tl-date-green">{{ row.returnDate | date:'M/d/yy' }}</span>
                   </div>
                 </div>
               </td>
@@ -89,13 +89,13 @@
                 </span>
               </td>
               <td>
-                @if (row.fine_amount > 0) {
+                @if (row.fineAmount > 0) {
                   <div class="ds-v-stack">
-                    <span class="ds-data-value" style="color: #16a34a; font-size: 1.1rem; font-weight: 900;">₹{{ row.fine_amount | number:'1.2-2' }}</span>
-                    <span class="meta" style="color: #16a34a; font-weight: 900; font-size: 0.65rem; letter-spacing: 1px;">{{ row.fine_paid ? 'PAID' : 'UNPAID' }}</span>
+                    <span class="ds-data-value fine-amt-green">₹{{ row.fineAmount | number:'1.2-2' }}</span>
+                    <span class="meta fine-tag-green">{{ row.finePaid ? 'PAID' : 'UNPAID' }}</span>
                   </div>
                 } @else {
-                  <span class="meta" style="color: #94a3b8; font-weight: 700;">No Fine</span>
+                  <span class="meta no-fine-text">No Fine</span>
                 }
               </td>
             </tr>

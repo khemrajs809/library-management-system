@@ -54,7 +54,7 @@
           </div>
           <div class="form-group">
             <label>Scroll Speed</label>
-            <select formControlName="scroll_speed">
+            <select formControlName="scrollSpeed">
               <option [value]="10">Blazing (10s)</option>
               <option [value]="12">Swift (12s)</option>
               <option [value]="14">Fast (14s)</option>
@@ -70,7 +70,7 @@
           </div>
           <div class="form-group">
             <label>Broadcast Status</label>
-            <select formControlName="is_active" class="status-select">
+            <select formControlName="isActive" class="status-select">
               <option [ngValue]="true">🟢 Active (Live)</option>
               <option [ngValue]="false">⚪ Inactive (Draft)</option>
             </select>
@@ -79,40 +79,40 @@
           <div class="form-group span-3">
             <label>Smooth & Creamy Style Presets</label>
             <div class="color-presets">
-              <button type="button" class="preset-btn" style="background: #fdfaf1; color: #1e293b; border: 1px solid #e2e8f0;" (click)="applyPreset('#fdfaf1', '#1e293b')">Creamy Pearl</button>
-              <button type="button" class="preset-btn" style="background: #fff5f5; color: #991b1b; border: 1px solid #fee2e2;" (click)="applyPreset('#fff5f5', '#991b1b')">Soft Rose</button>
-              <button type="button" class="preset-btn" style="background: #f0fdf4; color: #166534; border: 1px solid #dcfce7;" (click)="applyPreset('#f0fdf4', '#166534')">Mint Cream</button>
-              <button type="button" class="preset-btn" style="background: #eff6ff; color: #1e40af; border: 1px solid #dbeafe;" (click)="applyPreset('#eff6ff', '#1e40af')">Sky Silk</button>
-              <button type="button" class="preset-btn" style="background: #fffbeb; color: #92400e; border: 1px solid #fef3c7;" (click)="applyPreset('#fffbeb', '#92400e')">Honey Glow</button>
-              <button type="button" class="preset-btn" style="background: #faf5ff; color: #6b21a8; border: 1px solid #f3e8ff;" (click)="applyPreset('#faf5ff', '#6b21a8')">Lavender Mist</button>
-              <button type="button" class="preset-btn" style="background: #1e293b; color: #f8fafc; border: 1px solid #334155;" (click)="applyPreset('#1e293b', '#f8fafc')">Midnight Slate</button>
-              <button type="button" class="preset-btn" style="background: #b91c1c; color: #ffffff; border: 1px solid #991b1b;" (click)="applyPreset('#b91c1c', '#ffffff')">Royal Red</button>
+              <button type="button" class="preset-btn preset-pearl" (click)="applyPreset('#fdfaf1', '#1e293b')">Creamy Pearl</button>
+              <button type="button" class="preset-btn preset-rose" (click)="applyPreset('#fff5f5', '#991b1b')">Soft Rose</button>
+              <button type="button" class="preset-btn preset-mint" (click)="applyPreset('#f0fdf4', '#166534')">Mint Cream</button>
+              <button type="button" class="preset-btn preset-sky" (click)="applyPreset('#eff6ff', '#1e40af')">Sky Silk</button>
+              <button type="button" class="preset-btn preset-honey" (click)="applyPreset('#fffbeb', '#92400e')">Honey Glow</button>
+              <button type="button" class="preset-btn preset-lavender" (click)="applyPreset('#faf5ff', '#6b21a8')">Lavender Mist</button>
+              <button type="button" class="preset-btn preset-slate" (click)="applyPreset('#1e293b', '#f8fafc')">Midnight Slate</button>
+              <button type="button" class="preset-btn preset-red" (click)="applyPreset('#b91c1c', '#ffffff')">Royal Red</button>
             </div>
           </div>
           <!-- Fine Tuning: Colors -->
           <div class="form-group">
             <label>Background Color</label>
             <div class="color-picker-wrap">
-              <input type="color" formControlName="background_color">
-              <span>{{ annForm.get('background_color')?.value }}</span>
+              <input type="color" formControlName="backgroundColor">
+              <span>{{ annForm.get('backgroundColor')?.value }}</span>
             </div>
           </div>
           <div class="form-group">
             <label>Text Color</label>
             <div class="color-picker-wrap">
-              <input type="color" formControlName="text_color">
-              <span>{{ annForm.get('text_color')?.value }}</span>
+              <input type="color" formControlName="textColor">
+              <span>{{ annForm.get('textColor')?.value }}</span>
             </div>
           </div>
           <div class="toggle-group span-3">
             <label class="toggle-item">
-              <input type="checkbox" formControlName="show_icon"> Show Icon
+              <input type="checkbox" formControlName="showIcon"> Show Icon
             </label>
             <label class="toggle-item">
-              <input type="checkbox" formControlName="show_close_button"> Allow Close
+              <input type="checkbox" formControlName="showCloseButton"> Allow Close
             </label>
             <label class="toggle-item">
-              <input type="checkbox" formControlName="pause_on_hover"> Pause on Hover
+              <input type="checkbox" formControlName="pauseOnHover"> Pause on Hover
             </label>
           </div>
         </div>
@@ -154,7 +154,7 @@
                   <div class="type-cell">
                     <span class="prio-dot" [class]="ann.priority"></span>
                     <div class="type-info">
-                      <span class="type-badge" [style.background]="ann.background_color">{{ ann.type }}</span>
+                      <span class="type-badge" [style.background]="ann.backgroundColor">{{ ann.type }}</span>
                       <span class="prio-text">{{ ann.priority }} priority</span>
                     </div>
                   </div>
@@ -167,21 +167,21 @@
                 </td>
                 <td>
                   <div class="date-cell">
-                    <span>Start: {{ ann.start_time | date:'MMM d, h:mm a' }}</span>
-                    <span>End: {{ ann.end_time | date:'MMM d, h:mm a' }}</span>
+                    <span>Start: {{ ann.startTime | date:'MMM d, h:mm a' }}</span>
+                    <span>End: {{ ann.endTime | date:'MMM d, h:mm a' }}</span>
                   </div>
                 </td>
                 <td>
                   <div class="stats-cell">
-                    <span title="Total Views">👁️ {{ ann.view_count }}</span>
-                    @if (ann.clickable_link) {
-                      <span title="Total Clicks">🖱️ {{ ann.click_count }}</span>
+                    <span title="Total Views">👁️ {{ ann.viewCount }}</span>
+                    @if (ann.clickableLink) {
+                      <span title="Total Clicks">🖱️ {{ ann.clickCount }}</span>
                     }
                   </div>
                 </td>
                 <td>
-                  <button class="status-toggle" [class.active]="ann.is_active" (click)="toggleStatus(ann.id!, ann.is_active)">
-                    {{ ann.is_active ? 'ON AIR' : 'OFF AIR' }}
+                  <button class="status-toggle" [class.active]="ann.isActive" (click)="toggleStatus(ann.id!, ann.isActive)">
+                    {{ ann.isActive ? 'ON AIR' : 'OFF AIR' }}
                   </button>
                 </td>
                 <td class="text-right">

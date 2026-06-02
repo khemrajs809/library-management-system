@@ -1,0 +1,101 @@
+version: '3.8'
+
+services:
+  # ==========================================
+  #  MariaDB Database
+  # ==========================================
+  lms-db:
+    image: mariadb:10.11
+    container_name: lms-db
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: root_password_secure
+      MARIADB_DATABASE: library_db
+    ports:
+      - "3307:3306" # Maps to 3307 on host so it doesn't conflict with your local XAMPP MariaDB!
+    volumes:
+      - db_data:/var/lib/mysql
+      # Map the schema to run first (01)
+      - ./server/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      # Map the script to run second (02) to load the procedures
+      - ./server/database/init-db.sh:/docker-entrypoint-initdb.d/02-load-procedures.sh
+      # Map the actual procedures folder into a custom location for the script to find
+      - ./server/database/procedures:/custom-init/procedures
+    networks:
+      - lms-network
+
+  # ==========================================
+  #  Redis Cache
+  # ==========================================
+  lms-redis:
+    image: redis:7-alpine
+    container_name: lms-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - lms-network
+
+  # ==========================================
+  #  Node.js Express Backend
+  # ==========================================
+  lms-backend:
+    build: 
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: lms-backend
+    restart: unless-stopped
+    depends_on:
+      - lms-db
+      - lms-redis
+    environment:
+      # Use the docker-compose service name 'lms-db' to connect internally!
+      - DB_HOST=lms-db
+      - DB_USER=root
+      - DB_PASS=root_password_secure
+      - DB_NAME=library_db
+      - REDIS_URL=redis://lms-redis:6379
+      - PORT=5005
+      - JWT_SECRET=930fa80e6f908c97118e3a8470c1d69f1d4bc4849af8ab74cac8498ff0abed4a
+      - TOKEN_ENCRYPTION_KEY=e0a9f0431c7f42579f2f243c65250193
+    networks:
+      - lms-network
+
+  # ==========================================
+  #  Angular SSR Frontend
+  # ==========================================
+  lms-frontend:
+    build: 
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: lms-frontend
+    restart: unless-stopped
+    depends_on:
+      - lms-backend
+    networks:
+      - lms-network
+
+  # ==========================================
+  #  NGINX Reverse Proxy (Edge)
+  # ==========================================
+  lms-nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: lms-nginx
+    restart: always
+    depends_on:
+      - lms-backend
+      - lms-frontend
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - lms-network
+
+volumes:
+  db_data:
+
+networks:
+  lms-network:
+    driver: bridge

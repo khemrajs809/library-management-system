@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { verifyToken, checkRole } = require('../middlewares/auth.middleware');
 const auditLog = require('../middlewares/audit.middleware');
+const cacheMiddleware = require('../middlewares/cache.middleware');
 const { upload, csvUpload } = require('../middlewares/upload.middleware');
 const { validateResult, bookValidation } = require('../middlewares/validation.middleware');
 const { addBook, getBooks, getBookCopies, updateBook, deleteBook, importBooks, generateUniqueId, generateUniqueIsbn, getDeletedBooks, restoreBook, permanentDeleteBook, getBookHistory } = require('../controllers/book.controller');
@@ -14,7 +15,7 @@ router.post('/import', verifyToken, checkRole(['admin', 'librarian']), auditLog(
 
 router.get('/trash', verifyToken, checkRole(['admin']), getDeletedBooks);
 router.post('/', verifyToken, checkRole(['admin', 'librarian']), upload.single('cover'), bookValidation, validateResult, auditLog('Add New Book'), addBook);
-router.get('/', verifyToken, checkRole(['admin', 'librarian']), getBooks);
+router.get('/', verifyToken, checkRole(['admin', 'librarian']), cacheMiddleware(60), getBooks);
 router.get('/:id/copies', verifyToken, checkRole(['admin', 'librarian']), getBookCopies);
 router.get('/:id/history', verifyToken, checkRole(['admin', 'librarian']), getBookHistory);
 router.put('/:id', verifyToken, checkRole(['admin', 'librarian']), upload.single('cover'), bookValidation, validateResult, auditLog('Update Book Details'), updateBook);

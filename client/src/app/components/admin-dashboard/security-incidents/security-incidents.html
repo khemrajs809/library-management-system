@@ -1,0 +1,71 @@
+<div class="monitor-wrapper">
+  <div class="page-header-bar">
+    <div class="page-title-group">
+      <div>
+        <h2>Security Incidents & Alerts</h2>
+        <p>Review immediate failed or blocked authentication events flagged by internal heuristic engines.</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-refresh" (click)="refreshData()" [class.active]="refreshService.isRefreshing()" title="Refresh Logs">
+        <span class="refresh-indicator" [class.spinning]="refreshService.isRefreshing()"></span>
+        Refresh Incidents
+      </button>
+    </div>
+  </div>
+
+  @if (statsLoading()) {
+    <div class="loading-bar-placeholder">
+      <div class="loading-bar"></div>
+    </div>
+  }
+
+  @if (stats().alerts?.length > 0) {
+    <div class="alerts-container">
+      <div class="alerts-banner-list">
+        @for (alert of stats().alerts; track alert) {
+          <div class="alert-banner-item" [class.high-risk]="alert.riskLevel === 'High'">
+            <div class="alert-header">
+              @if (alert.status === 'blocked') {
+                <span class="alert-status-badge bg-red">BLOCKED</span>
+              }
+              @if (alert.status === 'failed') {
+                <span class="alert-status-badge bg-orange">FAILED</span>
+              }
+              @if (alert.status === 'suspicious') {
+                <span class="alert-status-badge bg-purple">SUSPICIOUS</span>
+              }
+              <span class="alert-email">{{ alert.email }}</span>
+              <span class="alert-time">{{ alert.loginTime | date:'medium' }}</span>
+            </div>
+            <div class="alert-details">
+              <span>IP Address: <strong>{{ alert.ipAddress }}</strong></span> |
+              <span>Reason: <strong class="text-red">{{ alert.failureReason || 'Visual Heuristic Flag' }}</strong></span> |
+              <span>Device: <strong>{{ alert.deviceType }} / {{ alert.browser }}</strong></span> |
+              @if (alert.currentUserStatus) {
+                <span class="live-status-badge">
+                  Current Account Status:
+                  <strong [class.text-green]="alert.currentUserStatus === 'active'"
+                    [class.text-red]="alert.currentUserStatus === 'inactive'">
+                    {{ alert.currentUserStatus | uppercase }}
+                  </strong>
+                </span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  @if (!stats().alerts || (stats().alerts.length === 0 && !statsLoading())) {
+    <div class="empty-state">
+      <div class="empty-state-content">
+        <span class="empty-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        </span>
+        <p>No critical security incidents detected. System is secure.</p>
+      </div>
+    </div>
+  }
+</div>

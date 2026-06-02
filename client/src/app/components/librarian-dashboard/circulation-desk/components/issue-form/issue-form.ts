@@ -12,7 +12,7 @@ import { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType } from '@zxing/
 })
 export class IssueFormComponent implements OnDestroy {
   @Input() recentActivity: any[] = [];
-  @Output() onIssue = new EventEmitter<{ member_id: string, book_id: string }>();
+  @Output() onIssue = new EventEmitter<{ memberId: string, bookId: string }>();
   
   @ViewChild('memberInput') memberInput!: ElementRef;
   @ViewChild('bookInput') bookInput!: ElementRef;
@@ -46,8 +46,8 @@ export class IssueFormComponent implements OnDestroy {
   onIssueSubmit() {
     if (!this.memberId || !this.bookId) return;
     this.onIssue.emit({ 
-      member_id: this.memberId, 
-      book_id: this.bookId 
+      memberId: this.memberId, 
+      bookId: this.bookId 
     });
     this.memberId = '';
     this.bookId = '';

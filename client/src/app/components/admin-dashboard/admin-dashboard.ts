@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth';
@@ -8,15 +8,17 @@ import { DeletedBooksComponent } from './deleted-books/deleted-books';
 import { DeletedMembersComponent } from './deleted-members/deleted-members';
 import { AuditLogViewerComponent } from './audit-log-viewer/audit-log-viewer';
 import { SessionMonitorComponent } from './session-monitor/session-monitor';
+import { SecurityIncidentsComponent } from './security-incidents/security-incidents';
 
 import { AnnouncementManagerComponent } from './announcement-manager/announcement-manager';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [RouterModule, StaffManagerComponent, DeletedBooksComponent, DeletedMembersComponent, AuditLogViewerComponent, SessionMonitorComponent, AnnouncementManagerComponent],
+  imports: [RouterModule, StaffManagerComponent, DeletedBooksComponent, DeletedMembersComponent, AuditLogViewerComponent, SessionMonitorComponent, AnnouncementManagerComponent, SecurityIncidentsComponent],
   templateUrl: './admin-dashboard.html',
   styleUrl: './admin-dashboard.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AdminDashboardComponent {
   private authService = inject(AuthService);

@@ -20,8 +20,8 @@
 
         <!-- Left: Member Avatar -->
           <div class="profile-avatar-v2">
-            @if (viewingMember.member.photo_url) {
-            <img [src]="uploadsBase + viewingMember.member.photo_url" alt="Member Photo">
+            @if (viewingMember.member.photoUrl) {
+            <img [src]="uploadsBase + viewingMember.member.photoUrl" alt="Member Photo">
             } @else {
             <div class="avatar-placeholder">
               {{ viewingMember.member.name.charAt(0).toUpperCase() }}
@@ -37,18 +37,18 @@
                 <div class="profile-name-row">
                   <h2>{{ viewingMember.member.name }}</h2>
                   <div class="status-pill-v2"
-                    [class.status-v2-active]="viewingMember.member.no_dues_status"
-                    [class.status-v2-pending]="!viewingMember.member.no_dues_status">
-                    <span>{{ viewingMember.member.no_dues_status ? 'ACTIVE' : 'DUES PENDING' }}</span>
+                    [class.status-v2-active]="viewingMember.member.noDuesStatus"
+                    [class.status-v2-pending]="!viewingMember.member.noDuesStatus">
+                    <span>{{ viewingMember.member.noDuesStatus ? 'ACTIVE' : 'DUES PENDING' }}</span>
                   </div>
                 </div>
               </div>
 
               <div>
                 <div class="id-badge-v2">
-                  <span>{{ viewingMember.member.member_id }}</span>
+                  <span>{{ viewingMember.member.memberId }}</span>
                   <div class="divider"></div>
-                  <span>Roll: {{ viewingMember.member.roll_number || 'N/A' }}</span>
+                  <span>Roll: {{ viewingMember.member.rollNumber || 'N/A' }}</span>
                 </div>
 
                 <div class="barcode-wrapper-v2">
@@ -79,15 +79,15 @@
               </div>
               <div class="detail-col">
                 <div class="label-pill">BLOOD GROUP</div>
-                <span class="value-text">{{ viewingMember.member.blood_group || 'N/A' }}</span>
+                <span class="value-text">{{ viewingMember.member.bloodGroup || 'N/A' }}</span>
               </div>
             </div>
 
             <div class="detail-row-v2">
               <div class="detail-col">
                 <div class="label-pill">EMERGENCY</div>
-                <span class="value-text">{{ viewingMember.member.guardian_phone || '—' }} ({{
-                  viewingMember.member.guardian_name || '—' }})</span>
+                <span class="value-text">{{ viewingMember.member.guardianPhone || '—' }} ({{
+                  viewingMember.member.guardianName || '—' }})</span>
               </div>
             </div>
           </div>
@@ -106,13 +106,13 @@
         <div class="stats-row-v2">
           <div class="stat-card-v2 bg-blue">
             <div class="stat-info-v2">
-              <span class="value">{{ viewingMember.stats.total_borrowed }}</span>
+              <span class="value">{{ viewingMember.stats.totalBorrowed }}</span>
               <span class="label">Lifetime Borrowed</span>
             </div>
           </div>
           <div class="stat-card-v2 bg-pink">
             <div class="stat-info-v2">
-              <span class="value">{{ viewingMember.stats.active_issues }} / {{ viewingMember.member.max_book_limit
+              <span class="value">{{ viewingMember.stats.activeIssues }} / {{ viewingMember.member.maxBookLimit
                 || 3 }}</span>
               <span class="label">Book Limit</span>
             </div>
@@ -125,7 +125,7 @@
           </div>
           <div class="stat-card-v2 bg-teal">
             <div class="stat-info-v2">
-              <span class="value">₹{{ viewingMember.stats.total_fines }}</span>
+              <span class="value">₹{{ viewingMember.stats.totalFines }}</span>
               <span class="label">Total Fines</span>
             </div>
           </div>
@@ -153,15 +153,15 @@
               </div>
               <div class="hover-light-blue bg-light-blue ds-style-72e7daaa">
                 <span class="ds-style-16e29c00">Year / Sem</span>
-                <span class="ds-style-1ed43e0e">{{ viewingMember.member.year_semester || '—' }}</span>
+                <span class="ds-style-1ed43e0e">{{ viewingMember.member.yearSemester || '—' }}</span>
               </div>
               <div class="hover-light-blue bg-light-blue ds-style-72e7daaa">
                 <span class="ds-style-16e29c00">Session</span>
-                <span class="ds-style-4b4248c4">{{ viewingMember.member.academic_session || '—' }}</span>
+                <span class="ds-style-4b4248c4">{{ viewingMember.member.academicSession || '—' }}</span>
               </div>
               <div class="hover-light-blue bg-light-blue ds-style-72e7daaa">
                 <span class="ds-style-16e29c00">HOD / Dean</span>
-                <span class="ds-style-4b4248c4">{{ viewingMember.member.hod_name || '—' }}</span>
+                <span class="ds-style-4b4248c4">{{ viewingMember.member.hodName || '—' }}</span>
               </div>
             </div>
           </div>
@@ -177,13 +177,13 @@
             <div class="ds-style-5d03416f">
               <div class="hover-light-blue bg-light-blue ds-style-72e7daaa">
                 <span class="ds-style-16e29c00">Member Type</span>
-                <span class="ds-style-4b4248c4">{{ viewingMember.member.membership_type }}</span>
+                <span class="ds-style-4b4248c4">{{ viewingMember.member.membershipType }}</span>
               </div>
               <div class="hover-light-red bg-light-red ds-style-23cb3755">
                 <span class="ds-style-1be5e0b9">
                   <span class="ds-style-316f55e4"></span> Expiry Date
                 </span>
-                <span class="ds-style-6a909415">{{ (viewingMember.member.membership_expiry | date:'dd/MM/yyyy') || 'No Expiry Set' }}</span>
+                <span class="ds-style-6a909415">{{ (viewingMember.member.membershipExpiry | date:'dd/MM/yyyy') || 'No Expiry Set' }}</span>
               </div>
               
               <div class="ds-style-9d95b09">
@@ -192,10 +192,10 @@
                   <span class="ds-style-17e185f5">(Verification Files)</span>
                 </div>
                 <div class="ds-style-2f34eefd">
-                  @if (viewingMember.member.govt_id_url) { <a [href]="uploadsBase + viewingMember.member.govt_id_url" target="_blank" class="ds-style-13fa7625">Govt ID</a> }
-                  @if (viewingMember.member.admission_receipt_url) { <a [href]="uploadsBase + viewingMember.member.admission_receipt_url" target="_blank" class="ds-style-13fa7625">Admission</a> }
-                  @if (viewingMember.member.security_deposit_url) { <a [href]="uploadsBase + viewingMember.member.security_deposit_url" target="_blank" class="ds-style-13fa7625">Deposit</a> }
-                  @if (!viewingMember.member.govt_id_url && !viewingMember.member.admission_receipt_url && !viewingMember.member.security_deposit_url) {
+                  @if (viewingMember.member.govtIdUrl) { <a [href]="uploadsBase + viewingMember.member.govtIdUrl" target="_blank" class="ds-style-13fa7625">Govt ID</a> }
+                  @if (viewingMember.member.admissionReceiptUrl) { <a [href]="uploadsBase + viewingMember.member.admissionReceiptUrl" target="_blank" class="ds-style-13fa7625">Admission</a> }
+                  @if (viewingMember.member.securityDepositUrl) { <a [href]="uploadsBase + viewingMember.member.securityDepositUrl" target="_blank" class="ds-style-13fa7625">Deposit</a> }
+                  @if (!viewingMember.member.govtIdUrl && !viewingMember.member.admissionReceiptUrl && !viewingMember.member.securityDepositUrl) {
                     <span class="ds-style-3c87751a">No Files Uploaded</span>
                   }
                 </div>
@@ -212,7 +212,7 @@
               Local Address
             </h4>
             <div class="ds-style-6b2130e8">
-              {{ viewingMember.member.current_address || 'Address not provided' }}
+              {{ viewingMember.member.currentAddress || 'Address not provided' }}
             </div>
           </div>
           <div class="ds-style-52a7157b">
@@ -221,7 +221,7 @@
               Permanent Address
             </h4>
             <div class="ds-style-6b2130e8">
-              {{ viewingMember.member.permanent_address || 'Address not provided' }}
+              {{ viewingMember.member.permanentAddress || 'Address not provided' }}
             </div>
           </div>
         </div>
@@ -250,28 +250,28 @@
                 </tr>
               </thead>
               <tbody>
-                @for (h of viewingMember.history.slice(0, 5); track h.issue_id) {
+                @for (h of viewingMember.history.slice(0, 5); track h.issueId) {
                 <tr class="ds-style-5099fc0b">
                   <td class="ds-style-43d506b9">
                     <div class="ds-style-6984da57">
-                      <span class="ds-style-211eb661">{{ h.book_title }}</span>
-                      <span class="ds-style-2b73260e">ID: {{ h.book_id }}</span>
+                      <span class="ds-style-211eb661">{{ h.bookTitle }}</span>
+                      <span class="ds-style-2b73260e">ID: {{ h.bookId }}</span>
                     </div>
                   </td>
                   <td class="ds-style-43d506b9">
                     <div class="ds-style-6984da57">
                       <div class="ds-style-76d1e5ac">
                         <span class="ds-style-3c6a86d8">Iss:</span> 
-                        <span>{{ h.issue_date | date:'dd/MM/yyyy' }} <small class="ds-style-492c42af">{{ $any(h).created_at | date:'shortTime' }}</small></span>
+                        <span>{{ h.issueDate | date:'dd/MM/yyyy' }} <small class="ds-style-492c42af">{{ $any(h).createdAt | date:'shortTime' }}</small></span>
                       </div>
                       <div class="ds-style-4767995a">
                         <span class="ds-style-3c6a86d8">Due:</span> 
-                        <span>{{ h.due_date | date:'dd/MM/yyyy' }}</span>
+                        <span>{{ h.dueDate | date:'dd/MM/yyyy' }}</span>
                       </div>
-                      @if (h.return_date) {
+                      @if (h.returnDate) {
                         <div class="ds-style-506e5899">
                           <span class="ds-style-3c6a86d8">Ret:</span> 
-                          <span>{{ h.return_date | date:'dd/MM/yyyy' }}</span>
+                          <span>{{ h.returnDate | date:'dd/MM/yyyy' }}</span>
                         </div>
                       }
                     </div>
@@ -279,8 +279,8 @@
                   <td class="ds-style-43d506b9">
                     <div class="ds-style-655c7fc8">
                       <span class="status-badge ds-style-68fad683" [class]="h.status">{{ h.status }}</span>
-                      @if (h.fine_amount > 0) {
-                        <span class="ds-style-122b39c">Fine: ₹{{ h.fine_amount }}</span>
+                      @if (h.fineAmount > 0) {
+                        <span class="ds-style-122b39c">Fine: ₹{{ h.fineAmount }}</span>
                       }
                     </div>
                   </td>
@@ -305,7 +305,7 @@
       <!-- Header Section -->
       <div class="ds-style-24c4ab81">
         <div class="ds-style-77411297">
-          <img src="/logolms.png" class="ds-style-32b6b1da">
+          <img src="/logolms.webp" class="ds-style-32b6b1da">
         </div>
         <div class="ds-style-83c3080">
           <h1 class="ds-style-697fbe66">
@@ -336,13 +336,13 @@
               <th class="ds-style-3847ace0">
                 Member ID / Roll No.</th>
               <td class="ds-style-34ec1e21">{{
-                viewingMember.member.member_id }} / {{ viewingMember.member.roll_number || 'N/A' }}</td>
+                viewingMember.member.memberId }} / {{ viewingMember.member.rollNumber || 'N/A' }}</td>
             </tr>
             <tr>
               <th class="ds-style-3847ace0">
                 Gender / Blood Group</th>
               <td class="ds-style-4b2127e6">{{ viewingMember.member.gender || 'NOT
-                SPECIFIED' }} / {{ viewingMember.member.blood_group || 'N/A' }}</td>
+                SPECIFIED' }} / {{ viewingMember.member.bloodGroup || 'N/A' }}</td>
             </tr>
             <tr>
               <th class="ds-style-3847ace0">
@@ -371,8 +371,8 @@
             <tr>
               <th class="ds-style-3847ace0">
                 Guardian Details</th>
-              <td class="ds-style-4b2127e6">{{ viewingMember.member.guardian_name || 'N/A'
-                }} (Ph: {{ viewingMember.member.guardian_phone || 'N/A' }})</td>
+              <td class="ds-style-4b2127e6">{{ viewingMember.member.guardianName || 'N/A'
+                }} (Ph: {{ viewingMember.member.guardianPhone || 'N/A' }})</td>
             </tr>
 
             <!-- ── Academic ── -->
@@ -383,8 +383,8 @@
             <tr>
               <th class="ds-style-3847ace0">
                 Academic Session</th>
-              <td class="ds-style-4b2127e6">{{ viewingMember.member.academic_session ||
-                'N/A' }} ({{ viewingMember.member.year_semester || 'N/A' }})</td>
+              <td class="ds-style-4b2127e6">{{ viewingMember.member.academicSession ||
+                'N/A' }} ({{ viewingMember.member.yearSemester || 'N/A' }})</td>
             </tr>
             <tr>
               <th class="ds-style-3847ace0">
@@ -395,7 +395,7 @@
             <tr>
               <th class="ds-style-3847ace0">
                 Head of Dept (HOD)</th>
-              <td class="ds-style-4b2127e6">{{ viewingMember.member.hod_name || 'NOT
+              <td class="ds-style-4b2127e6">{{ viewingMember.member.hodName || 'NOT
                 SPECIFIED' }}</td>
             </tr>
 
@@ -408,30 +408,30 @@
               <th class="ds-style-3847ace0">
                 Membership Type</th>
               <td class="ds-style-4139217a">{{
-                viewingMember.member.membership_type }}</td>
+                viewingMember.member.membershipType }}</td>
             </tr>
             <tr>
               <th class="ds-style-3847ace0">
                 Account Status</th>
-              <td [class.text-active]="viewingMember.member.account_status === 'Active'" [class.text-overdue]="viewingMember.member.account_status !== 'Active'" class="ds-style-413995d9">
-                {{ viewingMember.member.account_status | uppercase }} (Book Limit: {{
-                viewingMember.member.max_book_limit }})
+              <td [class.text-active]="viewingMember.member.accountStatus === 'Active'" [class.text-overdue]="viewingMember.member.accountStatus !== 'Active'" class="ds-style-413995d9">
+                {{ viewingMember.member.accountStatus | uppercase }} (Book Limit: {{
+                viewingMember.member.maxBookLimit }})
               </td>
             </tr>
             <tr>
               <th class="ds-style-3847ace0">
                 Valid Till / Clearance</th>
               <td class="ds-style-4139217a">
-                {{ (viewingMember.member.membership_expiry | date:'dd/MM/yyyy') || 'LIFETIME' }}
-                | {{ viewingMember.member.no_dues_status ? 'NO DUES' : 'DUES PENDING' }}
+                {{ (viewingMember.member.membershipExpiry | date:'dd/MM/yyyy') || 'LIFETIME' }}
+                | {{ viewingMember.member.noDuesStatus ? 'NO DUES' : 'DUES PENDING' }}
               </td>
             </tr>
           </table>
         </div>
         <div class="ds-style-47f0b890">
           <div class="ds-style-77feba75">
-            @if (viewingMember.member.photo_url) {
-            <img [src]="uploadsBase + viewingMember.member.photo_url" crossorigin="anonymous" class="ds-style-4a777a78">
+            @if (viewingMember.member.photoUrl) {
+            <img [src]="uploadsBase + viewingMember.member.photoUrl" crossorigin="anonymous" class="ds-style-4a777a78">
             } @else {
             <span class="ds-style-326b82e9">NO PHOTO</span>
             }
@@ -448,13 +448,13 @@
         <div>
           <div class="ds-style-95ed5d1">
             CURRENT / HOSTEL ADDRESS</div>
-          <div class="ds-style-1ac94f8">{{ viewingMember.member.current_address || 'NOT PROVIDED' }}
+          <div class="ds-style-1ac94f8">{{ viewingMember.member.currentAddress || 'NOT PROVIDED' }}
           </div>
         </div>
         <div>
           <div class="ds-style-95ed5d1">
             PERMANENT HOME ADDRESS</div>
-          <div class="ds-style-1ac94f8">{{ viewingMember.member.permanent_address || 'NOT PROVIDED' }}
+          <div class="ds-style-1ac94f8">{{ viewingMember.member.permanentAddress || 'NOT PROVIDED' }}
           </div>
         </div>
       </div>
@@ -463,7 +463,7 @@
       <div class="ds-style-111f8a25">
         <svg id="pdfBarcodeSvg"></svg>
         <div class="ds-style-7250b0c8">{{
-          viewingMember.member.member_id }}</div>
+          viewingMember.member.memberId }}</div>
       </div>
 
       <!-- Summary Stats -->
@@ -472,13 +472,13 @@
           MEMBER BORROWING PORTFOLIO</div>
         <div class="ds-style-65bba0de">
           <div class="ds-style-499b19d9"><strong>Lifetime
-              Borrowed:</strong><br>{{ viewingMember.stats.total_borrowed }}</div>
+              Borrowed:</strong><br>{{ viewingMember.stats.totalBorrowed }}</div>
           <div class="ds-style-499b19d9"><strong>Active
-              Holdings:</strong><br>{{ viewingMember.stats.active_issues }}</div>
+              Holdings:</strong><br>{{ viewingMember.stats.activeIssues }}</div>
           <div class="ds-style-499b19d9"><strong>Default /
               Overdue:</strong><br>{{ viewingMember.stats.overdue }}</div>
           <div class="ds-style-7411e18a"><strong>Total Penalties:</strong><br>₹{{
-            viewingMember.stats.total_fines }}</div>
+            viewingMember.stats.totalFines }}</div>
         </div>
       </div>
 
@@ -504,16 +504,16 @@
                 transaction records found in the system database.</td>
             </tr>
             } @else {
-            @for (h of viewingMember.history; track h.issue_id) {
+            @for (h of viewingMember.history; track h.issueId) {
             <tr>
-              <td class="ds-style-64293a38"><strong>{{ h.book_title }}</strong><br><span class="ds-style-1034e0d0">ID: {{ h.book_id }}</span></td>
-              <td class="ds-style-50de1d51">{{ h.issue_date | date:'dd/MM/yyyy' }}<br><span class="ds-style-62e757f9">{{ $any(h).created_at | date:'shortTime' }}</span></td>
-              <td class="ds-style-50de1d51">{{ h.due_date | date:'dd/MM/yyyy' }}
+              <td class="ds-style-64293a38"><strong>{{ h.bookTitle }}</strong><br><span class="ds-style-1034e0d0">ID: {{ h.bookId }}</span></td>
+              <td class="ds-style-50de1d51">{{ h.issueDate | date:'dd/MM/yyyy' }}<br><span class="ds-style-62e757f9">{{ $any(h).createdAt | date:'shortTime' }}</span></td>
+              <td class="ds-style-50de1d51">{{ h.dueDate | date:'dd/MM/yyyy' }}
               </td>
-              <td class="ds-style-50de1d51">{{ h.return_date ? (h.return_date |
+              <td class="ds-style-50de1d51">{{ h.returnDate ? (h.returnDate |
                 date:'dd/MM/yyyy') : 'PENDING' }}</td>
               <td [class.text-overdue]="h.status === 'issued'" [class.text-active]="h.status !== 'issued'" class="ds-style-6893d90f">{{ h.status | uppercase }}</td>
-              <td class="ds-style-5733628c">{{ h.fine_amount > 0 ? h.fine_amount
+              <td class="ds-style-5733628c">{{ h.fineAmount > 0 ? h.fineAmount
                 : '0.00' }}</td>
             </tr>
             }

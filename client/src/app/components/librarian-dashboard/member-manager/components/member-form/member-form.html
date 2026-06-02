@@ -11,9 +11,9 @@
         <div class="form-group">
           <label>Member ID</label>
           <div class="member-id-auto">
-            @if (form.get('member_id')?.value) {
+            @if (form.get('memberId')?.value) {
               <span class="id-value-badge">
-                 {{ form.get('member_id')?.value }}
+                 {{ form.get('memberId')?.value }}
               </span>
             } @else {
               <span class="id-auto-badge">Auto-assigned by system</span>
@@ -23,9 +23,9 @@
 
         <div class="form-group">
           <label>University Roll Number <span class="req-star">*</span></label>
-          <input type="text" formControlName="roll_number" placeholder="e.g. 21BCE1001"
-            [class.input-error]="form.get('roll_number')?.invalid && form.get('roll_number')?.touched">
-          @if (form.get('roll_number')?.touched && form.get('roll_number')?.hasError('required')) {
+          <input type="text" formControlName="rollNumber" placeholder="e.g. 21BCE1001"
+            [class.input-error]="form.get('rollNumber')?.invalid && form.get('rollNumber')?.touched">
+          @if (form.get('rollNumber')?.touched && form.get('rollNumber')?.hasError('required')) {
             <small class="err-msg">Roll number is required</small>
           }
         </div>
@@ -62,15 +62,15 @@
 
         <div class="form-group">
           <label>Blood Group <span class="req-star">*</span></label>
-          <select formControlName="blood_group" class="form-select"
-            [class.input-error]="form.get('blood_group')?.invalid && form.get('blood_group')?.touched">
+          <select formControlName="bloodGroup" class="form-select"
+            [class.input-error]="form.get('bloodGroup')?.invalid && form.get('bloodGroup')?.touched">
             <option value="">-- Select --</option>
             <option value="A+">A+</option><option value="A-">A-</option>
             <option value="B+">B+</option><option value="B-">B-</option>
             <option value="O+">O+</option><option value="O-">O-</option>
             <option value="AB+">AB+</option><option value="AB-">AB-</option>
           </select>
-          @if (form.get('blood_group')?.touched && form.get('blood_group')?.hasError('required')) {
+          @if (form.get('bloodGroup')?.touched && form.get('bloodGroup')?.hasError('required')) {
             <small class="err-msg">Blood group is required</small>
           }
         </div>
@@ -109,21 +109,21 @@
 
         <div class="form-group">
           <label>Guardian Name <span class="req-star">*</span></label>
-          <input type="text" formControlName="guardian_name" placeholder="Father/Mother Name"
-            [class.input-error]="form.get('guardian_name')?.invalid && form.get('guardian_name')?.touched">
-          @if (form.get('guardian_name')?.touched && form.get('guardian_name')?.hasError('required')) {
+          <input type="text" formControlName="guardianName" placeholder="Father/Mother Name"
+            [class.input-error]="form.get('guardianName')?.invalid && form.get('guardianName')?.touched">
+          @if (form.get('guardianName')?.touched && form.get('guardianName')?.hasError('required')) {
             <small class="err-msg">Guardian name is required</small>
           }
         </div>
 
         <div class="form-group">
           <label>Guardian Phone <span class="req-star">*</span></label>
-          <input type="text" formControlName="guardian_phone" placeholder="Emergency Contact" maxlength="10"
-            [class.input-error]="form.get('guardian_phone')?.invalid && form.get('guardian_phone')?.touched">
-          @if (form.get('guardian_phone')?.touched && form.get('guardian_phone')?.hasError('required')) {
+          <input type="text" formControlName="guardianPhone" placeholder="Emergency Contact" maxlength="10"
+            [class.input-error]="form.get('guardianPhone')?.invalid && form.get('guardianPhone')?.touched">
+          @if (form.get('guardianPhone')?.touched && form.get('guardianPhone')?.hasError('required')) {
             <small class="err-msg">Guardian phone is required</small>
           }
-          @if (form.get('guardian_phone')?.touched && form.get('guardian_phone')?.hasError('pattern')) {
+          @if (form.get('guardianPhone')?.touched && form.get('guardianPhone')?.hasError('pattern')) {
             <small class="err-msg">Enter a valid 10-digit number</small>
           }
         </div>
@@ -138,7 +138,7 @@
 
         <div class="form-group">
           <label>Membership Type <span class="req-star">*</span></label>
-          <select formControlName="membership_type" class="form-select">
+          <select formControlName="membershipType" class="form-select">
             <option value="Student">Student</option>
             <option value="Faculty">Faculty</option>
             <option value="Research Scholar">Research Scholar</option>
@@ -148,9 +148,9 @@
 
         <div class="form-group">
           <label>Academic Session <span class="req-star">*</span></label>
-          <input type="text" formControlName="academic_session" placeholder="e.g. 2024-2028"
-            [class.input-error]="form.get('academic_session')?.invalid && form.get('academic_session')?.touched">
-          @if (form.get('academic_session')?.touched && form.get('academic_session')?.hasError('required')) {
+          <input type="text" formControlName="academicSession" placeholder="e.g. 2024-2028"
+            [class.input-error]="form.get('academicSession')?.invalid && form.get('academicSession')?.touched">
+          @if (form.get('academicSession')?.touched && form.get('academicSession')?.hasError('required')) {
             <small class="err-msg">Academic session is required</small>
           }
         </div>
@@ -175,16 +175,16 @@
 
         <div class="form-group">
           <label>Year / Semester <span class="req-star">*</span></label>
-          <input type="text" formControlName="year_semester" placeholder="e.g. 3rd Year / 6th Sem"
-            [class.input-error]="form.get('year_semester')?.invalid && form.get('year_semester')?.touched">
-          @if (form.get('year_semester')?.touched && form.get('year_semester')?.hasError('required')) {
+          <input type="text" formControlName="yearSemester" placeholder="e.g. 3rd Year / 6th Sem"
+            [class.input-error]="form.get('yearSemester')?.invalid && form.get('yearSemester')?.touched">
+          @if (form.get('yearSemester')?.touched && form.get('yearSemester')?.hasError('required')) {
             <small class="err-msg">Year / Semester is required</small>
           }
         </div>
 
         <div class="form-group">
           <label>HOD / Dean Name</label>
-          <input type="text" formControlName="hod_name" placeholder="Head of Department">
+          <input type="text" formControlName="hodName" placeholder="Head of Department">
         </div>
 
       </div>
@@ -197,9 +197,9 @@
 
         <div class="form-group">
           <label>Account Status</label>
-          <select formControlName="account_status" class="form-select"
-            [class.border-success-v2]="form.get('account_status')?.value === 'Active'"
-            [class.border-danger-v2]="form.get('account_status')?.value !== 'Active'">
+          <select formControlName="accountStatus" class="form-select"
+            [class.border-success-v2]="form.get('accountStatus')?.value === 'Active'"
+            [class.border-danger-v2]="form.get('accountStatus')?.value !== 'Active'">
              <option value="Active">Active</option>
             <option value="Suspended">Suspended</option>
             <option value="Blacklisted">Blacklisted</option>
@@ -208,22 +208,22 @@
 
         <div class="form-group">
           <label>Membership Expiry <span class="req-star">*</span></label>
-          <input type="date" formControlName="membership_expiry"
-            [class.input-error]="form.get('membership_expiry')?.invalid && form.get('membership_expiry')?.touched">
-          @if (form.get('membership_expiry')?.touched && form.get('membership_expiry')?.hasError('required')) {
+          <input type="date" formControlName="membershipExpiry"
+            [class.input-error]="form.get('membershipExpiry')?.invalid && form.get('membershipExpiry')?.touched">
+          @if (form.get('membershipExpiry')?.touched && form.get('membershipExpiry')?.hasError('required')) {
             <small class="err-msg">Membership expiry date is required</small>
           }
         </div>
 
         <div class="form-group">
           <label>Book Issue Limit</label>
-          <input type="number" formControlName="max_book_limit" placeholder="Default: 3">
+          <input type="number" formControlName="maxBookLimit" placeholder="Default: 3">
         </div>
 
         <div class="form-group">
           <label>Clearance Status</label>
           <div class="ds-style-50670a00">
-            <input type="checkbox" formControlName="no_dues_status" class="ds-style-3d29c63f">
+            <input type="checkbox" formControlName="noDuesStatus" class="ds-style-3d29c63f">
             <span class="ds-style-3c54a937">No Pending Fines (No Dues)</span>
           </div>
         </div>
@@ -245,23 +245,23 @@
         <div class="address-grid">
           <div class="form-group">
             <label>House/Flat No. <span class="req-star">*</span></label>
-            <input type="text" formControlName="curr_house" placeholder="e.g., 42-B, Flat 301">
+            <input type="text" formControlName="currHouse" placeholder="e.g., 42-B, Flat 301">
           </div>
           <div class="form-group">
             <label>Street/Road <span class="req-star">*</span></label>
-            <input type="text" formControlName="curr_street" placeholder="e.g., MG Road, 2nd Cross">
+            <input type="text" formControlName="currStreet" placeholder="e.g., MG Road, 2nd Cross">
           </div>
           <div class="form-group">
             <label>Area/Locality <span class="req-star">*</span></label>
-            <input type="text" formControlName="curr_area" placeholder="e.g., Koramangala, Sector 15">
+            <input type="text" formControlName="currArea" placeholder="e.g., Koramangala, Sector 15">
           </div>
           <div class="form-group">
             <label>City/Town <span class="req-star">*</span></label>
-            <input type="text" formControlName="curr_city" placeholder="e.g., Bengaluru, Mumbai">
+            <input type="text" formControlName="currCity" placeholder="e.g., Bengaluru, Mumbai">
           </div>
           <div class="form-group">
             <label>State/UT <span class="req-star">*</span></label>
-            <select formControlName="curr_state">
+            <select formControlName="currState">
               <option value="">Select State</option>
               @for (state of states; track state) {
                 <option [value]="state">{{ state }}</option>
@@ -270,7 +270,7 @@
           </div>
           <div class="form-group">
             <label>PIN Code <span class="req-star">*</span></label>
-            <input type="text" formControlName="curr_pincode" placeholder="e.g., 560001">
+            <input type="text" formControlName="currPincode" placeholder="e.g., 560001">
           </div>
         </div>
       </div>
@@ -285,7 +285,7 @@
             <h4 class="addr-title">Permanent Address</h4>
           </div>
           <label class="addr-sync-badge">
-            <input type="checkbox" formControlName="same_as_current" class="ds-style-462f0763">
+            <input type="checkbox" formControlName="sameAsCurrent" class="ds-style-462f0763">
             Same as Current
           </label>
         </div>
@@ -293,23 +293,23 @@
         <div class="address-grid">
           <div class="form-group">
             <label>House/Flat No. <span class="req-star">*</span></label>
-            <input type="text" formControlName="perm_house" placeholder="e.g., 42-B, Flat 301" [class.input-sync-disabled]="form.get('same_as_current')?.value">
+            <input type="text" formControlName="permHouse" placeholder="e.g., 42-B, Flat 301" [class.input-sync-disabled]="form.get('sameAsCurrent')?.value">
           </div>
           <div class="form-group">
             <label>Street/Road <span class="req-star">*</span></label>
-            <input type="text" formControlName="perm_street" placeholder="e.g., MG Road, 2nd Cross" [class.input-sync-disabled]="form.get('same_as_current')?.value">
+            <input type="text" formControlName="permStreet" placeholder="e.g., MG Road, 2nd Cross" [class.input-sync-disabled]="form.get('sameAsCurrent')?.value">
           </div>
           <div class="form-group">
             <label>Area/Locality <span class="req-star">*</span></label>
-            <input type="text" formControlName="perm_area" placeholder="e.g., Koramangala, Sector 15" [class.input-sync-disabled]="form.get('same_as_current')?.value">
+            <input type="text" formControlName="permArea" placeholder="e.g., Koramangala, Sector 15" [class.input-sync-disabled]="form.get('sameAsCurrent')?.value">
           </div>
           <div class="form-group">
             <label>City/Town <span class="req-star">*</span></label>
-            <input type="text" formControlName="perm_city" placeholder="e.g., Bengaluru, Mumbai" [class.input-sync-disabled]="form.get('same_as_current')?.value">
+            <input type="text" formControlName="permCity" placeholder="e.g., Bengaluru, Mumbai" [class.input-sync-disabled]="form.get('sameAsCurrent')?.value">
           </div>
           <div class="form-group">
             <label>State/UT <span class="req-star">*</span></label>
-            <select formControlName="perm_state" [class.input-sync-disabled]="form.get('same_as_current')?.value">
+            <select formControlName="permState" [class.input-sync-disabled]="form.get('sameAsCurrent')?.value">
               <option value="">Select State</option>
               @for (state of states; track state) {
                 <option [value]="state">{{ state }}</option>
@@ -318,7 +318,7 @@
           </div>
           <div class="form-group">
             <label>PIN Code <span class="req-star">*</span></label>
-            <input type="text" formControlName="perm_pincode" placeholder="e.g., 560001" [class.input-sync-disabled]="form.get('same_as_current')?.value">
+            <input type="text" formControlName="permPincode" placeholder="e.g., 560001" [class.input-sync-disabled]="form.get('sameAsCurrent')?.value">
           </div>
         </div>
       </div>
@@ -355,10 +355,10 @@
     <!-- ── AGREEMENT ────────────────────────────────────── -->
     <div class="terms-agreement-section">
       <label class="ds-style-50670a00">
-        <input type="checkbox" formControlName="terms_accepted" class="ds-style-3d29c63f">
+        <input type="checkbox" formControlName="termsAccepted" class="ds-style-3d29c63f">
         <span class="ds-style-3c54a937">I agree to the <strong class="terms-link">Library Rules &amp; Membership Terms</strong></span>
       </label>
-      @if (form.get('terms_accepted')?.touched && form.get('terms_accepted')?.hasError('required')) {
+      @if (form.get('termsAccepted')?.touched && form.get('termsAccepted')?.hasError('required')) {
         <small class="err-msg terms-error">You must agree to the terms to proceed</small>
       }
     </div>

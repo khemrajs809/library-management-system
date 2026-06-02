@@ -5,7 +5,8 @@ const { sanitizeObject } = require('../services/sanitizer.service');
 
 // POST /api/admin/librarians — Create a new librarian account
 const createLibrarian = async (req, res) => {
-    let { lib_id, name, email, password } = req.body;
+    let { name, email, password } = req.body;
+    let lib_id = req.body.libId || req.body.lib_id;
     try {
         // Auto-generate lib_id if not provided
         if (!lib_id) {
@@ -275,7 +276,7 @@ const getOverviewStats = async (req, res) => {
 
         // Fine Amount
         const [fineResult] = await pool.query('CALL proc_get_total_unpaid_fine()');
-        const totalFine = Number(fineResult[0][0].total) || 0;
+        const totalFine = Number(fineResult[0]?.total) || 0;
 
         // Library Collection Summary
         const [
@@ -296,15 +297,15 @@ const getOverviewStats = async (req, res) => {
                 overdueList,
                 totalFine,
                 collection: {
-                    totalCategories: Number(catRes[0][0].count),
-                    totalAuthors: Number(authorRes[0][0].count),
-                    newBooksThisMonth: Number(newBooksRes[0][0].count)
+                    totalCategories: Number(catRes[0]?.count) || 0,
+                    totalAuthors: Number(authorRes[0]?.count) || 0,
+                    newBooksThisMonth: Number(newBooksRes[0]?.count) || 0
                 }
             }
         });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, message: 'Server error' });
+        console.error("Overview Stats Error:", err);
+        res.status(500).json({ success: false, message: 'Server error', error: err.message, stack: err.stack });
     }
 };
 

@@ -48,40 +48,40 @@ export class MemberFormComponent implements OnInit, OnChanges {
   ];
 
   form = this.fb.group({
-    member_id:         [null as string | null],
+    memberId:         [null as string | null],
     name:              ['', Validators.required],
     dob:               ['', [Validators.required, minAgeValidator(5)]],
     gender:            ['Male', Validators.required],
     phone:             ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
     email:             ['', [Validators.required, Validators.email]],
-    curr_house:        ['', Validators.required],
-    curr_street:       ['', Validators.required],
-    curr_area:         ['', Validators.required],
-    curr_city:         ['', Validators.required],
-    curr_state:        ['', Validators.required],
-    curr_pincode:      ['', [Validators.required, Validators.pattern('^[0-9]{6}$')]],
-    perm_house:        ['', Validators.required],
-    perm_street:       ['', Validators.required],
-    perm_area:         ['', Validators.required],
-    perm_city:         ['', Validators.required],
-    perm_state:        ['', Validators.required],
-    perm_pincode:      ['', [Validators.required, Validators.pattern('^[0-9]{6}$')]],
+    currHouse:        ['', Validators.required],
+    currStreet:       ['', Validators.required],
+    currArea:         ['', Validators.required],
+    currCity:         ['', Validators.required],
+    currState:        ['', Validators.required],
+    currPincode:      ['', [Validators.required, Validators.pattern('^[0-9]{6}$')]],
+    permHouse:        ['', Validators.required],
+    permStreet:       ['', Validators.required],
+    permArea:         ['', Validators.required],
+    permCity:         ['', Validators.required],
+    permState:        ['', Validators.required],
+    permPincode:      ['', [Validators.required, Validators.pattern('^[0-9]{6}$')]],
     course:            ['', Validators.required],
     department:        ['', Validators.required],
-    year_semester:     ['', Validators.required],
-    membership_type:   ['Student', Validators.required],
-    roll_number:       ['', Validators.required],
-    academic_session:  ['', Validators.required],
-    hod_name:          [''],
-    guardian_name:     ['', Validators.required],
-    guardian_phone:    ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-    blood_group:       ['', Validators.required],
-    membership_expiry: [this.getOneYearExpiry(), Validators.required],
-    max_book_limit:    [3],
-    account_status:    ['Active'],
-    no_dues_status:    [true],
-    same_as_current:   [false],
-    terms_accepted:    [false, Validators.requiredTrue]
+    yearSemester:     ['', Validators.required],
+    membershipType:   ['Student', Validators.required],
+    rollNumber:       ['', Validators.required],
+    academicSession:  ['', Validators.required],
+    hodName:          [''],
+    guardianName:     ['', Validators.required],
+    guardianPhone:    ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+    bloodGroup:       ['', Validators.required],
+    membershipExpiry: [this.getOneYearExpiry(), Validators.required],
+    maxBookLimit:    [3],
+    accountStatus:    ['Active'],
+    noDuesStatus:    [true],
+    sameAsCurrent:   [false],
+    termsAccepted:    [false, Validators.requiredTrue]
   });
 
   private getOneYearExpiry(): string {
@@ -93,13 +93,13 @@ export class MemberFormComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.setupAddressSync();
     if (this.nextMemberId && !this.isEditing) {
-      this.form.patchValue({ member_id: this.nextMemberId });
+      this.form.patchValue({ memberId: this.nextMemberId });
     }
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['nextMemberId'] && this.nextMemberId && !this.isEditing) {
-      this.form.patchValue({ member_id: this.nextMemberId });
+      this.form.patchValue({ memberId: this.nextMemberId });
     }
     if (changes['initialData'] && this.initialData && this.isEditing) {
       this.populateForm(this.initialData);
@@ -107,18 +107,18 @@ export class MemberFormComponent implements OnInit, OnChanges {
   }
 
   private setupAddressSync() {
-    const currFields = ['curr_house', 'curr_street', 'curr_area', 'curr_city', 'curr_state', 'curr_pincode'];
-    const permFields = ['perm_house', 'perm_street', 'perm_area', 'perm_city', 'perm_state', 'perm_pincode'];
+    const currFields = ['currHouse', 'currStreet', 'currArea', 'currCity', 'currState', 'currPincode'];
+    const permFields = ['permHouse', 'permStreet', 'permArea', 'permCity', 'permState', 'permPincode'];
 
     currFields.forEach((field, i) => {
       this.form.get(field)?.valueChanges.subscribe(val => {
-        if (this.form.get('same_as_current')?.value) {
+        if (this.form.get('sameAsCurrent')?.value) {
           this.form.patchValue({ [permFields[i]]: val }, { emitEvent: false });
         }
       });
     });
 
-    this.form.get('same_as_current')?.valueChanges.subscribe(checked => {
+    this.form.get('sameAsCurrent')?.valueChanges.subscribe(checked => {
       permFields.forEach((field, i) => {
         const ctrl = this.form.get(field);
         if (checked) {
@@ -133,40 +133,40 @@ export class MemberFormComponent implements OnInit, OnChanges {
 
   populateForm(member: Member) {
     this.form.patchValue({
-      member_id: member.member_id, 
+      memberId: member.memberId, 
       name: member.name,
       dob: member.dob ? new Date(member.dob).toISOString().split('T')[0] : '',
       gender: member.gender || 'Male',
       phone: member.phone, 
       email: member.email,
-      curr_house: member.curr_house,
-      curr_street: member.curr_street,
-      curr_area: member.curr_area,
-      curr_city: member.curr_city,
-      curr_state: member.curr_state,
-      curr_pincode: member.curr_pincode,
-      perm_house: member.perm_house,
-      perm_street: member.perm_street,
-      perm_area: member.perm_area,
-      perm_city: member.perm_city,
-      perm_state: member.perm_state,
-      perm_pincode: member.perm_pincode,
+      currHouse: member.currHouse,
+      currStreet: member.currStreet,
+      currArea: member.currArea,
+      currCity: member.currCity,
+      currState: member.currState,
+      currPincode: member.currPincode,
+      permHouse: member.permHouse,
+      permStreet: member.permStreet,
+      permArea: member.permArea,
+      permCity: member.permCity,
+      permState: member.permState,
+      permPincode: member.permPincode,
       course: member.course,
       department: member.department,
-      year_semester: member.year_semester,
-      membership_type: member.membership_type || 'Student',
-      roll_number: member.roll_number || '',
-      academic_session: member.academic_session || '',
-      hod_name: member.hod_name || '',
-      guardian_name: member.guardian_name || '',
-      guardian_phone: member.guardian_phone || '',
-      blood_group: member.blood_group || '',
-      membership_expiry: member.membership_expiry ? new Date(member.membership_expiry).toISOString().split('T')[0] : '',
-      max_book_limit: member.max_book_limit ?? 5,
-      account_status: member.account_status || 'Active',
-      no_dues_status: !!member.no_dues_status
+      yearSemester: member.yearSemester,
+      membershipType: member.membershipType || 'Student',
+      rollNumber: member.rollNumber || '',
+      academicSession: member.academicSession || '',
+      hodName: member.hodName || '',
+      guardianName: member.guardianName || '',
+      guardianPhone: member.guardianPhone || '',
+      bloodGroup: member.bloodGroup || '',
+      membershipExpiry: member.membershipExpiry ? new Date(member.membershipExpiry).toISOString().split('T')[0] : '',
+      maxBookLimit: member.maxBookLimit ?? 5,
+      accountStatus: member.accountStatus || 'Active',
+      noDuesStatus: !!member.noDuesStatus
     });
-    this.form.get('member_id')?.disable();
+    this.form.get('memberId')?.disable();
   }
 
   submit() {
@@ -181,19 +181,19 @@ export class MemberFormComponent implements OnInit, OnChanges {
 
   reset() {
     this.form.reset({
-      membership_expiry: this.getOneYearExpiry(),
+      membershipExpiry: this.getOneYearExpiry(),
       gender: 'Male',
-      membership_type: 'Student',
-      max_book_limit: 3,
-      account_status: 'Active',
-      no_dues_status: true,
-      same_as_current: false
+      membershipType: 'Student',
+      maxBookLimit: 3,
+      accountStatus: 'Active',
+      noDuesStatus: true,
+      sameAsCurrent: false
     });
-    this.form.get('member_id')?.enable();
+    this.form.get('memberId')?.enable();
     if (this.nextMemberId) {
-      this.form.patchValue({ member_id: this.nextMemberId });
+      this.form.patchValue({ memberId: this.nextMemberId });
     }
-    ['perm_house', 'perm_street', 'perm_area', 'perm_city', 'perm_state', 'perm_pincode'].forEach(f => {
+    ['permHouse', 'permStreet', 'permArea', 'permCity', 'permState', 'permPincode'].forEach(f => {
       this.form.get(f)?.enable();
     });
   }

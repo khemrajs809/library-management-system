@@ -28,10 +28,10 @@ export class ReturnHistoryComponent {
     const q = this.query.toLowerCase();
     if (!q) return this._history();
     return this._history().filter(h =>
-      h.member_name.toLowerCase().includes(q) ||
-      h.book_title.toLowerCase().includes(q) ||
-      h.member_id.toLowerCase().includes(q) ||
-      h.book_id.toString().includes(q)
+      h.memberName.toLowerCase().includes(q) ||
+      h.bookTitle.toLowerCase().includes(q) ||
+      h.memberId.toLowerCase().includes(q) ||
+      h.bookId.toString().includes(q)
     );
   });
 

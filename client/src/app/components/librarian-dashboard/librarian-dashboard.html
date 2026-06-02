@@ -18,31 +18,31 @@
 
       <!-- ─── Book Inventory ─── -->
       @if (activeTab === 'books') {
-      <app-book-manager />
+      @defer { <app-book-manager /> }
       }
 
       <!-- ─── Member Directory + Register Member ─── -->
       @if (activeTab === 'member_directory' || activeTab === 'register_member') {
-      <app-member-manager [activeTab]="activeTab" (tabChange)="setTab($event)" (openProfile)="openProfile($event)" />
+      @defer { <app-member-manager [activeTab]="activeTab" (tabChange)="setTab($event)"
+        (openProfile)="openProfile($event)" /> }
       }
 
       <!-- ─── Circulation Desk + Scanner + History ─── -->
       @if (activeTab === 'issues' || activeTab === 'scanner_mode' || activeTab === 'history') {
-      <app-circulation-desk [activeTab]="activeTab" />
+      @defer { <app-circulation-desk [activeTab]="activeTab" /> }
       }
 
       <!-- ─── Fines & Lost Books ─── -->
       @if (activeTab === 'fine_manager') {
-      <app-fine-manager></app-fine-manager>
+      @defer { <app-fine-manager></app-fine-manager> }
       }
     </div>
   </div>
 </div>
 
 <!-- ═══ Member Profile Modal ═══ -->
-<app-member-profile 
-  [viewingMember]="viewingMember()" 
-  [isProfileLoading]="isProfileLoading()" 
-  (onClose)="closeProfile()"
+@defer (when viewingMember()) {
+<app-member-profile [viewingMember]="viewingMember()" [isProfileLoading]="isProfileLoading()" (onClose)="closeProfile()"
   (onPayFine)="payFineFromProfile($event)">
 </app-member-profile>
+}

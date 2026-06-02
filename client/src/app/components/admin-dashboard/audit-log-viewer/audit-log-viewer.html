@@ -22,17 +22,28 @@
           <td colspan="7" class="empty-state">No audit logs available.</td>
         </tr>
       } @else {
-        @for (log of logs(); track log.log_id) {
+        @for (log of logs(); track log.logId) {
           <tr>
-            <td  class="ds-style-0ca50382">{{ log.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
-            <td><span class="badge ds-style-23bcb564" >{{ log.user_id }}</span></td>
-            <td><strong style="color: #1e293b;">{{ log.user_name || 'System Administrator' }}</strong></td>
-            <td><span class="text-muted small">{{ log.user_email || 'N/A' }}</span></td>
-            <td><span class="badge" [ngClass]="{'bg-purple': log.user_role === 'admin', 'bg-blue': log.user_role === 'librarian'}">{{ log.user_role | uppercase }}</span></td>
+            <td  class="ds-style-0ca50382">{{ log.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td><span class="badge ds-style-23bcb564" >{{ log.userId }}</span></td>
+            <td><strong [ngClass]="log.userId === 'System' ? 'text-system-automated' : 'text-dark-navy'">{{ log.userName || 'System Generated' }}</strong></td>
+            <td><span class="text-muted small">{{ log.userEmail || parseDetails(log.details).from || (log.userId === 'System' ? 'System Automated' : 'N/A') }}</span></td>
+            <td><span class="badge" [ngClass]="{'bg-purple': log.userRole === 'admin' && log.userId !== 'System', 'bg-blue': log.userRole === 'librarian', 'bg-teal': log.userId === 'System' || log.userRole === 'system'}">{{ (log.userId === 'System' ? 'system' : log.userRole) | uppercase }}</span></td>
             <td><strong>{{ log.action }}</strong></td>
             <td>
-              <span class="method-badge" [ngClass]="parseDetails(log.details).method">{{ parseDetails(log.details).method }}</span>
-              <code  class="ds-style-e2e35b48">{{ parseDetails(log.details).url }}</code>
+              @if (parseDetails(log.details).method) {
+                <span class="method-badge" [ngClass]="parseDetails(log.details).method">{{ parseDetails(log.details).method }}</span>
+              }
+              @if (parseDetails(log.details).url) {
+                <code class="ds-style-e2e35b48">{{ parseDetails(log.details).url }}</code>
+              }
+              @if (parseDetails(log.details).to) {
+                <span class="badge bg-blue" style="margin-right: 8px;">EMAIL</span>
+                <code class="ds-style-e2e35b48">{{ parseDetails(log.details).to }}</code>
+              }
+              @if (!parseDetails(log.details).method && !parseDetails(log.details).url && !parseDetails(log.details).to) {
+                <span class="text-muted small">N/A</span>
+              }
             </td>
           </tr>
         }

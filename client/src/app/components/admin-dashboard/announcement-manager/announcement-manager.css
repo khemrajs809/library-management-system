@@ -365,3 +365,13 @@ td {
     font-size: 0.75rem;
     color: #64748b;
 }
+
+/* Utilities for extraction */
+.preset-pearl { background: #fdfaf1; color: #1e293b; border: 1px solid #e2e8f0; }
+.preset-rose { background: #fff5f5; color: #991b1b; border: 1px solid #fee2e2; }
+.preset-mint { background: #f0fdf4; color: #166534; border: 1px solid #dcfce7; }
+.preset-sky { background: #eff6ff; color: #1e40af; border: 1px solid #dbeafe; }
+.preset-honey { background: #fffbeb; color: #92400e; border: 1px solid #fef3c7; }
+.preset-lavender { background: #faf5ff; color: #6b21a8; border: 1px solid #f3e8ff; }
+.preset-slate { background: #1e293b; color: #f8fafc; border: 1px solid #334155; }
+.preset-red { background: #b91c1c; color: #ffffff; border: 1px solid #991b1b; }

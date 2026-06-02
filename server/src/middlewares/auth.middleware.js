@@ -1,4 +1,5 @@
-const jwt = require('jsonwebtoken');
+const { jwtDecrypt } = require('jose');
+const crypto = require('crypto');
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -9,6 +10,9 @@ if (!JWT_SECRET) {
     console.error("FATAL ERROR: JWT_SECRET is not defined.");
     process.exit(1);
 }
+
+// Derive the exact same 32-byte secret used in auth.controller
+const encryptionSecret = crypto.createHash('sha256').update(JWT_SECRET).digest();
 
 /**
  * Basic authentication middleware to verify JWT presence and validity.
@@ -28,7 +32,9 @@ const verifyToken = async (req, res, next) => {
             return res.status(401).json({ success: false, message: 'Token has been revoked. Please log in again.' });
         }
 
-        const decoded = jwt.verify(token, JWT_SECRET);
+        // Decrypt and verify JWE
+        const { payload: decoded } = await jwtDecrypt(token, encryptionSecret);
+        
         // Standardize the user object on the request
         req.user = decoded; 
 

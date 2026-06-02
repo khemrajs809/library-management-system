@@ -1,6 +1,7 @@
 const cron = require('node-cron');
 const pool = require('../db');
-const transporter = require('../config/mailer');
+const { sendEmail } = require('../services/email.service');
+const { generateGenericMessageHTML, generateFineReminderHTML } = require('../utils/email-templates');
 
 /**
  * Sets up the daily overdue notification cron job.
@@ -18,36 +19,30 @@ function setupNotificationJob(io) {
             const [dueSoon] = await pool.query('CALL proc_get_issues_due_on(?)', [twoDaysFromNow]);
 
             for (const issue of dueSoon) {
-                transporter.sendMail({
-                    from: process.env.EMAIL_USER,
-                    to: issue.email,
-                    subject: 'Library Book Due Soon',
-                    text: `Hi ${issue.name},\n\nReminder: "${issue.title}" is due in 2 days (${issue.due_date}).`
-                });
+                const title = 'Library Book Due Soon';
+                const text = `Hi ${issue.name},\n\nReminder: "${issue.title}" is due in 2 days (${issue.due_date}).`;
+                const html = generateGenericMessageHTML(issue.name, title, text);
+                sendEmail(issue.email, title, text, html);
             }
 
             // 2. Due today — last warning
             const [dueToday] = await pool.query('CALL proc_get_issues_due_on(?)', [today]);
 
             for (const issue of dueToday) {
-                transporter.sendMail({
-                    from: process.env.EMAIL_USER,
-                    to: issue.email,
-                    subject: 'WARNING: Book Due Today',
-                    text: `Hi ${issue.name},\n\nYour book "${issue.title}" is due TODAY (${issue.due_date}). If not returned today, a daily fine of ₹5 will be applied starting tomorrow.`
-                });
+                const title = 'WARNING: Book Due Today';
+                const text = `Hi ${issue.name},\n\nYour book "${issue.title}" is due TODAY (${issue.due_date}). If not returned today, a daily fine will be applied starting tomorrow.`;
+                const html = generateGenericMessageHTML(issue.name, title, text);
+                sendEmail(issue.email, title, text, html);
             }
 
             // 3. Overdue — fine notice + real-time librarian alert
             const [overdue] = await pool.query('CALL proc_get_issues_overdue(?)', [today]);
 
             for (const issue of overdue) {
-                transporter.sendMail({
-                    from: process.env.EMAIL_USER,
-                    to: issue.email,
-                    subject: 'REMINDER: Library Book Overdue',
-                    text: `Hi ${issue.name},\n\nYour book "${issue.title}" remains OVERDUE. Please return it to stop the daily fines.`
-                });
+                const title = 'REMINDER: Library Book Overdue';
+                const text = `Hi ${issue.name},\n\nYour book "${issue.title}" remains OVERDUE. Please return it to stop the daily fines.`;
+                const html = generateFineReminderHTML(issue.name, issue.title, 'issued', 'Accruing Daily');
+                sendEmail(issue.email, title, text, html);
 
                 io.emit('bookOverdue', {
                     member_name: issue.name,

@@ -25,9 +25,10 @@ export class MemberCardComponent implements OnChanges {
   }
 
   renderBarcode() {
+    if (typeof document === 'undefined') return;
     const svg = document.getElementById(this.barcodeId);
     if (svg && this.member) {
-      JsBarcode(svg, this.member.member_id, {
+      JsBarcode(svg, this.member.memberId, {
         format: 'CODE128',
         width: 2,
         height: 70,
@@ -51,7 +52,7 @@ export class MemberCardComponent implements OnChanges {
         // High quality PDF export
         const pdf = new jsPDF('l', 'mm', [85.6, 54]);
         pdf.addImage(c.toDataURL('image/png'), 'PNG', 0, 0, 85.6, 54);
-        pdf.save(`LMS_SmartCard_${this.member?.member_id}.pdf`);
+        pdf.save(`LMS_SmartCard_${this.member?.memberId}.pdf`);
       });
     }, 50);
   }

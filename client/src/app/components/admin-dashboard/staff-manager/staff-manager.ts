@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, OnDestroy, NgZone } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy, NgZone, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -14,6 +14,7 @@ import { Subscription } from 'rxjs';
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './staff-manager.html',
   styleUrl: './staff-manager.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StaffManagerComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
@@ -22,6 +23,7 @@ export class StaffManagerComponent implements OnInit, OnDestroy {
   private modal = inject(ModalService);
   public refreshService = inject(RefreshService);
   private ngZone = inject(NgZone);
+  private cdr = inject(ChangeDetectorRef);
   private refreshSub?: Subscription;
 
   libForm: FormGroup;
@@ -30,6 +32,7 @@ export class StaffManagerComponent implements OnInit, OnDestroy {
   
   // Librarian Directory State
   librarians = signal<any[]>([]);
+  fetchingData = signal<boolean>(true);
   editingLibId = signal<string | null>(null);
   passwordUpdateLoading = signal<boolean>(false);
   generatedId = signal<string | null>(null);
@@ -45,7 +48,10 @@ export class StaffManagerComponent implements OnInit, OnDestroy {
   refreshData() {
     this.loadLibrarians();
     this.checkAndGenerateId();
-    setTimeout(() => this.refreshService.completeRefresh(), 800);
+    setTimeout(() => {
+      this.refreshService.completeRefresh();
+      this.cdr.markForCheck();
+    }, 800);
   }
 
   ngOnDestroy() {
@@ -53,14 +59,14 @@ export class StaffManagerComponent implements OnInit, OnDestroy {
   }
 
   private checkAndGenerateId() {
-    if (!this.editingLibId() && !this.libForm.get('lib_id')?.value) {
+    if (!this.editingLibId() && !this.libForm.get('libId')?.value) {
       this.generateLibrarianId();
     }
   }
 
   constructor() {
     this.libForm = this.fb.group({
-      lib_id: [null as string | null],
+      libId: [null as string | null],
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
@@ -68,11 +74,16 @@ export class StaffManagerComponent implements OnInit, OnDestroy {
   }
 
   loadLibrarians() {
+    this.fetchingData.set(true);
     this.http.get<{success: boolean, data: any[]}>(`${API_BASE}/admin/librarians`).subscribe({
       next: (res) => {
         this.librarians.set(res.data);
+        this.fetchingData.set(false);
       },
-      error: (err: any) => this.toast.error(err.error?.message || 'Failed to load librarians')
+      error: (err: any) => {
+        this.toast.error(err.error?.message || 'Failed to load librarians');
+        this.fetchingData.set(false);
+      }
     });
   }
 
@@ -80,9 +91,10 @@ export class StaffManagerComponent implements OnInit, OnDestroy {
     this.http.get<{success: boolean, id: string}>(`${API_BASE}/admin/librarians/generate-id`).subscribe({
       next: (res) => {
         this.generatedId.set(res.id);
-        this.libForm.get('lib_id')?.setValue(res.id, { emitEvent: false });
+        this.libForm.get('libId')?.setValue(res.id, { emitEvent: false });
+        this.cdr.markForCheck();
       },
-      error: () => this.toast.error('Failed to generate unique Librarian ID')
+      error: (err) => this.toast.error(err.error?.message || 'Failed to generate unique Librarian ID')
     });
   }
 

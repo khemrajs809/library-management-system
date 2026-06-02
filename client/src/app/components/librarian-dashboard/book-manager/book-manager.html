@@ -32,7 +32,7 @@
 <app-book-copies-modal
   [isOpen]="isViewingCopies()"
   [copies]="selectedBookCopies()"
-  [bookId]="selectedBook()?.book_id || null"
+  [bookId]="selectedBook()?.bookId || null"
   (onClose)="closeCopies()">
 </app-book-copies-modal>
 

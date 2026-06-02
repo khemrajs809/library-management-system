@@ -40,10 +40,10 @@
                <div class="review-card member-card">
                   <div class="card-tag">MEMBER IDENTITY</div>
                   <div class="card-main">
-                     <img [src]="scannedIssue.member_photo ? (uploadsBase + scannedIssue.member_photo) : '/assets/placeholder-user.png'" class="review-avatar">
+                     <img [src]="scannedIssue.memberPhoto ? (uploadsBase + scannedIssue.memberPhoto) : '/assets/placeholder-user.png'" class="review-avatar">
                      <div class="review-info">
-                        <h3 class="name">{{ scannedIssue.member_name }}</h3>
-                        <span class="id-pill">ID: {{ scannedIssue.member_id }}</span>
+                        <h3 class="name">{{ scannedIssue.memberName }}</h3>
+                        <span class="id-pill">ID: {{ scannedIssue.memberId }}</span>
                      </div>
                   </div>
                   <div class="card-footer-grid">
@@ -53,11 +53,11 @@
                      </div>
                      <div class="footer-item">
                         <span class="label">CONTACT</span>
-                        <span class="val">{{ scannedIssue.member_phone || 'N/A' }}</span>
+                        <span class="val">{{ scannedIssue.memberPhone || 'N/A' }}</span>
                      </div>
                      <div class="footer-item full">
                         <span class="label">EMAIL ADDRESS</span>
-                        <span class="val">{{ scannedIssue.member_email || 'N/A' }}</span>
+                        <span class="val">{{ scannedIssue.memberEmail || 'N/A' }}</span>
                      </div>
                   </div>
                </div>
@@ -68,17 +68,17 @@
                   <div class="card-main">
                      <img [src]="scannedIssue.book_cover ? (uploadsBase + scannedIssue.book_cover) : '/assets/cover-placeholder.png'" class="review-cover">
                      <div class="review-info">
-                        <h3 class="name">{{ scannedIssue.book_title }}</h3>
+                        <h3 class="name">{{ scannedIssue.bookTitle }}</h3>
                         <div class="id-row">
-                           <span class="copy-pill">COPY ID: {{ scannedIssue.copy_id }}</span>
-                           <span class="stream-pill">{{ scannedIssue.book_stream || 'CS' }}</span>
+                           <span class="copy-pill">COPY ID: {{ scannedIssue.copyId }}</span>
+                           <span class="stream-pill">{{ scannedIssue.bookStream || 'CS' }}</span>
                         </div>
                      </div>
                   </div>
                   <div class="card-footer-grid">
                      <div class="footer-item">
                         <span class="label">AUTHOR</span>
-                        <span class="val">{{ scannedIssue.book_author || 'Unknown' }}</span>
+                        <span class="val">{{ scannedIssue.bookAuthor || 'Unknown' }}</span>
                      </div>
                      <div class="footer-item">
                         <span class="label">ISBN</span>
@@ -86,19 +86,19 @@
                      </div>
                      <div class="footer-item">
                         <span class="label">ISSUE DATE</span>
-                        <span class="val">{{ scannedIssue.issue_date | date:'MMMM d, y' }}</span>
+                        <span class="val">{{ scannedIssue.issueDate | date:'MMMM d, y' }}</span>
                      </div>
                      <div class="footer-item">
                         <span class="label">DUE DATE</span>
-                        <span class="val due" [class.overdue]="isOverdue(scannedIssue)">{{ scannedIssue.due_date | date:'MMMM d, y' }}</span>
+                        <span class="val due" [class.overdue]="isOverdue(scannedIssue)">{{ scannedIssue.dueDate | date:'MMMM d, y' }}</span>
                      </div>
                   </div>
                </div>
             </div>
 
-            @if (scannedIssue.fine_amount > 0) {
+            @if (scannedIssue.fineAmount > 0) {
               <div class="fine-alert-banner">
-                 ⚠️ Penalty Detected: ₹{{ scannedIssue.fine_amount }} must be collected
+                 ⚠️ Penalty Detected: ₹{{ scannedIssue.fineAmount }} must be collected
               </div>
             }
 

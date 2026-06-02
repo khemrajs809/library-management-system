@@ -39,6 +39,13 @@
     transition: all 0.2s ease;
 }
 
+button.logout-link {
+    background: transparent;
+    border: none;
+    font-size: inherit;
+    font-family: inherit;
+}
+
 .nav-links a:hover, 
 .nav-links a.active,
 .logout-link:hover {
@@ -92,5 +99,7 @@
     }
 }
 
-
-
+.refresh-section {
+    display: flex;
+    align-items: center;
+}

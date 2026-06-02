@@ -17,7 +17,7 @@
   <div class="fine-filter-bar">
     <div class="search-wrapper">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      <input type="text" class="fine-search-input" placeholder="Search by member, book title, or ID..." (input)="onSearch($event)">
+      <input type="text" class="fine-search-input" aria-label="Search fines" placeholder="Search by member, book title, or ID..." (input)="onSearch($event)">
     </div>
     <select class="filter-select" (change)="onFilterChange($event)">
       <option value="all">All Records</option>
@@ -44,26 +44,26 @@
             <th>Fine Details</th>
             <th>Timeline & Days</th>
             <th>Contact & Ref</th>
-            <th style="text-align: center;">Actions</th>
+            <th class="text-center">Actions</th>
           </tr>
         </thead>
         <tbody>
-          @for (row of paginatedRecords(); track row.issue_id) {
+          @for (row of paginatedRecords(); track row.issueId) {
             <tr>
               <td>
                 <div class="ds-member-cell">
-                  @if (row.member_photo) {
-                    <img [src]="uploadsBase + row.member_photo" class="ds-member-photo" (error)="row.member_photo = null">
+                  @if (row.memberPhoto) {
+                    <img [src]="uploadsBase + row.memberPhoto" class="ds-member-photo" (error)="row.memberPhoto = null">
                   } @else {
-                    <div class="ds-member-placeholder">{{ row.member_name.charAt(0) }}</div>
+                    <div class="ds-member-placeholder">{{ row.memberName.charAt(0) }}</div>
                   }
                   <div class="ds-info-stack">
-                    <span class="name">{{ row.member_name }}</span>
-                    <span class="meta">#{{ row.member_id }} | {{ row.member_dept || 'Gen' }}</span>
-                    @if (row.guardian_name) {
+                    <span class="name">{{ row.memberName }}</span>
+                    <span class="meta">#{{ row.memberId }} | {{ row.memberDept || 'Gen' }}</span>
+                    @if (row.guardianName) {
                       <div class="guardian-badge">
                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
-                        <span>{{ row.guardian_name }}</span>
+                        <span>{{ row.guardianName }}</span>
                       </div>
                     }
                   </div>
@@ -71,10 +71,10 @@
               </td>
               <td>
                 <div class="ds-info-stack">
-                  <span class="name">{{ row.book_title }}</span>
-                  <span class="meta">{{ row.book_author || 'Unknown Author' }}</span>
-                  <span class="meta">Accession: <span class="book-id-tag">#{{ row.book_id }}</span></span>
-                  <span class="meta" style="font-size: 0.65rem; opacity: 0.8;">ISBN: {{ row.isbn || 'N/A' }}</span>
+                  <span class="name">{{ row.bookTitle }}</span>
+                  <span class="meta">{{ row.bookAuthor || 'Unknown Author' }}</span>
+                  <span class="meta">Accession: <span class="book-id-tag">#{{ row.bookId }}</span></span>
+                  <span class="meta meta-isbn">ISBN: {{ row.isbn || 'N/A' }}</span>
                 </div>
               </td>
               <td>
@@ -87,16 +87,16 @@
                     }
                     {{ row.status }}
                   </span>
-                  @if (row.book_price) {
-                    <span class="meta mt-1" style="font-size: 0.6rem;">Value: ₹{{ row.book_price }}</span>
+                  @if (row.bookPrice) {
+                    <span class="meta mt-1 meta-value">Value: ₹{{ row.bookPrice }}</span>
                   }
                 </div>
               </td>
               <td>
                 <div class="fine-display">
-                  <span class="fine-amount">₹{{ row.dynamic_fine }}</span>
-                  <span class="fine-tag" [class.fine-paid]="row.fine_paid" [class.fine-unpaid]="!row.fine_paid">
-                    {{ row.fine_paid ? 'PAID' : 'UNPAID' }}
+                  <span class="fine-amount">₹{{ row.dynamicFine }}</span>
+                  <span class="fine-tag" [class.fine-paid]="row.finePaid" [class.fine-unpaid]="!row.finePaid">
+                    {{ row.finePaid ? 'PAID' : 'UNPAID' }}
                   </span>
                 </div>
               </td>
@@ -104,19 +104,19 @@
                 <div class="timeline-item">
                   <div class="timeline-point">
                     <span class="timeline-label">Due</span>
-                    <span class="timeline-date">{{ row.due_date | date:'dd MMM yy' }}</span>
+                    <span class="timeline-date">{{ row.dueDate | date:'dd MMM yy' }}</span>
                   </div>
-                  @if (row.return_date) {
+                  @if (row.returnDate) {
                     <div class="timeline-point">
                       <span class="timeline-label">Ret</span>
-                      <span class="timeline-date">{{ row.return_date | date:'dd MMM yy' }}</span>
+                      <span class="timeline-date">{{ row.returnDate | date:'dd MMM yy' }}</span>
                     </div>
                   }
-                  @if (!row.fine_paid && row.status !== 'Returned') {
+                  @if (!row.finePaid && row.status !== 'Returned') {
                     <div class="timeline-point mt-1">
-                      <span class="timeline-label" style="color: #b91c1c;">OD</span>
-                      <span class="timeline-date" style="color: #b91c1c;">
-                        {{ row.dynamic_fine }} Days
+                      <span class="timeline-label text-crimson">OD</span>
+                      <span class="timeline-date text-crimson">
+                        {{ row.dynamicFine }} Days
                       </span>
                     </div>
                   }
@@ -124,27 +124,27 @@
               </td>
               <td>
                 <div class="ds-info-stack">
-                  <span class="meta"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> {{ row.member_phone || 'No Phone' }}</span>
-                  <span class="meta" style="font-size: 0.65rem; text-transform: lowercase;">{{ row.member_email || 'No Email' }}</span>
-                  @if (row.shelf_location) {
-                    <span class="meta mt-1" style="color: #145277; font-weight: 700;">
+                  <span class="meta"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> {{ row.memberPhone || 'No Phone' }}</span>
+                  <span class="meta meta-email">{{ row.memberEmail || 'No Email' }}</span>
+                  @if (row.shelfLocation) {
+                    <span class="meta mt-1 meta-shelf">
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                      {{ row.shelf_location }}
+                      {{ row.shelfLocation }}
                     </span>
                   }
                 </div>
               </td>
-              <td style="text-align: center;">
+              <td class="text-center">
                 <div class="fine-actions">
-                  @if (!row.fine_paid && row.dynamic_fine > 0) {
-                    <button class="btn-crimson" (click)="payFine(row.issue_id, row.dynamic_fine)">
+                  @if (!row.finePaid && row.dynamicFine > 0) {
+                    <button class="btn-crimson" (click)="payFine(row.issueId, row.dynamicFine)">
                       Pay
                     </button>
-                    <button class="btn-crimson-outline" (click)="sendReminder(row.issue_id)" title="Send Email Reminder">
+                    <button class="btn-crimson-outline" (click)="sendReminder(row.issueId)" title="Send Email Reminder">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                     </button>
                   } @else {
-                    <span style="color: #14532d; font-weight: 900; font-size: 0.7rem; letter-spacing: 0.05em;">CLEARED</span>
+                    <span class="status-cleared">CLEARED</span>
                   }
                 </div>
               </td>

@@ -36,10 +36,10 @@ export class ActiveIssuesTableComponent {
     const q = this._query().toLowerCase().trim();
     if (!q) return this._issues();
     return this._issues().filter(i =>
-      (i.member_name?.toLowerCase().includes(q)) ||
-      (i.book_title?.toLowerCase().includes(q)) ||
-      (i.member_id?.toLowerCase().includes(q)) ||
-      (i.book_id?.toString().includes(q))
+      (i.memberName?.toLowerCase().includes(q)) ||
+      (i.bookTitle?.toLowerCase().includes(q)) ||
+      (i.memberId?.toLowerCase().includes(q)) ||
+      (i.bookId?.toString().includes(q))
     );
   });
 
@@ -66,7 +66,7 @@ export class ActiveIssuesTableComponent {
   });
 
   isOverdue = (issue: Issue) => {
-    const due = new Date(issue.due_date);
+    const due = new Date(issue.dueDate);
     const today = new Date();
     today.setHours(0,0,0,0);
     return today > due;

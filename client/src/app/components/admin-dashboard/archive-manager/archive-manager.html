@@ -20,18 +20,18 @@
             @if (deletedBooks().length === 0) {
               <tr><td colspan="3" class="empty-state">No deleted books.</td></tr>
             } @else {
-              @for (book of deletedBooks(); track book.book_id) {
+              @for (book of deletedBooks(); track book.bookId) {
                 <tr>
                   <td>
                     <div  class="ds-style-54a40d7d">
-                      @if (book.cover_url) {
-                        <img [src]="uploadsBase + book.cover_url"  class="ds-style-1b5fd647">
+                      @if (book.coverUrl) {
+                        <img [src]="uploadsBase + book.coverUrl"  class="ds-style-1b5fd647">
                       } @else {
                         <div  class="ds-style-2974c8c6">📖</div>
                       }
                       <div>
                         <strong  class="ds-style-0adff40a">{{ book.title }}</strong>
-                        <span class="id-badge">{{ book.book_id }}</span>
+                        <span class="id-badge">{{ book.bookId }}</span>
                       </div>
                     </div>
                   </td>
@@ -40,13 +40,13 @@
                       <div><strong>ISBN:</strong> {{ book.isbn }}</div>
                       <div><strong>Author:</strong> {{ book.author || 'N/A' }}</div>
                       <div><strong>Category:</strong> {{ book.category || 'N/A' }}</div>
-                      <div><strong>Year:</strong> {{ book.publication_year || 'N/A' }}</div>
+                      <div><strong>Year:</strong> {{ book.publicationYear || 'N/A' }}</div>
                     </div>
                   </td>
                   <td class="text-right">
                     <div class="action-buttons">
-                      <button class="btn btn-outline btn-sm" (click)="restoreBook(book.book_id)">♻️ Restore</button>
-                      <button class="btn btn-red-outline btn-sm" (click)="permanentDeleteBook(book.book_id)">🗑️</button>
+                      <button class="btn btn-outline btn-sm" (click)="restoreBook(book.bookId)">♻️ Restore</button>
+                      <button class="btn btn-red-outline btn-sm" (click)="permanentDeleteBook(book.bookId)">🗑️</button>
                     </div>
                   </td>
                 </tr>
@@ -76,18 +76,18 @@
             @if (deletedMembers().length === 0) {
               <tr><td colspan="3" class="empty-state">No deleted members.</td></tr>
             } @else {
-              @for (member of deletedMembers(); track member.member_id) {
+              @for (member of deletedMembers(); track member.memberId) {
                 <tr>
                   <td>
                     <div  class="ds-style-54a40d7d">
-                      @if (member.photo_url) {
-                        <img [src]="uploadsBase + member.photo_url"  class="ds-style-8551b25c">
+                      @if (member.photoUrl) {
+                        <img [src]="uploadsBase + member.photoUrl"  class="ds-style-8551b25c">
                       } @else {
                         <div  class="ds-style-990369cf">👤</div>
                       }
                       <div>
                         <strong  class="ds-style-0adff40a">{{ member.name }}</strong>
-                        <span class="id-badge">{{ member.member_id }}</span>
+                        <span class="id-badge">{{ member.memberId }}</span>
                       </div>
                     </div>
                   </td>
@@ -95,13 +95,13 @@
                     <div  class="ds-style-758b0d26">
                       <div>📞 {{ member.phone }}</div>
                       <div>📩 {{ member.email }}</div>
-                      <div><strong>Joined:</strong> {{ member.created_at | date:'dd/MM/yyyy' }}</div>
+                      <div><strong>Joined:</strong> {{ member.createdAt | date:'dd/MM/yyyy' }}</div>
                     </div>
                   </td>
                   <td class="text-right">
                     <div class="action-buttons">
-                      <button class="btn btn-outline btn-sm" (click)="restoreMember(member.member_id)">♻️ Restore</button>
-                      <button class="btn btn-red-outline btn-sm" (click)="permanentDeleteMember(member.member_id)">🗑️</button>
+                      <button class="btn btn-outline btn-sm" (click)="restoreMember(member.memberId)">♻️ Restore</button>
+                      <button class="btn btn-red-outline btn-sm" (click)="permanentDeleteMember(member.memberId)">🗑️</button>
                     </div>
                   </td>
                 </tr>

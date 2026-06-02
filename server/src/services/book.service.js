@@ -2,7 +2,10 @@ const pool = require('../db');
 
 class BookService {
     async createBook(data, cover_url) {
-        const { book_id, isbn, title, price, author, stream, publication_year, quantity, publisher, edition, shelf_location } = data;
+        const book_id = data.bookId || data.book_id;
+        const publication_year = data.publicationYear || data.publication_year;
+        const shelf_location = data.shelfLocation || data.shelf_location;
+        const { isbn, title, price, author, stream, quantity, publisher, edition } = data;
         
         await pool.query(
             'CALL proc_create_book(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
@@ -44,7 +47,9 @@ class BookService {
     }
 
     async updateBook(id, data, cover_url) {
-        const { isbn, title, quantity, price, author, stream, publication_year, publisher, edition, shelf_location } = data;
+        const publication_year = data.publicationYear || data.publication_year;
+        const shelf_location = data.shelfLocation || data.shelf_location;
+        const { isbn, title, quantity, price, author, stream, publisher, edition } = data;
         
         const [currentRes] = await pool.query('CALL proc_get_book_quantity(?)', [id]);
         const current = currentRes;

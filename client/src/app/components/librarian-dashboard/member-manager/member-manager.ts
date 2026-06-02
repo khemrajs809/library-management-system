@@ -122,7 +122,7 @@ export class MemberManagerComponent implements OnInit, OnChanges, OnDestroy {
         if (r.pagination) this.pagination.set(r.pagination);
         this.isLoading.set(false);
       },
-      error: () => { console.error('Failed to load members'); this.isLoading.set(false); }
+      error: (err) => { this.toastService.error(err.error?.message || 'Failed to load members'); this.isLoading.set(false); }
     });
   }
 
@@ -154,10 +154,10 @@ export class MemberManagerComponent implements OnInit, OnChanges, OnDestroy {
     });
 
     // Build legacy formatted strings for backend/ID card
-    const currAddr = `${formData.curr_house}, ${formData.curr_street}, ${formData.curr_area}, ${formData.curr_city}, ${formData.curr_state} - ${formData.curr_pincode}`;
-    const permAddr = `${formData.perm_house}, ${formData.perm_street}, ${formData.perm_area}, ${formData.perm_city}, ${formData.perm_state} - ${formData.perm_pincode}`;
-    fd.append('current_address', currAddr);
-    fd.append('permanent_address', permAddr);
+    const currAddr = `${formData.currHouse}, ${formData.currStreet}, ${formData.currArea}, ${formData.currCity}, ${formData.currState} - ${formData.currPincode}`;
+    const permAddr = `${formData.permHouse}, ${formData.permStreet}, ${formData.permArea}, ${formData.permCity}, ${formData.permState} - ${formData.permPincode}`;
+    fd.append('currentAddress', currAddr);
+    fd.append('permanentAddress', permAddr);
 
     if (this.selectedFile) fd.append('photo', this.selectedFile);
     if (this.selectedGovtId) fd.append('govt_id', this.selectedGovtId);
@@ -174,14 +174,14 @@ export class MemberManagerComponent implements OnInit, OnChanges, OnDestroy {
         if (!this.isEditing()) {
           this.previewMember.set({
             ...formData,
-            photo_url: res.photo_url ? `${UPLOADS_BASE}${res.photo_url}` : null
+            photoUrl: res.photoUrl ? `${UPLOADS_BASE}${res.photoUrl}` : null
           });
         }
         this.resetForm();
         this.loadMembers();
         this.loadActivities();
-        if (!this.isEditing() && res.member_id) {
-          this.memberService.getMember(res.member_id).subscribe({
+        if (!this.isEditing() && res.memberId) {
+          this.memberService.getMember(res.memberId).subscribe({
             next: (r) => this.selectedMember.set(r.data)
           });
         }
@@ -193,7 +193,7 @@ export class MemberManagerComponent implements OnInit, OnChanges, OnDestroy {
   editMember(member: Member) {
     this.isEditing.set(true);
     this.selectedMember.set(member); // Set the member data for the form
-    this.selectedMemberId = member.member_id;
+    this.selectedMemberId = member.memberId;
     this.previewMember.set(null);
     this.tabChange.emit('register_member');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -216,21 +216,21 @@ export class MemberManagerComponent implements OnInit, OnChanges, OnDestroy {
       title: 'Confirm Deletion',
       subtitle: 'MEMBER IDENTITY',
       message: `Are you sure you want to remove this member?`,
-      image: member.photo_url ? (this.uploadsBase + member.photo_url) : undefined,
+      image: member.photoUrl ? (this.uploadsBase + member.photoUrl) : undefined,
       metadata: [
-        { label: 'Member ID', value: member.member_id, color: '#ef4444' },
+        { label: 'Member ID', value: member.memberId, color: '#ef4444' },
         { label: 'Name', value: member.name },
         { label: 'Course & Dept', value: `${member.course || 'N/A'} (${member.department || 'N/A'})` },
-        { label: 'Year/Sem & Session', value: `${member.year_semester || 'N/A'} | ${member.academic_session || 'N/A'}` },
-        { label: 'Membership Type', value: member.membership_type || 'Other' },
-        { label: 'Status / Dues', value: `${member.account_status || 'Active'} | ${member.no_dues_status === 1 ? 'Clear' : 'Pending'}` },
+        { label: 'Year/Sem & Session', value: `${member.yearSemester || 'N/A'} | ${member.academicSession || 'N/A'}` },
+        { label: 'Membership Type', value: member.membershipType || 'Other' },
+        { label: 'Status / Dues', value: `${member.accountStatus || 'Active'} | ${member.noDuesStatus === 1 ? 'Clear' : 'Pending'}` },
         { label: 'Contact', value: member.phone || 'N/A' },
         { label: 'Email Address', value: member.email || 'N/A', fullWidth: true }
       ],
       type: 'danger',
       confirmText: 'Delete Member',
       onConfirm: () => {
-        this.memberService.deleteMember(member.member_id).subscribe({
+        this.memberService.deleteMember(member.memberId).subscribe({
           next: (r) => { this.toastService.success(r.message); this.loadMembers(this.memberSearch()); },
           error: (e) => this.toastService.error(e.error?.message || 'Failed to delete member')
         });
@@ -239,7 +239,7 @@ export class MemberManagerComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   viewDetails(member: Member) {
-    this.memberService.getMember(member.member_id).subscribe({
+    this.memberService.getMember(member.memberId).subscribe({
       next: (r) => this.selectedMember.set(r.data),
       error: () => this.toastService.error('Failed to load member details')
     });
@@ -248,7 +248,7 @@ export class MemberManagerComponent implements OnInit, OnChanges, OnDestroy {
   downloadCard(member: Member) {
     this.previewMember.set({ 
       ...member, 
-      photo_url: member.photo_url ? `${UPLOADS_BASE}${member.photo_url}` : null 
+      photoUrl: member.photoUrl ? `${UPLOADS_BASE}${member.photoUrl}` : null 
     });
 
     // Wait for the signal to propagate to the hidden card, then trigger download
@@ -326,7 +326,7 @@ export class MemberManagerComponent implements OnInit, OnChanges, OnDestroy {
   onPhotoError() {
     const member = this.selectedMember();
     if (member) {
-      member.photo_url = undefined;
+      member.photoUrl = undefined;
       this.selectedMember.set({ ...member });
     }
   }

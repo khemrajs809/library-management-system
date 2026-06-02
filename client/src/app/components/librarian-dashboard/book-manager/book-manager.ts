@@ -58,15 +58,15 @@ export class BookManagerComponent implements OnInit, OnDestroy {
   @ViewChild('bookLabelElement') bookLabelElement!: ElementRef;
 
   form = this.fb.group({
-    book_id:          [null as string | null],
+    bookId:          [null as string | null],
     isbn:             [null as string | null],
     title:            ['', Validators.required],
     author:           ['', Validators.required],
     stream:           ['', Validators.required],
-    publication_year: ['', Validators.required],
+    publicationYear: ['', Validators.required],
     publisher:        ['', Validators.required],
     edition:          ['', Validators.required],
-    shelf_location:   ['', Validators.required],
+    shelfLocation:   ['', Validators.required],
     price:            [null as any, [Validators.required, Validators.min(0)]],
     quantity:         [null as any, [Validators.required, Validators.min(1)]]
   });
@@ -82,8 +82,8 @@ export class BookManagerComponent implements OnInit, OnDestroy {
 
     this.form.valueChanges.subscribe(val => {
       // If the user has typed anything into any field and it's a new book without an ID yet
-      const hasValue = !!(val.title || val.author || val.stream || val.publication_year || val.publisher || val.edition || val.shelf_location || val.price || val.quantity || val.isbn);
-      if (hasValue && !this.isEditing() && !this.form.get('book_id')?.value) {
+      const hasValue = !!(val.title || val.author || val.stream || val.publicationYear || val.publisher || val.edition || val.shelfLocation || val.price || val.quantity || val.isbn);
+      if (hasValue && !this.isEditing() && !this.form.get('bookId')?.value) {
         this.generateIds();
       }
     });
@@ -104,7 +104,7 @@ export class BookManagerComponent implements OnInit, OnDestroy {
 
   private generateIds() {
     this.bookService.generateUniqueId().subscribe({
-      next: (r: any) => this.form.patchValue({ book_id: r.id }),
+      next: (r: any) => this.form.patchValue({ bookId: r.id }),
       error: () => this.toastService.error('Failed to generate Book ID')
     });
   }
@@ -172,14 +172,14 @@ export class BookManagerComponent implements OnInit, OnDestroy {
   editBook(book: Book) {
     this.isEditing.set(true);
     this.selectedBook.set(book);
-    this.selectedBookId = book.book_id;
+    this.selectedBookId = book.bookId;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   cancelEdit() {
     this.isEditing.set(false); this.selectedBookId = null; this.selectedCover = null;
     this.form.reset(); 
-    this.form.get('book_id')?.enable();
+    this.form.get('bookId')?.enable();
     this.checkAndGenerateIds();
   }
 
@@ -204,13 +204,13 @@ export class BookManagerComponent implements OnInit, OnDestroy {
       title: 'Confirm Deletion',
       subtitle: 'BOOK METADATA',
       message: `Are you sure you want to move this book to trash?`,
-      image: book.cover_url || 'assets/cover-placeholder.png',
+      image: book.coverUrl || 'assets/cover-placeholder.png',
       metadata: [
-        { label: 'Book ID', value: book.book_id, color: '#ef4444' },
+        { label: 'Book ID', value: book.bookId, color: '#ef4444' },
         { label: 'ISBN', value: book.isbn || 'N/A' },
         { label: 'Author', value: book.author || 'N/A' },
         { label: 'Stream', value: book.stream || 'N/A' },
-        { label: 'Pub. Year', value: book.publication_year || 'N/A' },
+        { label: 'Pub. Year', value: book.publicationYear || 'N/A' },
         { label: 'Price', value: book.price ? `₹${book.price}` : 'N/A', color: '#b91c1c' },
         { label: 'Publisher', value: book.publisher || 'N/A', fullWidth: true }
       ],
@@ -218,7 +218,7 @@ export class BookManagerComponent implements OnInit, OnDestroy {
       confirmText: 'Delete Book',
       cancelText: 'Back',
       onConfirm: () => {
-        this.bookService.deleteBook(book.book_id).subscribe({
+        this.bookService.deleteBook(book.bookId).subscribe({
           next: (r) => { 
             this.toastService.success(r.message); 
             this.addActivity(`Deleted book: ${book.title}`, 'success');
@@ -237,7 +237,7 @@ export class BookManagerComponent implements OnInit, OnDestroy {
 
   generateBookId() {
     this.bookService.generateUniqueId().subscribe({
-      next: (r: any) => this.form.patchValue({ book_id: r.id }),
+      next: (r: any) => this.form.patchValue({ bookId: r.id }),
       error: () => this.toastService.error('Failed to generate unique ID')
     });
   }
@@ -297,12 +297,12 @@ export class BookManagerComponent implements OnInit, OnDestroy {
     return canvas.toDataURL('image/png');
   }
 
-  loadBookCopies(book_id: string) {
-    this.bookService.getBookCopies(book_id).subscribe({
+  loadBookCopies(bookId: string) {
+    this.bookService.getBookCopies(bookId).subscribe({
       next: (r) => {
         const copies = (r.data || []).map((c: any) => ({
           ...c,
-          barcodeBase64: this.getBarcodeBase64(c.copy_id)
+          barcodeBase64: this.getBarcodeBase64(c.copyId)
         }));
         this.selectedBookCopies.set(copies);
       },
@@ -311,14 +311,14 @@ export class BookManagerComponent implements OnInit, OnDestroy {
   }
 
   viewCopies(book: Book) {
-    this.selectedBookId = book.book_id;
+    this.selectedBookId = book.bookId;
     this.isViewingCopies.set(true);
-    this.loadBookCopies(book.book_id);
+    this.loadBookCopies(book.bookId);
   }
 
   async printBarcode(book: Book) {
     this.toastService.info(`Generating barcodes for ${book.title}... please wait.`);
-    this.bookService.getBookCopies(book.book_id).subscribe({
+    this.bookService.getBookCopies(book.bookId).subscribe({
       next: (r) => {
         try {
           const copies = r.data;
@@ -332,8 +332,8 @@ export class BookManagerComponent implements OnInit, OnDestroy {
           for (let i = 0; i < copies.length; i++) {
             const copy = copies[i];
             
-            if (!copy.copy_id) {
-              console.warn('Missing copy_id for copy:', copy);
+            if (!copy.copyId) {
+              console.warn('Missing copyId for copy:', copy);
               continue;
             }
 
@@ -344,7 +344,7 @@ export class BookManagerComponent implements OnInit, OnDestroy {
 
             try {
               // 1. Generate Barcode
-              JsBarcode(canvas, copy.copy_id.toString(), { 
+              JsBarcode(canvas, copy.copyId.toString(), { 
                 format: 'CODE128', 
                 width: 2, 
                 height: 40, 
@@ -375,14 +375,14 @@ export class BookManagerComponent implements OnInit, OnDestroy {
               const barcodeData = canvas.toDataURL('image/png');
               pdf.addImage(barcodeData, 'PNG', 5.4, 11, 40, 13);
             } catch (err) {
-              console.error('Error generating barcode for copy:', copy.copy_id, err);
+              console.error('Error generating barcode for copy:', copy.copyId, err);
             } finally {
               // Clean up DOM
               document.body.removeChild(canvas);
             }
           }
           
-          pdf.save(`Barcodes_${book.book_id.replace(/\s+/g, '_')}.pdf`);
+          pdf.save(`Barcodes_${book.bookId.replace(/\s+/g, '_')}.pdf`);
           this.toastService.success('Barcodes downloaded successfully!');
         } catch (err: any) {
           console.error('PDF Generation Error:', err);
@@ -407,17 +407,17 @@ export class BookManagerComponent implements OnInit, OnDestroy {
     this.copyPage.set(1);
     
     // Fetch History
-    this.bookService.getBookHistory(book.book_id).subscribe({
+    this.bookService.getBookHistory(book.bookId).subscribe({
       next: (r) => this.bookHistory.set(r.data),
       error: () => this.toastService.error('Failed to load book history')
     });
 
     // Fetch All Copies
-    this.bookService.getBookCopies(book.book_id).subscribe({
+    this.bookService.getBookCopies(book.bookId).subscribe({
       next: (r) => {
         const copies = (r.data || []).map((c: any) => ({
           ...c,
-          barcodeBase64: this.getBarcodeBase64(c.copy_id)
+          barcodeBase64: this.getBarcodeBase64(c.copyId)
         }));
         this.selectedBookCopies.set(copies);
       },

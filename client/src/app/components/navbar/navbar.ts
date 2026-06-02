@@ -2,13 +2,13 @@ import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../services/auth';
 import { IdleTimeoutService } from '../../services/idle-timeout.service';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { ModalService } from '../../services/modal.service';
 import { RefreshButtonComponent } from '../shared/refresh-button/refresh-button.component';
 
 @Component({
   selector: 'app-navbar',
-  imports: [RouterLink, RouterLinkActive, CommonModule, RefreshButtonComponent],
+  imports: [RouterLink, RouterLinkActive, CommonModule, NgOptimizedImage, RefreshButtonComponent],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })

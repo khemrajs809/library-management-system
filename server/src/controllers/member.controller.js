@@ -1,22 +1,46 @@
 const pool = require('../db');
 const Papa = require('papaparse');
 const { sendEmail } = require('../services/email.service');
+const { generateGenericMessageHTML } = require('../utils/email-templates');
 const { sanitizeObject } = require('../services/sanitizer.service');
 
 // POST /api/members — Register a new member
 const addMember = async (req, res) => {
-    const {
-        name, dob, gender, phone, email,
-        permanent_address, current_address,
-        curr_house, curr_street, curr_area, curr_city, curr_state, curr_pincode,
-        perm_house, perm_street, perm_area, perm_city, perm_state, perm_pincode,
-        course, department, year_semester,
-        membership_type, no_dues_status,
-        roll_number, academic_session, hod_name,
-        guardian_name, guardian_phone, blood_group,
-        membership_expiry, max_book_limit, account_status
-    } = req.body;
-    let { member_id } = req.body;
+const b = req.body;
+    const name = b.name;
+    const dob = b.dob;
+    const gender = b.gender;
+    const phone = b.phone;
+    const email = b.email;
+    const permanent_address = b.permanent_address || b.permanentAddress;
+    const current_address = b.current_address || b.currentAddress;
+    const curr_house = b.curr_house || b.currHouse;
+    const curr_street = b.curr_street || b.currStreet;
+    const curr_area = b.curr_area || b.currArea;
+    const curr_city = b.curr_city || b.currCity;
+    const curr_state = b.curr_state || b.currState;
+    const curr_pincode = b.curr_pincode || b.currPincode;
+    const perm_house = b.perm_house || b.permHouse;
+    const perm_street = b.perm_street || b.permStreet;
+    const perm_area = b.perm_area || b.permArea;
+    const perm_city = b.perm_city || b.permCity;
+    const perm_state = b.perm_state || b.permState;
+    const perm_pincode = b.perm_pincode || b.permPincode;
+    const course = b.course;
+    const department = b.department;
+    const year_semester = b.year_semester || b.yearSemester;
+    const membership_type = b.membership_type || b.membershipType;
+    const no_dues_status = b.no_dues_status || b.noDuesStatus;
+    const roll_number = b.roll_number || b.rollNumber;
+    const academic_session = b.academic_session || b.academicSession;
+    const hod_name = b.hod_name || b.hodName;
+    const guardian_name = b.guardian_name || b.guardianName;
+    const guardian_phone = b.guardian_phone || b.guardianPhone;
+    const blood_group = b.blood_group || b.bloodGroup;
+    const membership_expiry = b.membership_expiry || b.membershipExpiry;
+    const max_book_limit = b.max_book_limit || b.maxBookLimit;
+    const account_status = b.account_status || b.accountStatus;
+    let member_id = b.member_id || b.memberId;
     if (!member_id) {
         member_id = 'MEM-' + Math.floor(1000 + Math.random() * 9000);
     }
@@ -166,17 +190,40 @@ const getMemberProfile = async (req, res) => {
 
 // PUT /api/members/:id — Update member details and optional photo
 const updateMember = async (req, res) => {
-    const {
-        name, dob, gender, phone, email,
-        permanent_address, current_address,
-        curr_house, curr_street, curr_area, curr_city, curr_state, curr_pincode,
-        perm_house, perm_street, perm_area, perm_city, perm_state, perm_pincode,
-        course, department, year_semester,
-        membership_type, no_dues_status,
-        roll_number, academic_session, hod_name,
-        guardian_name, guardian_phone, blood_group,
-        membership_expiry, max_book_limit, account_status
-    } = req.body;
+const b = req.body;
+    const name = b.name;
+    const dob = b.dob;
+    const gender = b.gender;
+    const phone = b.phone;
+    const email = b.email;
+    const permanent_address = b.permanent_address || b.permanentAddress;
+    const current_address = b.current_address || b.currentAddress;
+    const curr_house = b.curr_house || b.currHouse;
+    const curr_street = b.curr_street || b.currStreet;
+    const curr_area = b.curr_area || b.currArea;
+    const curr_city = b.curr_city || b.currCity;
+    const curr_state = b.curr_state || b.currState;
+    const curr_pincode = b.curr_pincode || b.currPincode;
+    const perm_house = b.perm_house || b.permHouse;
+    const perm_street = b.perm_street || b.permStreet;
+    const perm_area = b.perm_area || b.permArea;
+    const perm_city = b.perm_city || b.permCity;
+    const perm_state = b.perm_state || b.permState;
+    const perm_pincode = b.perm_pincode || b.permPincode;
+    const course = b.course;
+    const department = b.department;
+    const year_semester = b.year_semester || b.yearSemester;
+    const membership_type = b.membership_type || b.membershipType;
+    const no_dues_status = b.no_dues_status || b.noDuesStatus;
+    const roll_number = b.roll_number || b.rollNumber;
+    const academic_session = b.academic_session || b.academicSession;
+    const hod_name = b.hod_name || b.hodName;
+    const guardian_name = b.guardian_name || b.guardianName;
+    const guardian_phone = b.guardian_phone || b.guardianPhone;
+    const blood_group = b.blood_group || b.bloodGroup;
+    const membership_expiry = b.membership_expiry || b.membershipExpiry;
+    const max_book_limit = b.max_book_limit || b.maxBookLimit;
+    const account_status = b.account_status || b.accountStatus;
     const { id } = req.params;
 
     if (!name || !dob) {
@@ -381,11 +428,14 @@ const sendMemberEmail = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Email address not found in active member records' });
         }
 
-        const result = await sendEmail(to, subject, message);
+        const memberName = memberCheck[0].name || memberCheck[0].first_name || '';
+        const html = generateGenericMessageHTML(memberName, subject, message);
+        const result = await sendEmail(to, subject, message, html);
+        
         if (result) {
-            res.status(200).json({ success: true, message: 'Email sent successfully' });
+            res.status(200).json({ success: true, message: 'Email queued successfully' });
         } else {
-            res.status(500).json({ success: false, message: 'Failed to send email' });
+            res.status(500).json({ success: false, message: 'Failed to queue email' });
         }
     } catch (err) {
         console.error(err);

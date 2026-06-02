@@ -1,10 +1,14 @@
 const pool = require('../db');
 const Papa = require('papaparse');
 const bookService = require('../services/book.service');
+const { invalidateCache } = require('../utils/cache.util');
 
 // POST /api/books — Add a book and automatically generate unique copy IDs
 const addBook = async (req, res) => {
-    let { book_id, isbn, title, price, author, stream, publication_year, publisher, edition, shelf_location } = req.body;
+    let { book_id, bookId, isbn, title, price, author, stream, publication_year, publicationYear, publisher, edition, shelf_location, shelfLocation } = req.body;
+    book_id = book_id || bookId;
+    publication_year = publication_year || publicationYear;
+    shelf_location = shelf_location || shelfLocation;
     const qty = parseInt(req.body.quantity) || 1;
     const book_price = parseFloat(price) || 0;
     const pub_year = parseInt(publication_year) || null;
@@ -30,6 +34,7 @@ const addBook = async (req, res) => {
 
     try {
         await bookService.createBook({ book_id, isbn, title, price: book_price, author, stream, publication_year: pub_year, quantity: qty, publisher, edition, shelf_location }, cover_url);
+        await invalidateCache('cache:/api/books*');
         res.status(201).json({ success: true, message: `Book added successfully with ${qty} unique barcodes.` });
     } catch (err) {
         if (err.code === 'ER_DUP_ENTRY') {
@@ -73,6 +78,7 @@ const updateBook = async (req, res) => {
         
         if (!result) return res.status(404).json({ success: false, message: 'Book not found' });
 
+        await invalidateCache('cache:/api/books*');
         res.status(200).json({ success: true, message: 'Book and copies updated successfully' });
     } catch (err) {
         console.error(err);
@@ -84,6 +90,7 @@ const updateBook = async (req, res) => {
 const deleteBook = async (req, res) => {
     try {
         await bookService.deleteBook(req.params.id);
+        await invalidateCache('cache:/api/books*');
         res.status(200).json({ success: true, message: 'Book moved to trash' });
     } catch (err) {
         if (err.message.includes('Cannot delete')) {
@@ -121,6 +128,7 @@ const importBooks = async (req, res) => {
             results.failed.push({ id: book_id, reason: err.message });
         }
     }
+    await invalidateCache('cache:/api/books*');
     res.status(200).json({ success: true, message: `Imported ${results.added} books`, results });
 };
 
@@ -164,6 +172,7 @@ const getDeletedBooks = async (req, res) => {
 const restoreBook = async (req, res) => {
     try {
         await bookService.restoreBook(req.params.id);
+        await invalidateCache('cache:/api/books*');
         res.status(200).json({ success: true, message: 'Book restored successfully' });
     } catch (err) {
         console.error(err);
@@ -174,6 +183,7 @@ const restoreBook = async (req, res) => {
 const permanentDeleteBook = async (req, res) => {
     try {
         await bookService.permanentDeleteBook(req.params.id);
+        await invalidateCache('cache:/api/books*');
         res.status(200).json({ success: true, message: 'Book permanently deleted' });
     } catch (err) {
         console.error(err);

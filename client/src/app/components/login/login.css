@@ -127,6 +127,12 @@
     outline: none;
 }
 
+/* Hide native Edge password reveal button to prevent double eyes */
+.input-wrapper input[type="password"]::-ms-reveal,
+.input-wrapper input[type="password"]::-ms-clear {
+    display: none;
+}
+
 .toggle-btn {
     position: absolute;
     right: 12px;
@@ -379,7 +385,7 @@
 
 .resend-countdown {
     font-size: 0.9rem;
-    color: #ffb703; /* High-contrast amber for the timer */
+    color: #b45309; /* Darker amber for WCAG contrast compliance */
     font-weight: 700;
     letter-spacing: 0.5px;
 }

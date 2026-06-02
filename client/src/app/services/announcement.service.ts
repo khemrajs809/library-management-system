@@ -33,7 +33,7 @@ export class AnnouncementService {
   }
 
   toggleStatus(id: number, isActive: boolean): Observable<any> {
-    return this.http.patch(`${this.adminUrl}/${id}/status`, { is_active: isActive });
+    return this.http.patch(`${this.adminUrl}/${id}/status`, { isActive: isActive });
   }
 
   deleteAnnouncement(id: number): Observable<any> {

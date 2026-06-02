@@ -23,10 +23,10 @@
         @if (books.length === 0) {
         <div class="empty-state ds-style-4523fa21">No books found. Add books using the form or import a CSV.</div>
         } @else {
-        @for (book of books; track book.book_id) {
+        @for (book of books; track book.bookId) {
         <div class="book-card">
-          @if (book.cover_url) {
-          <img [src]="book.cover_url" alt="Book Cover" class="gallery-cover ds-style-4f7b02be" crossorigin="anonymous" (click)="onViewDetails.emit(book)">
+          @if (book.coverUrl) {
+          <img [src]="book.coverUrl" alt="Book Cover" class="gallery-cover ds-style-4f7b02be" crossorigin="anonymous" (click)="onViewDetails.emit(book)">
           } @else {
           <img src="/assets/cover-placeholder.png" alt="No Cover" class="gallery-cover ds-style-346e4bf" (click)="onViewDetails.emit(book)">
           }
@@ -34,20 +34,20 @@
           <p class="author">{{ book.author || 'Unknown Author' }}</p>
           <div class="book-meta ds-style-198ffc35">
             @if (book.stream) { <span class="badge stream-badge">{{ book.stream }}</span> }
-            @if (book.publication_year) { <span class="badge year-badge">{{ book.publication_year }}</span> }
+            @if (book.publicationYear) { <span class="badge year-badge">{{ book.publicationYear }}</span> }
             @if (book.edition) { <span class="badge ds-style-169981d2">{{ book.edition }}</span> }
           </div>
           @if (book.publisher) {
           <p class="ds-style-66365d53">Publisher: {{ book.publisher }}</p>
           }
-          @if (book.shelf_location) {
-          <p class="ds-style-359efd4c">Shelf: {{ book.shelf_location }}</p>
+          @if (book.shelfLocation) {
+          <p class="ds-style-359efd4c">Shelf: {{ book.shelfLocation }}</p>
           }
 
           <div class="book-status ds-style-3ec755b2">
-            <span class="ds-style-3851cc97">ID: {{ book.book_id }}</span>
-            <span [class.text-success]="book.available_copies > 0" [class.text-danger]="book.available_copies <= 0" class="ds-style-552e3a43">
-              {{ book.available_copies }} / {{ book.total_copies }}
+            <span class="ds-style-3851cc97">ID: {{ book.bookId }}</span>
+            <span [class.text-success]="book.availableCopies > 0" [class.text-danger]="book.availableCopies <= 0" class="ds-style-552e3a43">
+              {{ book.availableCopies }} / {{ book.totalCopies }}
             </span>
           </div>
           <div class="book-actions ds-style-5a295f6a">
@@ -80,16 +80,16 @@
             <td colspan="6" class="empty-state ds-style-35150210">No books found.</td>
           </tr>
           } @else {
-          @for (book of books; track book.book_id; let odd = $odd) {
+          @for (book of books; track book.bookId; let odd = $odd) {
             <tr class="expandable-row ds-style-50f7c686">
             <td class="ds-style-ce6317">
               <div (click)="onViewDetails.emit(book)" class="ds-style-5c2c8820">
-                @if (book.cover_url) {
-                <img [src]="book.cover_url" class="hover-zoom-img ds-style-497a11d0" crossorigin="anonymous">
+                @if (book.coverUrl) {
+                <img [src]="book.coverUrl" class="hover-zoom-img ds-style-497a11d0" crossorigin="anonymous">
                 } @else {
                 <div class="ds-style-559103de">NO COVER</div>
                 }
-                <span class="id-badge ds-style-5e83fc93">BK-{{ book.book_id.toString().split('-').pop() }}</span>
+                <span class="id-badge ds-style-5e83fc93">BK-{{ book.bookId.toString().split('-').pop() }}</span>
               </div>
             </td>
             <td (click)="onViewDetails.emit(book)" class="ds-style-2022e629">
@@ -104,28 +104,28 @@
                 <span class="badge ds-style-1d469a35">{{ book.stream || 'N/A' }}</span>
                 @if (book.publisher) { <span class="ds-style-2937b434">Pub: {{ book.publisher }}</span> }
                 @if (book.edition) { <span class="ds-style-117e3bb5">Ed: {{ book.edition }}</span> }
-                @if (book.shelf_location) { <span class="ds-style-3dc76201">Loc: {{ book.shelf_location }}</span> }
+                @if (book.shelfLocation) { <span class="ds-style-3dc76201">Loc: {{ book.shelfLocation }}</span> }
                 <div class="ds-style-2cc33f10">{{ book.price || 0 }}</div>
               </div>
             </td>
             <td class="ds-style-3b0e85b5">
               <div class="ds-style-6984da57">
                 <span class="ds-style-26a649c7">
-                  {{ book.available_copies }} / {{ book.total_copies }}
+                  {{ book.availableCopies }} / {{ book.totalCopies }}
                 </span>
                 <span class="ds-style-7f1f8bb4" [ngClass]="{
-                  'status-available': book.available_copies > 5,
-                  'status-low': book.available_copies > 0 && book.available_copies <= 5,
-                  'status-out': book.available_copies === 0
+                  'status-available': book.availableCopies > 5,
+                  'status-low': book.availableCopies > 0 && book.availableCopies <= 5,
+                  'status-out': book.availableCopies === 0
                 }">
-                  {{ book.available_copies === 0 ? 'Out of Stock' : (book.available_copies <= 5 ? 'Low Stock' : 'Available') }}
+                  {{ book.availableCopies === 0 ? 'Out of Stock' : (book.availableCopies <= 5 ? 'Low Stock' : 'Available') }}
                 </span>
               </div>
             </td>
             <td (click)="onViewCopies.emit(book)" class="ds-style-2022e629">
               <div class="ds-v-stack">
-                <div class="ds-style-5de3b6be">{{ book.created_at ? (book.created_at | date:'dd/MM/yyyy') : '-' }}</div>
-                <div class="ds-style-280ad8a9">{{ book.created_at ? (book.created_at | date:'shortTime') : '-' }}</div>
+                <div class="ds-style-5de3b6be">{{ book.createdAt ? (book.createdAt | date:'dd/MM/yyyy') : '-' }}</div>
+                <div class="ds-style-280ad8a9">{{ book.createdAt ? (book.createdAt | date:'shortTime') : '-' }}</div>
               </div>
             </td>
             <td class="ds-style-1e433929">

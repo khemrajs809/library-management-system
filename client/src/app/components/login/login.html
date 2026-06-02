@@ -15,7 +15,7 @@
         <!-- Center Login Form -->
         <div class="login-card">
             <div class="login-header">
-                <img src="/logolms.png" alt="Library Logo" class="login-logo">
+                <img src="/logolms.webp" alt="Library Logo" class="login-logo" fetchpriority="high" width="800" height="436">
                 @if (!isMfaRequired()) {
                     <h2>Login</h2>
                     <p>Enter your credentials to access your dashboard</p>
@@ -54,7 +54,7 @@
                     </div>
 
                     <div class="form-group captcha-group">
-                        <label>Verification</label>
+                        <label for="captchaText">Verification</label>
                         <div class="captcha-row">
                             <div class="captcha-container">
                                 @if (captchaSvg()) {

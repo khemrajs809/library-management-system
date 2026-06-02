@@ -478,10 +478,11 @@
     100% { transform: rotate(360deg); }
 }
 
-
-
-
-
-
-
-
+/* Utilities for extraction */
+.text-center { text-align: center; }
+.meta-isbn { font-size: 0.65rem; opacity: 0.8; }
+.meta-value { font-size: 0.6rem; }
+.text-crimson { color: #b91c1c; }
+.meta-email { font-size: 0.65rem; text-transform: lowercase; }
+.meta-shelf { color: #145277; font-weight: 700; }
+.status-cleared { color: #14532d; font-weight: 900; font-size: 0.7rem; letter-spacing: 0.05em; }

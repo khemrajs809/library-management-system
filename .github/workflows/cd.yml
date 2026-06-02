@@ -1,0 +1,63 @@
+name: LMS CD Pipeline (Production)
+
+# Trigger this workflow ONLY when code is merged into the main branch
+on:
+  push:
+    branches:
+      - main
+
+# We use GitHub Secrets to store production passwords safely without hardcoding them
+env:
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  PROD_SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
+  PROD_SSH_KEY: ${{ secrets.PROD_SSH_KEY }}
+  PROD_SSH_USER: ${{ secrets.PROD_SSH_USER }}
+
+jobs:
+  build-and-push:
+    name: 📦 Build and Push to Registry
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ env.DOCKER_PASSWORD }}
+
+      - name: Build & Push Backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./server
+          push: true
+          tags: ${{ env.DOCKER_USERNAME }}/lms-backend:latest
+
+      - name: Build & Push Frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./client
+          push: true
+          tags: ${{ env.DOCKER_USERNAME }}/lms-frontend:latest
+
+  deploy-to-production:
+    name: 🚀 Deploy to Production Server
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Execute Remote SSH Commands
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.PROD_SSH_HOST }}
+          username: ${{ env.PROD_SSH_USER }}
+          key: ${{ env.PROD_SSH_KEY }}
+          script: |
+            cd /opt/lms
+            # Pull the newest images securely
+            docker-compose pull
+            # Restart only the containers that have changed (Zero Downtime logic)
+            docker-compose up -d --no-deps lms-backend lms-frontend
+            # Clean up old floating images to save disk space
+            docker image prune -f

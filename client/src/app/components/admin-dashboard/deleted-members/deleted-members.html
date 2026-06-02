@@ -38,34 +38,34 @@
               </td>
             </tr>
           } @else {
-            @for (member of deletedMembers(); track member.member_id) {
+            @for (member of deletedMembers(); track member.memberId) {
               <tr>
                 <td>
                   <div class="member-cell">
-                    @if (member.photo_url) {
-                      <img [src]="uploadsBase + member.photo_url" class="member-photo">
+                    @if (member.photoUrl) {
+                      <img [src]="uploadsBase + member.photoUrl" class="member-photo">
                     } @else {
                       <div class="photo-placeholder">👤</div>
                     }
                     <div>
                       <strong class="member-name">{{ member.name }}</strong>
-                      <span class="id-badge">{{ member.member_id }}</span>
+                      <span class="id-badge">{{ member.memberId }}</span>
                     </div>
                   </div>
                 </td>
                 <td>{{ member.phone || '—' }}</td>
                 <td class="email-text">{{ member.email || '—' }}</td>
-                <td>{{ member.created_at | date:'dd/MM/yyyy' }}</td>
+                <td>{{ member.createdAt | date:'dd/MM/yyyy' }}</td>
                 <td class="date-cell">
-                  <div class="del-date">{{ member.deleted_at | date:'dd MMM yyyy' }}</div>
-                  <div class="del-time text-muted small">{{ member.deleted_at | date:'hh:mm a' }}</div>
+                  <div class="del-date">{{ member.deletedAt | date:'dd MMM yyyy' }}</div>
+                  <div class="del-time text-muted small">{{ member.deletedAt | date:'hh:mm a' }}</div>
                 </td>
                 <td class="text-right">
                   <div class="action-buttons">
-                    <button class="btn btn-restore" (click)="restoreMember(member.member_id)">
+                    <button class="btn btn-restore" (click)="restoreMember(member.memberId)">
                       ♻️ Restore
                     </button>
-                    <button class="btn btn-perm-delete" (click)="permanentDeleteMember(member.member_id)">
+                    <button class="btn btn-perm-delete" (click)="permanentDeleteMember(member.memberId)">
                       🗑️ Delete
                     </button>
                   </div>

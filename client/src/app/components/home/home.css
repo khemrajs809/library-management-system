@@ -120,11 +120,11 @@
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    background: #ef4444;
+    background: var(--primary-red, #b91c1c); /* Fixed contrast */
     color: white;
     font-weight: 600;
     font-size: 0.95rem;
-    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.25);
+    box-shadow: 0 6px 20px rgba(185, 28, 28, 0.25);
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     border: none;
     cursor: pointer;
@@ -133,8 +133,8 @@
 
 .animated-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(239, 68, 68, 0.35);
-    background: #dc2626;
+    box-shadow: 0 10px 25px rgba(185, 28, 28, 0.35);
+    background: #991b1b;
 }
 
 .btn-text-slider {
@@ -176,8 +176,8 @@
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    border: 1.5px solid #ef4444;
-    color: #ef4444;
+    border: 1.5px solid var(--primary-red, #b91c1c);
+    color: var(--primary-red, #b91c1c);
     background: transparent;
     font-weight: 600;
     font-size: 0.95rem;
@@ -187,7 +187,7 @@
 }
 
 .btn-outline:hover {
-    background-color: rgba(239, 68, 68, 0.05);
+    background-color: rgba(185, 28, 28, 0.05);
     transform: translateY(-2px);
 }
 

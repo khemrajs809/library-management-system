@@ -1,4 +1,5 @@
 const pool = require('../db');
+const { invalidateCache } = require('../utils/cache.util');
 
 // GET /api/announcements/active - Public: Fetch current active announcements
 const getActiveAnnouncements = async (req, res) => {
@@ -42,6 +43,7 @@ const createAnnouncement = async (req, res) => {
         ];
 
         await pool.query('CALL proc_create_announcement(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', params);
+        await invalidateCache('cache:/api/announcements*');
         res.status(201).json({ success: true, message: 'Announcement created successfully' });
     } catch (err) {
         console.error("Announcement Creation Error:", err);
@@ -70,6 +72,7 @@ const toggleStatus = async (req, res) => {
     const { is_active } = req.body;
     try {
         await pool.query('CALL proc_toggle_announcement_status(?, ?)', [id, is_active ? 1 : 0]);
+        await invalidateCache('cache:/api/announcements*');
         res.status(200).json({ success: true, message: 'Status updated successfully' });
     } catch (err) {
         console.error(err);
@@ -82,6 +85,7 @@ const deleteAnnouncement = async (req, res) => {
     const { id } = req.params;
     try {
         await pool.query('CALL proc_delete_announcement(?)', [id]);
+        await invalidateCache('cache:/api/announcements*');
         res.status(200).json({ success: true, message: 'Announcement deleted' });
     } catch (err) {
         console.error(err);

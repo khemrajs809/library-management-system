@@ -130,7 +130,8 @@ CREATE PROCEDURE proc_get_borrow_rate_by_stream()
 BEGIN
     SELECT COALESCE(b.stream, 'General') as stream, COUNT(i.issue_id) as count 
     FROM issues i 
-    JOIN books b ON i.book_id = b.book_id 
+    JOIN book_copies bc ON i.book_id = bc.copy_id 
+    JOIN books b ON bc.book_id = b.book_id 
     GROUP BY b.stream 
     ORDER BY count DESC 
     LIMIT 9;
@@ -154,7 +155,8 @@ CREATE PROCEDURE proc_get_popular_books()
 BEGIN
     SELECT b.title, b.author, COUNT(i.issue_id) as borrow_count 
     FROM issues i 
-    JOIN books b ON i.book_id = b.book_id 
+    JOIN book_copies bc ON i.book_id = bc.copy_id 
+    JOIN books b ON bc.book_id = b.book_id 
     GROUP BY b.book_id, b.title, b.author 
     ORDER BY borrow_count DESC 
     LIMIT 5;
@@ -244,7 +246,8 @@ CREATE PROCEDURE proc_get_popular_books_with_cover()
 BEGIN
     SELECT b.title, b.author, COUNT(i.issue_id) as count, b.cover_url
     FROM issues i 
-    JOIN books b ON i.book_id = b.book_id 
+    JOIN book_copies bc ON i.book_id = bc.copy_id 
+    JOIN books b ON bc.book_id = b.book_id 
     GROUP BY b.book_id, b.title, b.author, b.cover_url 
     ORDER BY count DESC 
     LIMIT 5;
@@ -257,7 +260,8 @@ CREATE PROCEDURE proc_get_recent_activities()
 BEGIN
     SELECT 'issue' as type, b.title, m.name as user_name, i.issue_date as date 
     FROM issues i 
-    JOIN books b ON i.book_id = b.book_id 
+    JOIN book_copies bc ON i.book_id = bc.copy_id 
+    JOIN books b ON bc.book_id = b.book_id 
     JOIN members m ON i.member_id = m.member_id 
     ORDER BY i.issue_date DESC 
     LIMIT 5;
@@ -271,7 +275,8 @@ BEGIN
     SELECT m.name as member_name, m.member_id, b.title as book_title, i.issue_date, i.due_date,
            DATEDIFF(CURDATE(), i.due_date) as overdue_days, i.fine_amount
     FROM issues i 
-    JOIN books b ON i.book_id = b.book_id 
+    JOIN book_copies bc ON i.book_id = bc.copy_id 
+    JOIN books b ON bc.book_id = b.book_id 
     JOIN members m ON i.member_id = m.member_id 
     WHERE i.status = 'issued' AND i.due_date < CURDATE()
     ORDER BY overdue_days DESC 

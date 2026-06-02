@@ -1,5 +1,9 @@
 const { Server } = require('socket.io');
-const jwt = require('jsonwebtoken');
+const { jwtDecrypt } = require('jose');
+const crypto = require('crypto');
+
+// Derive the exact same 32-byte secret used in auth.controller
+const encryptionSecret = crypto.createHash('sha256').update(process.env.JWT_SECRET).digest();
 
 const setupSocket = (server, app) => {
     const io = new Server(server, {
@@ -10,12 +14,12 @@ const setupSocket = (server, app) => {
     app.set('io', io);
 
     // --- Socket.io Authentication Middleware ---
-    io.use((socket, next) => {
+    io.use(async (socket, next) => {
         const token = socket.handshake.auth.token;
         if (!token) return next(new Error('Authentication error: No token provided'));
 
         try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            const { payload: decoded } = await jwtDecrypt(token, encryptionSecret);
             socket.user = decoded;
             next();
         } catch (err) {

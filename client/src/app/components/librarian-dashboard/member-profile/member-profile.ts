@@ -31,12 +31,13 @@ export class MemberProfileComponent implements OnChanges {
   }
 
   renderProfileBarcode() {
+    if (typeof document === 'undefined') return;
     const svg = document.getElementById('profileBarcodeSvg');
     const pdfSvg = document.getElementById('pdfBarcodeSvg');
     if (this.viewingMember) {
       const opts = { format: 'CODE128', width: 1.5, height: 40, displayValue: false, margin: 0 };
-      if (svg) JsBarcode(svg, this.viewingMember.member.member_id, opts);
-      if (pdfSvg) JsBarcode(pdfSvg, this.viewingMember.member.member_id, { ...opts, height: 50, width: 2 });
+      if (svg) JsBarcode(svg, this.viewingMember.member.memberId, opts);
+      if (pdfSvg) JsBarcode(pdfSvg, this.viewingMember.member.memberId, { ...opts, height: 50, width: 2 });
     }
   }
 
@@ -61,7 +62,7 @@ export class MemberProfileComponent implements OnChanges {
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
       
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`Member_Profile_${this.viewingMember?.member.member_id}.pdf`);
+      pdf.save(`Member_Profile_${this.viewingMember?.member.memberId}.pdf`);
       
       this.toastService.success('Profile downloaded successfully');
     } catch (error) {

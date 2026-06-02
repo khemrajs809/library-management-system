@@ -1,13 +1,13 @@
 const { body, validationResult } = require('express-validator');
 
-// Generic validation result checker middleware
 const validateResult = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        // Return 400 Bad Request if validation fails
+        const errorMessages = errors.array().map(e => e.msg).join(', ');
+        // Return 400 Bad Request with full error string
         return res.status(400).json({ 
             success: false, 
-            message: 'Validation failed', 
+            message: `Validation failed: ${errorMessages}`, 
             errors: errors.array() 
         });
     }
@@ -29,10 +29,13 @@ const loginValidation = [
 
 // Validation chain for creating a Librarian
 const createLibrarianValidation = [
-    body('lib_id')
-        .trim()
-        .notEmpty().withMessage('Librarian ID is required')
-        .matches(/^[a-zA-Z0-9]{8}$/).withMessage('Librarian ID must be exactly 8 alphanumeric characters'),
+    body(['lib_id', 'libId'])
+        .custom((value, { req }) => {
+            const id = req.body.lib_id || req.body.libId;
+            if (!id) throw new Error('Librarian ID is required');
+            if (!/^[a-zA-Z0-9]{8}$/.test(id)) throw new Error('Librarian ID must be exactly 8 alphanumeric characters');
+            return true;
+        }),
     body('name')
         .trim()
         .notEmpty().withMessage('Name is required')
@@ -51,9 +54,13 @@ const createLibrarianValidation = [
 
 // Validation chain for creating/updating a Book
 const bookValidation = [
-    body('book_id')
-        .trim()
-        .notEmpty().withMessage('Book ID is required'),
+    body(['book_id', 'bookId'])
+        .custom((value, { req }) => {
+            if (!req.body.book_id && !req.body.bookId && !req.params.id) {
+                throw new Error('Book ID is required');
+            }
+            return true;
+        }),
     body('title')
         .trim()
         .notEmpty().withMessage('Title is required')
@@ -73,9 +80,13 @@ const bookValidation = [
 
 // Validation chain for creating/updating a Member
 const memberValidation = [
-    body('member_id')
-        .trim()
-        .notEmpty().withMessage('Member ID is required'),
+    body(['member_id', 'memberId'])
+        .custom((value, { req }) => {
+            if (!req.body.member_id && !req.body.memberId && !req.params.id) {
+                throw new Error('Member ID is required');
+            }
+            return true;
+        }),
     body('name')
         .trim()
         .notEmpty().withMessage('Name is required')

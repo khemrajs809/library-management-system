@@ -1,7 +1,8 @@
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const { EncryptJWT, jwtDecrypt } = require('jose');
 const pool = require('../db');
 const { sendEmail } = require('../services/email.service');
+const { generateOTPHTML } = require('../utils/email-templates');
 const crypto = require('crypto');
 const { logSession } = require('../services/session.service');
 
@@ -11,8 +12,14 @@ if (!JWT_SECRET) {
     process.exit(1);
 }
 
+// Derive a guaranteed 32-byte secret for AES-GCM encryption
+const encryptionSecret = crypto.createHash('sha256').update(JWT_SECRET).digest();
+
 const login = async (req, res) => {
-    const { email, password, captchaId, captchaText } = req.body;
+    const email = req.body.email;
+    const password = req.body.password;
+    const captchaId = req.body.captchaId || req.body.captcha_id;
+    const captchaText = req.body.captchaText || req.body.captcha_text;
 
     try {
         console.log(`[AUTH] Attempting login for: ${email}`);
@@ -97,11 +104,11 @@ const login = async (req, res) => {
                     return res.status(500).json({ success: false, message: 'Security system error. Please contact admin.' });
                 }
 
-                const emailSent = await sendEmail(
-                    user.email,
-                    'Your LMS Security Code',
-                    `Your one-time security code is: ${otp}. It will expire in 10 minutes.`
-                );
+                const subject = 'Your LMS Security Code';
+                const text = `Your one-time security code is: ${otp}. It will expire in 10 minutes.`;
+                const html = generateOTPHTML(user.name || user.email, otp, 'login');
+
+                const emailSent = await sendEmail(user.email, subject, text, html);
 
                 if (!emailSent) {
                     return res.status(500).json({ success: false, message: 'Failed to send security code' });
@@ -172,7 +179,15 @@ const logout = async (req, res) => {
     }
 
     try {
-        const decoded = jwt.decode(token);
+        let decoded;
+        try {
+            const { payload } = await jwtDecrypt(token, encryptionSecret);
+            decoded = payload;
+        } catch (e) {
+            // Invalid token
+            decoded = null;
+        }
+
         if (decoded && decoded.exp) {
             const expiresAt = new Date(decoded.exp * 1000).toISOString().slice(0, 19).replace('T', ' ');
 
@@ -229,19 +244,19 @@ const verifyOTP = async (req, res) => {
         // OTP is valid, delete all OTPs for this user
         await pool.query('CALL proc_delete_user_otps(?)', [user.id]);
 
-        // --- Generate Final JWT ---
-        const token = jwt.sign(
-            {
-                jti: crypto.randomUUID(),
-                id: user.id,
-                email: user.email,
-                role: user.role
-            },
-            JWT_SECRET,
-            { expiresIn: '3h' }
-        );
+        // --- Generate Final Encrypted JWT (JWE) ---
+        const token = await new EncryptJWT({
+            id: user.id,
+            email: user.email,
+            role: user.role
+        })
+        .setProtectedHeader({ alg: 'dir', enc: 'A256GCM' })
+        .setIssuedAt()
+        .setJti(crypto.randomUUID())
+        .setExpirationTime('3h')
+        .encrypt(encryptionSecret);
 
-        const decoded = jwt.decode(token);
+        const { payload: decoded } = await jwtDecrypt(token, encryptionSecret);
         const expiresAt = new Date(decoded.exp * 1000).toISOString().slice(0, 19).replace('T', ' ');
         const ipAddress = req.ip || req.connection?.remoteAddress || '';
         const userAgent = req.headers['user-agent'] || '';
@@ -309,11 +324,11 @@ const resendOTP = async (req, res) => {
 
         console.log(`[AUTH] New OTP generated for resend: ${user.email}`);
 
-        const emailSent = await sendEmail(
-            user.email,
-            'Your NEW LMS Security Code',
-            `Your new security code is: ${otp}. It will expire in 10 minutes. Previous codes are now invalid.`
-        );
+        const subject = 'Your NEW LMS Security Code';
+        const text = `Your new security code is: ${otp}. It will expire in 10 minutes. Previous codes are now invalid.`;
+        const html = generateOTPHTML(user.name || user.email, otp, 'mfa');
+
+        const emailSent = await sendEmail(user.email, subject, text, html);
 
         if (!emailSent) {
             return res.status(500).json({ success: false, message: 'Failed to resend security code' });
@@ -351,11 +366,11 @@ const forgotPassword = async (req, res) => {
 
         console.log(`[AUTH] Forgot Password OTP sent to: ${user.email}`);
 
-        const emailSent = await sendEmail(
-            user.email,
-            'Reset Your LMS Password',
-            `You requested a password reset. Your security code is: ${otp}. This code expires in 10 minutes. If you did not request this, please ignore this email.`
-        );
+        const subject = 'LMS Password Reset Request';
+        const text = `You requested a password reset. Your security code is: ${otp}. This code expires in 10 minutes. If you did not request this, please ignore this email.`;
+        const html = generateOTPHTML(user.name || user.email, otp, 'password-reset');
+
+        const emailSent = await sendEmail(user.email, subject, text, html);
 
         if (!emailSent) {
             return res.status(500).json({ success: false, message: 'Failed to send reset code' });
@@ -370,7 +385,9 @@ const forgotPassword = async (req, res) => {
 };
 
 const resetPassword = async (req, res) => {
-    const { email, otp, newPassword } = req.body;
+    const email = req.body.email;
+    const otp = req.body.otp;
+    const newPassword = req.body.newPassword || req.body.new_password;
 
     try {
         if (!email || !otp || !newPassword) {

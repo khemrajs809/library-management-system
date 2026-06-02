@@ -26,23 +26,23 @@ export class BookFormComponent implements OnInit, OnChanges {
   selectedCover: File | null = null;
 
   form = this.fb.group({
-    book_id:          [null as string | null],
+    bookId:          [null as string | null],
     isbn:             [null as string | null],
     title:            ['', Validators.required],
     author:           ['', Validators.required],
     stream:           ['', Validators.required],
-    publication_year: ['', Validators.required],
+    publicationYear: ['', Validators.required],
     publisher:        ['', Validators.required],
     edition:          ['', Validators.required],
-    shelf_location:   ['', Validators.required],
+    shelfLocation:   ['', Validators.required],
     price:            [null as any, [Validators.required, Validators.min(0)]],
     quantity:         [null as any, [Validators.required, Validators.min(1)]]
   });
 
   ngOnInit() {
     this.form.valueChanges.subscribe(val => {
-      const hasValue = !!(val.title || val.author || val.stream || val.publication_year || val.publisher || val.edition || val.shelf_location || val.price || val.quantity || val.isbn);
-      if (hasValue && !this.isEditing && !this.form.get('book_id')?.value) {
+      const hasValue = !!(val.title || val.author || val.stream || val.publicationYear || val.publisher || val.edition || val.shelfLocation || val.price || val.quantity || val.isbn);
+      if (hasValue && !this.isEditing && !this.form.get('bookId')?.value) {
         this.generateIds();
       }
     });
@@ -56,26 +56,26 @@ export class BookFormComponent implements OnInit, OnChanges {
 
   private generateIds() {
     this.bookService.generateUniqueId().subscribe({
-      next: (r: any) => this.form.patchValue({ book_id: r.id }),
+      next: (r: any) => this.form.patchValue({ bookId: r.id }),
       error: () => this.toastService.error('Failed to generate Book ID')
     });
   }
 
   populateForm(book: Book) {
     this.form.patchValue({
-      book_id: book.book_id,
+      bookId: book.bookId,
       isbn: book.isbn,
       title: book.title,
       author: book.author,
       stream: book.stream,
-      publication_year: book.publication_year as any,
+      publicationYear: book.publicationYear as any,
       publisher: book.publisher,
       edition: book.edition,
-      shelf_location: book.shelf_location,
+      shelfLocation: book.shelfLocation,
       price: book.price,
       quantity: book.quantity
     });
-    this.form.get('book_id')?.disable();
+    this.form.get('bookId')?.disable();
   }
 
   onCoverSelected(e: any) {
@@ -90,17 +90,17 @@ export class BookFormComponent implements OnInit, OnChanges {
 
     const v = this.form.getRawValue();
     const fd = new FormData();
-    fd.append('book_id', v.book_id ?? '');
+    fd.append('bookId', v.bookId ?? '');
     fd.append('isbn',    v.isbn    ?? '');
     fd.append('title',   v.title   ?? '');
     fd.append('price',   String(v.price ?? 0));
     fd.append('quantity', String(v.quantity ?? 1));
     if (v.author) fd.append('author', v.author);
     if (v.stream) fd.append('stream', v.stream);
-    if (v.publication_year) fd.append('publication_year', String(v.publication_year));
+    if (v.publicationYear) fd.append('publicationYear', String(v.publicationYear));
     if (v.publisher) fd.append('publisher', v.publisher);
     if (v.edition) fd.append('edition', v.edition);
-    if (v.shelf_location) fd.append('shelf_location', v.shelf_location);
+    if (v.shelfLocation) fd.append('shelfLocation', v.shelfLocation);
     if (this.selectedCover) fd.append('cover', this.selectedCover);
 
     this.onSave.emit(fd);
@@ -108,7 +108,7 @@ export class BookFormComponent implements OnInit, OnChanges {
 
   reset() {
     this.form.reset();
-    this.form.get('book_id')?.enable();
+    this.form.get('bookId')?.enable();
     this.selectedCover = null;
     this.onCancel.emit();
   }

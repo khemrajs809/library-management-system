@@ -16,39 +16,39 @@ export class IssueService {
     return this.http.get<ApiResponse<Issue[]>>(`${API_BASE}/issues/history`);
   }
 
-  issueBook(member_id: string, book_id: string): Observable<ApiResponse<any>> {
-    return this.http.post<ApiResponse<any>>(`${API_BASE}/issues`, { member_id, book_id });
+  issueBook(memberId: string, bookId: string): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${API_BASE}/issues`, { memberId, bookId });
   }
 
-  returnBook(issue_id: number): Observable<ApiResponse<any>> {
-    return this.http.post<ApiResponse<any>>(`${API_BASE}/issues/return`, { issue_id });
+  returnBook(issueId: number): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${API_BASE}/issues/return`, { issueId });
   }
 
-  renewBook(issue_id: number): Observable<ApiResponse<any>> {
-    return this.http.post<ApiResponse<any>>(`${API_BASE}/issues/renew`, { issue_id });
+  renewBook(issueId: number): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${API_BASE}/issues/renew`, { issueId });
   }
 
-  markAsLost(issue_id: number): Observable<ApiResponse<any>> {
-    return this.http.post<ApiResponse<any>>(`${API_BASE}/issues/lost`, { issue_id });
+  markAsLost(issueId: number): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${API_BASE}/issues/lost`, { issueId });
   }
 
-  payFine(issue_id: number): Observable<ApiResponse<any>> {
-    return this.http.post<ApiResponse<any>>(`${API_BASE}/issues/${issue_id}/pay-fine`, {});
+  payFine(issueId: number): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${API_BASE}/issues/${issueId}/pay-fine`, {});
   }
 
-  returnByBookId(book_id: string): Observable<ApiResponse<any>> {
-    return this.http.post<ApiResponse<any>>(`${API_BASE}/issues/return-by-book`, { book_id });
+  returnByBookId(bookId: string): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${API_BASE}/issues/return-by-book`, { bookId });
   }
 
-  lookupIssueByBookId(book_id: string): Observable<ApiResponse<any>> {
-    return this.http.get<ApiResponse<any>>(`${API_BASE}/issues/lookup/${book_id}`);
+  lookupIssueByBookId(bookId: string): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(`${API_BASE}/issues/lookup/${bookId}`);
   }
 
   getFinesAndLost(): Observable<ApiResponse<any[]>> {
     return this.http.get<ApiResponse<any[]>>(`${API_BASE}/issues/fines-and-lost`);
   }
 
-  sendFineReminder(issue_id: number): Observable<ApiResponse<any>> {
-    return this.http.post<ApiResponse<any>>(`${API_BASE}/issues/${issue_id}/send-reminder`, {});
+  sendFineReminder(issueId: number): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${API_BASE}/issues/${issueId}/send-reminder`, {});
   }
 }

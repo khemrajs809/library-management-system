@@ -74,10 +74,10 @@ export class CirculationDeskComponent {
     const q = this.issuesQuery().toLowerCase();
     if (!q) return this.issues();
     return this.issues().filter(i =>
-      i.member_name.toLowerCase().includes(q) ||
-      i.book_title.toLowerCase().includes(q) ||
-      i.member_id.toLowerCase().includes(q) ||
-      i.book_id.toString().includes(q)
+      i.memberName.toLowerCase().includes(q) ||
+      i.bookTitle.toLowerCase().includes(q) ||
+      i.memberId.toLowerCase().includes(q) ||
+      i.bookId.toString().includes(q)
     );
   });
 
@@ -126,10 +126,10 @@ export class CirculationDeskComponent {
     const q = this.historyQuery().toLowerCase();
     if (!q) return this.history();
     return this.history().filter(h =>
-      h.member_name.toLowerCase().includes(q) ||
-      h.book_title.toLowerCase().includes(q) ||
-      h.member_id.toLowerCase().includes(q) ||
-      h.book_id.toString().includes(q)
+      h.memberName.toLowerCase().includes(q) ||
+      h.bookTitle.toLowerCase().includes(q) ||
+      h.memberId.toLowerCase().includes(q) ||
+      h.bookId.toString().includes(q)
     );
   });
 
@@ -210,11 +210,11 @@ export class CirculationDeskComponent {
   @ViewChild('memberIdInput') memberIdInput!: ElementRef;
   @ViewChild('bookIdInput') bookIdInput!: ElementRef;
   @ViewChild('scannerMemberInput') scannerMemberInput!: ElementRef;
-  @ViewChild('scannerBookInput') scannerBookInput!: ElementRef;
+  @ViewChild(ReturnScannerComponent) returnScannerComponent!: ReturnScannerComponent;
 
   issueForm = this.fb.group({
-    member_id: ['', Validators.required],
-    book_id: ['', Validators.required]
+    memberId: ['', Validators.required],
+    bookId: ['', Validators.required]
   });
 
   constructor() {
@@ -245,7 +245,7 @@ export class CirculationDeskComponent {
   }
   
   isOverdue = (issue: Issue) => {
-    const due = new Date(issue.due_date);
+    const due = new Date(issue.dueDate);
     const today = new Date();
     today.setHours(0,0,0,0);
     return today > due;
@@ -263,18 +263,18 @@ export class CirculationDeskComponent {
 
   issueBook() {
     if (this.issueForm.invalid) return;
-    const { member_id, book_id } = this.issueForm.value;
+    const { memberId, bookId } = this.issueForm.value;
     
     // Look up member and book details
-    const member = this.members().find(m => m.member_id === member_id);
-    const book = this.books().find(b => b.book_id === book_id);
+    const member = this.members().find(m => m.memberId === memberId);
+    const book = this.books().find(b => b.bookId === bookId);
 
     if (!member) {
-      this.toastService.error(`Member ID "${member_id}" not found.`);
+      this.toastService.error(`Member ID "${memberId}" not found.`);
       return;
     }
     if (!book) {
-      this.toastService.error(`Book ID "${book_id}" not found.`);
+      this.toastService.error(`Book ID "${bookId}" not found.`);
       return;
     }
 
@@ -287,7 +287,7 @@ export class CirculationDeskComponent {
   confirmIssuePreview() {
     const preview = this.issuePreview();
     if (!preview) return;
-    this.executeIssue(preview.member.member_id, preview.book.book_id);
+    this.executeIssue(preview.member.memberId, preview.book.bookId);
     this.issuePreview.set(null);
   }
 
@@ -295,11 +295,11 @@ export class CirculationDeskComponent {
     this.issuePreview.set(null);
   }
 
-  executeIssue(member_id: string, book_id: string) {
-    this.issueService.issueBook(member_id, book_id).subscribe({
+  executeIssue(memberId: string, bookId: string) {
+    this.issueService.issueBook(memberId, bookId).subscribe({
       next: (r: any) => {
-        this.toastService.success(`Book issued! Due: ${r.due_date}`);
-        this.addActivity(`Issued ${book_id} to ${member_id}`, 'success');
+        this.toastService.success(`Book issued! Due: ${r.dueDate}`);
+        this.addActivity(`Issued ${bookId} to ${memberId}`, 'success');
         this.issueForm.reset(); this.loadIssues();
         this.bookService.getBooks().subscribe({ next: (rb) => this.books.set(rb.data) });
         setTimeout(() => this.memberIdInput?.nativeElement.focus(), 100);
@@ -316,23 +316,23 @@ export class CirculationDeskComponent {
     });
   }
 
-  returnBook(issue_id: number) {
-    this.issueService.returnBook(issue_id).subscribe({
+  returnBook(issueId: number) {
+    this.issueService.returnBook(issueId).subscribe({
       next: (r: any) => {
         let txt = 'Book returned successfully!';
-        if (r.fine_amount > 0) txt += ` Fine: ₹${r.fine_amount}`;
+        if (r.fineAmount > 0) txt += ` Fine: ₹${r.fineAmount}`;
         this.toastService.success(txt);
-        this.addActivity(`Returned issue #${issue_id}`, 'success');
+        this.addActivity(`Returned issue #${issueId}`, 'success');
         this.loadIssues();
       },
       error: (e) => {
         this.toastService.error(e.error?.message || 'Failed to return');
-        this.addActivity(`Return failed for issue #${issue_id}`, 'error');
+        this.addActivity(`Return failed for issue #${issueId}`, 'error');
       }
     });
   }
 
-  renewBook(issue_id: number) {
+  renewBook(issueId: number) {
     this.modalService.show({
       title: 'Renew Book',
       message: 'Extend the due date for this book by 15 more days?',
@@ -340,23 +340,23 @@ export class CirculationDeskComponent {
       confirmText: 'Renew Now',
       cancelText: 'Cancel',
       onConfirm: () => {
-        this.issueService.renewBook(issue_id).subscribe({
+        this.issueService.renewBook(issueId).subscribe({
           next: (r: any) => {
             this.toastService.success(`Renewed! New Due: ${r.new_due_date}`);
-            this.addActivity(`Renewed issue #${issue_id}`, 'success');
+            this.addActivity(`Renewed issue #${issueId}`, 'success');
             this.loadIssues();
           },
           error: (e) => {
             this.toastService.error(e.error?.message || 'Failed to renew');
-            this.addActivity(`Renew failed for issue #${issue_id}`, 'error');
+            this.addActivity(`Renew failed for issue #${issueId}`, 'error');
           }
         });
       }
     });
   }
 
-  markAsLost(issue_id: number) {
-    console.log('Marking issue as lost:', issue_id);
+  markAsLost(issueId: number) {
+    console.log('Marking issue as lost:', issueId);
     this.modalService.show({
       title: 'Mark as Lost',
       message: 'Are you sure you want to mark this book as lost? A penalty (Book Price + ₹150) will be applied to the member\'s account.',
@@ -364,25 +364,25 @@ export class CirculationDeskComponent {
       confirmText: 'Mark as Lost',
       cancelText: 'Cancel',
       onConfirm: () => {
-        console.log('Confirmed lost for:', issue_id);
-        this.issueService.markAsLost(issue_id).subscribe({
+        console.log('Confirmed lost for:', issueId);
+        this.issueService.markAsLost(issueId).subscribe({
           next: (r: any) => {
             console.log('Lost marked successfully:', r);
-            this.toastService.success(`Marked as lost. Penalty: ₹${r.fine_amount}`);
-            this.addActivity(`Marked issue #${issue_id} as lost`, 'error');
+            this.toastService.success(`Marked as lost. Penalty: ₹${r.fineAmount}`);
+            this.addActivity(`Marked issue #${issueId} as lost`, 'error');
             this.loadIssues();
           },
           error: (e) => {
             console.error('Error marking lost:', e);
             this.toastService.error(e.error?.message || 'Failed');
-            this.addActivity(`Failed to mark issue #${issue_id} as lost`, 'error');
+            this.addActivity(`Failed to mark issue #${issueId} as lost`, 'error');
           }
         });
       }
     });
   }
 
-  payFine(issue_id: number) {
+  payFine(issueId: number) {
     this.modalService.show({
       title: 'Confirm Payment',
       message: 'Are you sure you want to mark this fine as paid?',
@@ -390,16 +390,16 @@ export class CirculationDeskComponent {
       confirmText: 'Mark Paid',
       cancelText: 'Cancel',
       onConfirm: () => {
-        this.issueService.payFine(issue_id).subscribe({
+        this.issueService.payFine(issueId).subscribe({
           next: (r) => {
             this.toastService.success(r.message);
-            this.addActivity(`Fine paid for issue #${issue_id}`, 'success');
+            this.addActivity(`Fine paid for issue #${issueId}`, 'success');
             this.loadIssues();
             this.loadHistory();
           },
           error: (e) => {
             this.toastService.error(e.error?.message || 'Failed');
-            this.addActivity(`Failed to pay fine for issue #${issue_id}`, 'error');
+            this.addActivity(`Failed to pay fine for issue #${issueId}`, 'error');
           }
         });
       }
@@ -417,7 +417,7 @@ export class CirculationDeskComponent {
         this.isScannerProcessing.set(false);
         this.triggerFeedback('success');
         this.addActivity(`Session started for ${r.data.name}`, 'success');
-        setTimeout(() => this.scannerBookInput?.nativeElement.focus(), 50);
+        setTimeout(() => this.returnScannerComponent?.focusBookInput(), 50);
       },
       error: () => {
         this.triggerFeedback('error');
@@ -446,7 +446,7 @@ export class CirculationDeskComponent {
         this.triggerFeedback('error');
         this.isScannerProcessing.set(false);
         event.target.value = '';
-        setTimeout(() => this.scannerBookInput?.nativeElement.focus(), 50);
+        setTimeout(() => this.returnScannerComponent?.focusBookInput(), 50);
       }
     });
   }
@@ -456,9 +456,9 @@ export class CirculationDeskComponent {
     if (!issue) return;
     this.isScannerProcessing.set(true);
 
-    this.issueService.returnBook(issue.issue_id).subscribe({
+    this.issueService.returnBook(issue.issueId).subscribe({
       next: (r: any) => {
-        const msg = `Returned: ${issue.book_title}${r.fine_amount > 0 ? ' (Fine: ₹' + r.fine_amount + ')' : ''}`;
+        const msg = `Returned: ${issue.bookTitle}${r.fineAmount > 0 ? ' (Fine: ₹' + r.fineAmount + ')' : ''}`;
         this.toastService.success(msg);
         this.addActivity(msg, 'success');
         this.triggerFeedback('success');
@@ -477,9 +477,9 @@ export class CirculationDeskComponent {
     if (!issue) return;
     this.isScannerProcessing.set(true);
 
-    this.issueService.renewBook(issue.issue_id).subscribe({
+    this.issueService.renewBook(issue.issueId).subscribe({
       next: (r: any) => {
-        const msg = `Renewed: ${issue.book_title}. New Due: ${r.new_due_date}`;
+        const msg = `Renewed: ${issue.bookTitle}. New Due: ${r.new_due_date}`;
         this.toastService.success(msg);
         this.addActivity(msg, 'success');
         this.triggerFeedback('success');
@@ -496,7 +496,7 @@ export class CirculationDeskComponent {
   cancelQuickReturn() {
     this.scannedIssue.set(null);
     this.isScannerProcessing.set(false);
-    setTimeout(() => this.scannerBookInput?.nativeElement.focus(), 50);
+    setTimeout(() => this.returnScannerComponent?.focusBookInput(), 50);
   }
 
   private handleScanError(e: any, event: any) {
@@ -510,7 +510,7 @@ export class CirculationDeskComponent {
     this.triggerFeedback('error');
     this.isScannerProcessing.set(false);
     event.target.value = '';
-    setTimeout(() => this.scannerBookInput?.nativeElement.focus(), 50);
+    setTimeout(() => this.returnScannerComponent?.focusBookInput(), 50);
   }
 
   private triggerFeedback(type: 'success' | 'error') {
@@ -608,7 +608,7 @@ export class CirculationDeskComponent {
     if (this.isSideMemberScannerActive()) {
       this.stopSideBookScanner();
       setTimeout(() => this.startCamera('reader-side-member', (text) => {
-        this.issueForm.patchValue({ member_id: text });
+        this.issueForm.patchValue({ memberId: text });
         this.onMemberIdEnter();
         this.toggleSideMemberScanner();
       }), 100);
@@ -627,7 +627,7 @@ export class CirculationDeskComponent {
     if (this.isSideBookScannerActive()) {
       this.stopSideMemberScanner();
       setTimeout(() => this.startCamera('reader-side-book', (text) => {
-        this.issueForm.patchValue({ book_id: text });
+        this.issueForm.patchValue({ bookId: text });
         this.toggleSideBookScanner();
       }), 100);
     } else {

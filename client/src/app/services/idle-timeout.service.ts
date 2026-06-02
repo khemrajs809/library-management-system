@@ -27,6 +27,8 @@ export class IdleTimeoutService {
    */
   startMonitoring() {
     this.stopMonitoring();
+    if (typeof window === 'undefined') return;
+
     this.lastActivityTime = Date.now();
     this.isThresholdReached.set(false);
     this.idleRemaining.set(this.GRACE_PERIOD_SECONDS);

@@ -1,18 +1,18 @@
 export interface Book {
-  book_id: string;
+  bookId: string;
   isbn: string;
   title: string;
   author?: string;
   stream?: string;
-  publication_year?: number;
+  publicationYear?: number;
   price: number;
   quantity: number;
   available: number;
-  total_copies: number;
-  available_copies: number;
-  cover_url?: string;
+  totalCopies: number;
+  availableCopies: number;
+  coverUrl?: string;
   publisher?: string;
   edition?: string;
-  shelf_location?: string;
-  created_at?: string;
+  shelfLocation?: string;
+  createdAt?: string;
 }
