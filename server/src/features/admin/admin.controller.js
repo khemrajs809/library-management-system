@@ -1,7 +1,7 @@
-const pool = require('../db');
+const pool = require('../../db');
 const bcrypt = require('bcryptjs');
 const Papa = require('papaparse');
-const { sanitizeObject } = require('../services/sanitizer.service');
+const { sanitizeObject } = require('../../services/sanitizer.service');
 
 // POST /api/admin/librarians — Create a new librarian account
 const createLibrarian = async (req, res) => {

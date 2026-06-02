@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { verifyToken, checkRole } = require('../middlewares/auth.middleware');
-const auditLog = require('../middlewares/audit.middleware');
-const { validateResult, loginValidation, createLibrarianValidation } = require('../middlewares/validation.middleware');
+const { verifyToken, checkRole } = require('../../middlewares/auth.middleware');
+const auditLog = require('../../middlewares/audit.middleware');
+const { validateResult, loginValidation, createLibrarianValidation } = require('../../middlewares/validation.middleware');
 const { 
     createLibrarian, 
     getLibrarians, 
@@ -15,10 +15,10 @@ const {
     generateUniqueLibrarianId,
     getAuditLogs,
     updateLibrarianStatus
-} = require('../controllers/admin.controller');
-const announcementController = require('../features/announcements/announcement.controller');
-const authController = require('../controllers/auth.controller');
-const { authLimiter } = require('../middlewares/rateLimiter.middleware');
+} = require('./admin.controller');
+const announcementController = require('../announcements/announcement.controller');
+const authController = require('../../controllers/auth.controller');
+const { authLimiter } = require('../../middlewares/rateLimiter.middleware');
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -53,7 +53,7 @@ const {
     terminateSession, 
     getSessionStats, 
     logClientAction 
-} = require('../controllers/session.controller');
+} = require('../../controllers/session.controller');
 
 router.get('/sessions/stats', verifyToken, checkRole(['admin']), getSessionStats);
 router.get('/sessions', verifyToken, checkRole(['admin']), getSessions);

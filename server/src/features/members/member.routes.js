@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { verifyToken, checkRole } = require('../middlewares/auth.middleware');
-const auditLog = require('../middlewares/audit.middleware');
-const { upload, csvUpload } = require('../middlewares/upload.middleware');
-const { validateResult, memberValidation } = require('../middlewares/validation.middleware');
-const { addMember, getMembers, getMember, getMemberProfile, updateMember, deleteMember, importMembers, generateUniqueMemberId, getDeletedMembers, restoreMember, permanentDeleteMember, sendMemberEmail, getRecentActivities } = require('../controllers/member.controller');
+const { verifyToken, checkRole } = require('../../middlewares/auth.middleware');
+const auditLog = require('../../middlewares/audit.middleware');
+const { upload, csvUpload } = require('../../middlewares/upload.middleware');
+const { validateResult, memberValidation } = require('../../middlewares/validation.middleware');
+const { addMember, getMembers, getMember, getMemberProfile, updateMember, deleteMember, importMembers, generateUniqueMemberId, getDeletedMembers, restoreMember, permanentDeleteMember, sendMemberEmail, getRecentActivities } = require('./member.controller');
 
 const memberUploadFields = (req, res, next) => {
     console.log('Hitting memberUploadFields middleware');
