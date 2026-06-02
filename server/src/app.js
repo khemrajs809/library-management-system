@@ -14,7 +14,7 @@ const bookRoutes = require('./features/books/book.routes');
 const memberRoutes = require('./features/members/member.routes');
 const issueRoutes = require('./features/issues/issue.routes');
 const notesRoutes = require('./features/notes/notes.routes');
-const authController = require('./controllers/auth.controller');
+const authController = require('./features/auth/auth.controller');
 const captchaRoutes = require('./features/captcha/captcha.routes');
 const publicRoutes = require('./features/announcements/announcement.routes');
 

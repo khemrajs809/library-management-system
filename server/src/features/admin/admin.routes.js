@@ -17,7 +17,7 @@ const {
     updateLibrarianStatus
 } = require('./admin.controller');
 const announcementController = require('../announcements/announcement.controller');
-const authController = require('../../controllers/auth.controller');
+const authController = require('../auth/auth.controller');
 const { authLimiter } = require('../../middlewares/rateLimiter.middleware');
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
@@ -53,7 +53,7 @@ const {
     terminateSession, 
     getSessionStats, 
     logClientAction 
-} = require('../../controllers/session.controller');
+} = require('../sessions/session.controller');
 
 router.get('/sessions/stats', verifyToken, checkRole(['admin']), getSessionStats);
 router.get('/sessions', verifyToken, checkRole(['admin']), getSessions);

@@ -1,10 +1,10 @@
 const bcrypt = require('bcryptjs');
 const { EncryptJWT, jwtDecrypt } = require('jose');
-const pool = require('../db');
-const { sendEmail } = require('../services/email.service');
-const { generateOTPHTML } = require('../utils/email-templates');
+const pool = require('../../db');
+const { sendEmail } = require('../../common/services/email.service');
+const { generateOTPHTML } = require('../../utils/email-templates');
 const crypto = require('crypto');
-const { logSession } = require('../services/session.service');
+const { logSession } = require('../sessions/session.service');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {

@@ -1,8 +1,8 @@
 const pool = require('../../db');
 const Papa = require('papaparse');
-const { sendEmail } = require('../../services/email.service');
+const { sendEmail } = require('../../common/services/email.service');
 const { generateGenericMessageHTML } = require('../../utils/email-templates');
-const { sanitizeObject } = require('../../services/sanitizer.service');
+const { sanitizeObject } = require('../../common/services/sanitizer.service');
 
 // POST /api/members — Register a new member
 const addMember = async (req, res) => {

@@ -1,6 +1,6 @@
 const cron = require('node-cron');
 const pool = require('../db');
-const { sendEmail } = require('../services/email.service');
+const { sendEmail } = require('../common/services/email.service');
 const { generateGenericMessageHTML, generateFineReminderHTML } = require('../utils/email-templates');
 
 /**

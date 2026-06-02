@@ -1,5 +1,5 @@
-const pool = require('../db');
-const { revokeSession, logSessionAction } = require('../services/session.service');
+const pool = require('../../db');
+const { revokeSession, logSessionAction } = require('./session.service');
 
 /**
  * GET /api/admin/sessions — List and filter login sessions

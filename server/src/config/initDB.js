@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const pool = require('../db');
-const { initSessionDb } = require('../services/session.service');
+const { initSessionDb } = require('../features/sessions/session.service');
 
 const syncProcedures = async () => {
     try {

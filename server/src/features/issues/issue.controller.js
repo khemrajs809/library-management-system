@@ -1,5 +1,5 @@
 const pool = require('../../db');
-const { sendEmail } = require('../../services/email.service');
+const { sendEmail } = require('../../common/services/email.service');
 const { generateLostBookHTML, generatePaymentReceiptHTML, generateFineReminderHTML } = require('../../utils/email-templates');
 
 // POST /api/issues — Issue a specific book copy to a member

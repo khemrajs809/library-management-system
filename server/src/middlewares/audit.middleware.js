@@ -1,5 +1,5 @@
-const { logSystemAction } = require('../services/audit.service');
-const { logSessionAction } = require('../services/session.service');
+const { logSystemAction } = require('../common/services/audit.service');
+const { logSessionAction } = require('../features/sessions/session.service');
 
 /**
  * Middleware to log high-value actions (POST, PUT, DELETE) into the audit_logs table.
