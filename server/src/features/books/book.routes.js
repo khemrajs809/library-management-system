@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { verifyToken, checkRole } = require('../middlewares/auth.middleware');
-const auditLog = require('../middlewares/audit.middleware');
-const cacheMiddleware = require('../middlewares/cache.middleware');
-const { upload, csvUpload } = require('../middlewares/upload.middleware');
-const { validateResult, bookValidation } = require('../middlewares/validation.middleware');
-const { addBook, getBooks, getBookCopies, updateBook, deleteBook, importBooks, generateUniqueId, generateUniqueIsbn, getDeletedBooks, restoreBook, permanentDeleteBook, getBookHistory } = require('../controllers/book.controller');
+const { verifyToken, checkRole } = require('../../middlewares/auth.middleware');
+const auditLog = require('../../middlewares/audit.middleware');
+const cacheMiddleware = require('../../middlewares/cache.middleware');
+const { upload, csvUpload } = require('../../middlewares/upload.middleware');
+const { validateResult, bookValidation } = require('../../middlewares/validation.middleware');
+const { addBook, getBooks, getBookCopies, updateBook, deleteBook, importBooks, generateUniqueId, generateUniqueIsbn, getDeletedBooks, restoreBook, permanentDeleteBook, getBookHistory } = require('./book.controller');
 
 router.get('/generate-id', verifyToken, checkRole(['admin', 'librarian']), generateUniqueId);
 router.get('/generate-isbn', verifyToken, checkRole(['admin', 'librarian']), generateUniqueIsbn);

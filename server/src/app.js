@@ -10,9 +10,9 @@ const caseConverter = require('./middlewares/caseConverter.middleware');
 
 // --- Routes ---
 const adminRoutes = require('./routes/admin.routes');
-const bookRoutes = require('./routes/book.routes');
+const bookRoutes = require('./features/books/book.routes');
 const memberRoutes = require('./routes/member.routes');
-const issueRoutes = require('./routes/issue.routes');
+const issueRoutes = require('./features/issues/issue.routes');
 const notesRoutes = require('./features/notes/notes.routes');
 const authController = require('./controllers/auth.controller');
 const captchaRoutes = require('./features/captcha/captcha.routes');

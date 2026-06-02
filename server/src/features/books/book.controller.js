@@ -1,7 +1,7 @@
-const pool = require('../db');
+const pool = require('../../db');
 const Papa = require('papaparse');
-const bookService = require('../services/book.service');
-const { invalidateCache } = require('../utils/cache.util');
+const bookService = require('./book.service');
+const { invalidateCache } = require('../../utils/cache.util');
 
 // POST /api/books — Add a book and automatically generate unique copy IDs
 const addBook = async (req, res) => {

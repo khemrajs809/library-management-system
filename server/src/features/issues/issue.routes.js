@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { verifyToken, checkRole } = require('../middlewares/auth.middleware');
-const auditLog = require('../middlewares/audit.middleware');
-const { issueBook, renewBook, returnBook, markAsLost, getActiveIssues, getIssueHistory, payFine, returnByBookId, lookupIssueByBookId, getFinesAndLost, sendFineReminder } = require('../controllers/issue.controller');
+const { verifyToken, checkRole } = require('../../middlewares/auth.middleware');
+const auditLog = require('../../middlewares/audit.middleware');
+const { issueBook, renewBook, returnBook, markAsLost, getActiveIssues, getIssueHistory, payFine, returnByBookId, lookupIssueByBookId, getFinesAndLost, sendFineReminder } = require('./issue.controller');
 
 // Specific action routes must come before /:id routes
 router.post('/renew', verifyToken, checkRole(['admin', 'librarian']), auditLog('Renew Book'), renewBook);
