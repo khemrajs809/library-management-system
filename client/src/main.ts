@@ -5,11 +5,10 @@ import { isDevMode } from '@angular/core';
 
 // Intercept and suppress specific Angular development logs without disabling HMR
 if (isDevMode()) {
-  const method = 'log' as keyof Console;
-  const originalLog = console[method];
+  const originalLog = console['log'] as (...args: any[]) => void;
   const originalWarn = console.warn;
 
-  console[method] = (...args) => {
+  console['log'] = (...args: any[]) => {
     if (typeof args[0] === 'string' && (args[0].includes('Angular hydrated') || args[0].includes('Angular is running in development mode'))) return;
     originalLog(...args);
   };
