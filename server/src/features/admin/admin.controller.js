@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const Papa = require('papaparse');
 const { sanitizeObject } = require('../../common/services/sanitizer.service');
 const zxcvbn = require('zxcvbn');
+const { sendEmail } = require('../../common/services/email.service');
 
 // POST /api/admin/librarians — Create a new librarian account
 const createLibrarian = async (req, res) => {
@@ -26,6 +27,14 @@ const createLibrarian = async (req, res) => {
             'CALL proc_create_librarian(?, ?, ?, ?)',
             [lib_id, name, email, hashedPassword]
         );
+
+        // Send welcome email with credentials
+        sendEmail(
+            email,
+            'Welcome to LMS - Librarian Account Created',
+            `Hello ${name},\n\nYour Librarian account has been successfully created.\n\nYour Login ID: ${lib_id}\nYour Password: ${password}\n\nPlease log in and change your password immediately.\n\nBest regards,\nLMS Administrator`
+        );
+
         res.status(201).json({ success: true, message: 'Librarian account created successfully', lib_id });
     } catch (err) {
         if (err.code === 'ER_DUP_ENTRY') {
