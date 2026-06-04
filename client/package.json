@@ -53,7 +53,7 @@
     "@angular/compiler-cli": "^21.1.0",
     "@types/express": "^5.0.1",
     "@types/jsbarcode": "^3.11.4",
-    "@types/node": "^20.17.19",
+    "@types/node": "^25.9.1",
     "jsdom": "^27.1.0",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8"
