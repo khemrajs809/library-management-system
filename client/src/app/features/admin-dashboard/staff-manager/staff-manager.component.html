@@ -42,9 +42,9 @@
             </div>
             <div class="form-group">
                 <label for="password">Initial Password</label>
-                <input type="password" id="password" formControlName="password" placeholder="Min 6 characters">
+                <input type="password" id="password" formControlName="password" placeholder="Min 8 characters">
                 @if (libForm.get('password')?.touched && libForm.get('password')?.invalid) {
-                    <small class="error-text">Password must be at least 6 characters.</small>
+                    <small class="error-text">Password must be at least 8 characters.</small>
                 }
             </div>
         </div>
@@ -107,7 +107,7 @@
                                 <div class="action-buttons">
                                     @if (editingLibId() === lib.libId) {
                                         <div class="inline-edit">
-                                            <input #passInput type="password" aria-label="New Password" placeholder="New Password" class="small-input">
+                                            <input #passInput type="password" aria-label="New Password" placeholder="Min 8 characters" class="small-input">
                                             <button class="btn btn-green btn-icon" (click)="onUpdatePassword(lib.libId, passInput.value)" [disabled]="passwordUpdateLoading()">✔</button>
                                             <button class="btn btn-gray btn-icon" (click)="toggleEdit(null)">✖</button>
                                         </div>
