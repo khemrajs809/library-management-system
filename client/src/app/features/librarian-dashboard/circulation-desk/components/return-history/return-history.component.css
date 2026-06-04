@@ -1,0 +1,71 @@
+@import "../../../librarian-dashboard.component.css";
+@import "../../circulation-desk.component.css";
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.ds-data-value {
+    color: #0f172a !important; /* High contrast dark navy */
+    font-weight: 800 !important;
+    font-size: 1rem !important; /* Increased from inline 0.95rem */
+}
+
+.meta {
+    color: #334155 !important; /* Darker gray for better legibility */
+    font-weight: 600;
+    font-size: 0.8rem !important; /* Increased from 0.7rem */
+}
+
+.ds-id-pill {
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    font-size: 0.75rem !important;
+}
+
+.ds-admin-table th {
+    background: #145277 !important;
+    color: white !important;
+    font-size: 0.75rem !important; /* Increased from 0.65rem */
+    letter-spacing: 0.08em !important;
+    padding: 12px 15px !important;
+}
+
+.ds-admin-table tbody tr:nth-child(odd) {
+    background-color: #fff1e6 !important; /* Almond */
+}
+
+.ds-admin-table tbody tr:nth-child(even) {
+    background-color: #f0efeb !important; /* Off-white */
+}
+
+.ds-admin-table tbody tr:hover {
+    background-color: #e2e8f0 !important;
+}
+
+/* Utilities for extraction */
+.rh-header-flex { border: none; padding-bottom: 0; display: flex; justify-content: space-between; align-items: center; }
+.rh-title { color: #b91c1c; font-size: 1.5rem; font-weight: 800; margin-bottom: 0; }
+.mt-1rem { margin-top: 1rem; }
+.font-095 { font-size: 0.95rem; }
+.pill-gray { background: #f1f5f9; color: #475569; border-color: #cbd5e1; font-size: 0.65rem; }
+.meta-phone { font-weight: 800; margin-left: 6px; font-size: 0.75rem; color: #0f172a; }
+.meta-email { font-size: 0.7rem; margin-left: 6px; color: #334155; text-transform: lowercase; }
+.pill-dept { font-size: 0.65rem; background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; }
+.pill-type { background: #eff6ff; color: #1e40af; border-color: #bfdbfe; margin-left: 4px; font-size: 0.6rem; }
+.price-tag-sm { margin-left: 8px; font-size: 0.75rem; color: #64748b; }
+.author-text { font-size: 0.75rem; color: #1e293b; }
+.isbn-text { font-size: 0.65rem; color: #94a3b8; }
+.timeline-dashed { border-left: 1px dashed #e2e8f0; padding-left: 15px; }
+.tl-label { font-size: 0.65rem; width: 60px; display: inline-block; }
+.tl-date { font-size: 0.8rem; }
+.tl-label-red { font-size: 0.65rem; width: 60px; color: #dc2626; display: inline-block; }
+.tl-date-red { font-size: 0.8rem; color: #dc2626; }
+.tl-label-green { font-size: 0.65rem; width: 60px; color: #16a34a; display: inline-block; }
+.tl-date-green { font-size: 0.8rem; color: #16a34a; }
+.fine-amt-green { color: #16a34a; font-size: 1.1rem; font-weight: 900; }
+.fine-tag-green { color: #16a34a; font-weight: 900; font-size: 0.65rem; letter-spacing: 1px; }
+.no-fine-text { color: #94a3b8; font-weight: 700; }

@@ -1,3 +1,5 @@
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'; // Bypass self-signed cert error during local SSR development
+
 import {
   AngularNodeAppEngine,
   createNodeRequestHandler,

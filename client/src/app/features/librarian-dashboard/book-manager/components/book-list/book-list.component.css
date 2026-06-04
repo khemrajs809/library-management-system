@@ -1,0 +1,7 @@
+@import "../../../librarian-dashboard.component.css";
+@import "../../book-manager.component.css";
+
+:host {
+  display: block;
+  flex: 1;
+}

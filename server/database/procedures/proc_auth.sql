@@ -51,7 +51,7 @@ BEGIN
     DELETE FROM otps WHERE user_id = p_user_id;
     -- Insert new one with 10 minute expiry in UTC
     INSERT INTO otps (user_id, otp_code, expires_at) 
-    VALUES (p_user_id, p_otp, UTC_TIMESTAMP() + INTERVAL 10 MINUTE);
+    VALUES (p_user_id, p_otp, NOW() + INTERVAL 10 MINUTE);
 END;
 
 /* NEXT_PROCEDURE */
@@ -120,7 +120,7 @@ END;
 CREATE PROCEDURE proc_verify_otp(IN p_user_id VARCHAR(50), IN p_otp VARCHAR(10))
 BEGIN
     SELECT * FROM otps 
-    WHERE user_id = p_user_id AND otp_code = p_otp AND expires_at > UTC_TIMESTAMP() 
+    WHERE user_id = p_user_id AND otp_code = p_otp AND expires_at > NOW() 
     ORDER BY created_at DESC LIMIT 1;
 END;
 

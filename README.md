@@ -1,63 +1,52 @@
-# Librarian Management System
+# Enterprise Library Management System (LMS)
 
-A professional, high-density digital library management solution with a "Seashell & Crimson" aesthetic.
+Welcome to the Enterprise Library Management System. This project is a highly-scalable, resilient, and secure Full-Stack application designed to manage library operations at scale.
 
-## 🚀 Features
+## 🏗️ Architecture Overview
 
-- **Circulation Desk**: Manage book issues and returns with ease.
-- **Book Manager**: Inventory control with barcode support.
-- **Member Manager**: Detailed member profiles and digital library cards.
-- **Fine Management**: Automated fine calculation and tracking.
-- **Audit Logs**: Comprehensive history of all library transactions.
+The application utilizes a modern Microservices-oriented Monolithic Architecture deployed via Docker containers:
 
-## 🛠️ Technology Stack
+1. **NGINX Edge Proxy**: Serves as the public gateway. Handles HTTPS termination, GZIP compression, rate limiting against DDoS attacks, and static asset caching.
+2. **Angular SSR Frontend**: The user interface is built with Angular 17. It operates securely behind the reverse proxy.
+3. **Node.js Express Backend**: The core API. Protected by strict Content Security Policies (CSP), Double-Submit CSRF Cookies, and JWE Encrypted Tokens.
+4. **Redis Cache & Message Queue**: Used for high-speed API caching and managing the BullMQ background worker queues (for sending asynchronous emails).
+5. **MariaDB Database**: The persistent data store. Heavy data processing logic is optimized using internal Stored Procedures.
 
-- **Frontend**: Angular (Modern Signal-based architecture)
-- **Backend**: Node.js / Express
-- **Database**: SQLite / MySQL (depending on configuration)
-- **Styling**: Vanilla CSS with a professional design system.
+## 🚀 Getting Started (Docker Deployment)
 
-## 📦 Project Structure
-
-- `/client`: Angular frontend application.
-- `/server`: Node.js backend API and file storage.
-
-## 🚦 Getting Started
+You do not need Node.js, Angular, or MariaDB installed on your host machine. Everything is containerized.
 
 ### Prerequisites
-- Node.js (v18+)
-- Angular CLI
+- Docker
+- Docker Compose
 
-### Installation
+### Step 1: Boot the Infrastructure
+Open your terminal in the root of the project and run:
+```bash
+docker-compose up --build -d
+```
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/khemrajs809/library-management-system.git
-   ```
+### Step 2: Access the Application
+- **Frontend UI**: `https://localhost`
+- **Backend API**: `https://localhost/api` (Proxied by Nginx)
 
-2. **Setup Server**:
-   ```bash
-   cd server
-   npm install
-   ```
+*(Note: Ensure you accept the self-signed SSL certificates in your browser if running locally.)*
 
-3. **Manual Setup (Required)**:
-   Since sensitive files are ignored by Git, you must manually create the following:
-   - **Environment Variables**: Create a `.env` file in the `server/` directory with `DB_HOST`, `JWT_SECRET`, and `EMAIL_PASS`.
-   - **Security Certificates**: Create a `server/certs/` directory and add your `localhost.key` and `localhost.crt` for HTTPS support.
-   - **Uploads Folder**: Create a `server/uploads/` directory for storing member photos and book covers.
+## 🛡️ Security Features
+- **OWASP Hardened**: Protected against SQL Injection (via stored procedures), XSS (via Helmet CSP), and CSRF (via double-submit tokens).
+- **Rate Limiting**: Brute-force attacks are blocked via Redis memory store.
+- **Account Lockouts**: 5 failed login attempts will lock an account.
+- **Secure Sessions**: Uses AES-GCM encrypted JWTs stored in strict HttpOnly secure cookies. No sensitive tokens are exposed to JavaScript.
 
-4. **Run Server**:
-   ```bash
-   npm run dev
-   ```
+## 🧪 Testing
+The backend features a comprehensive automated testing suite built with Jest and Supertest.
+To run the automated tests locally:
+```bash
+cd server
+npm install
+npm test
+```
+*(Note: Tests safely mock the database and Redis queues to prevent corrupting local data).*
 
-3. **Setup Client**:
-   ```bash
-   cd client
-   npm install
-   npm run dev # or ng serve
-   ```
-
-## 📄 License
-This project is for academic/professional use.
+## 📧 Background Workers
+Emails (like OTPs, Fine Reminders, and Issue Confirmations) are dispatched asynchronously. The Express API instantly sends a job to the Redis queue, and the `email.worker.js` process handles the heavy lifting in the background, ensuring 100% API responsiveness.

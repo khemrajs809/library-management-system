@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-import { AuthService } from '../services/auth';
+import { AuthService } from '../services/auth.service';
 import { ToastService } from '../services/toast.service';
 
 export const authGuard = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
@@ -42,7 +42,7 @@ export const authGuard = (route: ActivatedRouteSnapshot, state: RouterStateSnaps
 
     return true;
   } else {
-    router.navigate(['/login']);
+    router.navigate(['/login.component']);
     return false;
   }
 };

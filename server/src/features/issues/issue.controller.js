@@ -1,6 +1,7 @@
-const pool = require('../../db');
+const pool = require('../../config/db');
+const { generateLostBookHTML, generatePaymentReceiptHTML, generateFineReminderHTML } = require('../../utils/email.util');
+const { invalidateCache } = require('../../utils/cache.util');
 const { sendEmail } = require('../../common/services/email.service');
-const { generateLostBookHTML, generatePaymentReceiptHTML, generateFineReminderHTML } = require('../../utils/email-templates');
 
 // POST /api/issues — Issue a specific book copy to a member
 const issueBook = async (req, res) => {
@@ -35,6 +36,9 @@ const issueBook = async (req, res) => {
 
         await pool.query('CALL proc_issue_book(?, ?, ?, ?)', [copy_id, member_id, issue_date, due_date]);
 
+        await invalidateCache('cache:/api/admin/stats*');
+        await invalidateCache('cache:/api/admin/overview-stats*');
+
         res.status(201).json({ success: true, message: 'Book issued successfully', due_date });
     } catch (err) {
         console.error(err);
@@ -50,7 +54,7 @@ const renewBook = async (req, res) => {
     try {
         const results = await pool.query('CALL proc_get_issue_details(?)', [issue_id]);
         const issueCheck = results[0];
-        
+
         if (!issueCheck || issueCheck.length === 0 || issueCheck[0].status !== 'issued') return res.status(404).json({ success: false, message: 'Active issue not found' });
 
         const issue = issueCheck[0];
@@ -69,13 +73,13 @@ const renewBook = async (req, res) => {
 
         const resultsSwap = await pool.query('CALL proc_find_available_copies(?)', [issue.actual_book_id]);
         const otherCopiesCheck = resultsSwap[0];
-        
+
         if (otherCopiesCheck && otherCopiesCheck.length > 0) {
             const newCopy = otherCopiesCheck[0];
             const issue_date = new Date().toISOString().split('T')[0];
-            
+
             await pool.query('CALL proc_renew_book_with_swap(?, ?, ?, ?, ?, ?)', [issue_id, issue.book_id, newCopy.copy_id, issue.member_id, issue_date, newDueStr]);
-            
+
             return res.status(200).json({ success: true, message: `Renewed successfully by swapping to another available copy (ID: ${newCopy.copy_id})`, new_due_date: newDueStr });
         }
 
@@ -100,9 +104,12 @@ const returnBook = async (req, res) => {
         let fine = 0;
         const due = new Date(issue.due_date);
         const ret = new Date(return_date);
-        if (ret > due) fine = Math.ceil(Math.abs(ret - due) / (1000*60*60*24)) * 1;
+        if (ret > due) fine = Math.ceil(Math.abs(ret - due) / (1000 * 60 * 60 * 24)) * 1;
 
         await pool.query('CALL proc_return_book(?, ?, ?, ?)', [issue_id, issue.book_id, return_date, fine]);
+
+        await invalidateCache('cache:/api/admin/stats*');
+        await invalidateCache('cache:/api/admin/overview-stats*');
 
         res.status(200).json({ success: true, message: 'Returned successfully', fine_amount: fine });
     } catch (err) {
@@ -118,7 +125,7 @@ const markAsLost = async (req, res) => {
 
     try {
         const results = await pool.query('CALL proc_get_lost_book_details(?)', [issue_id]);
-        
+
         if (!results || !results[0] || results[0].length === 0 || results[0][0].status !== 'issued') return res.status(404).json({ success: false, message: 'Active issue not found' });
 
         const issue = results[0][0];
@@ -131,8 +138,15 @@ const markAsLost = async (req, res) => {
         if (issue.member_email) {
             const html = generateLostBookHTML(issue.member_name, issue.book_title, issue.book_id, fine);
             const text = `Hi ${issue.member_name},\n\nThe book "${issue.book_title}" (ID: ${issue.book_id}) has been marked as lost/damaged. As per our policy, a penalty of ₹${fine} (Book Price + ₹150) has been applied to your account.\n\nPlease visit the library to settle this amount.`;
-            sendEmail(issue.member_email, 'Library Book Lost - Penalty Applied', text, html);
+            try {
+                sendEmail(issue.member_email, 'Library Book Lost - Penalty Applied', text, html);
+            } catch (err) {
+                console.warn('[API] Failed to send lost book email', err);
+            }
         }
+
+        await invalidateCache('cache:/api/admin/stats*');
+        await invalidateCache('cache:/api/admin/overview-stats*');
 
         res.status(200).json({ success: true, message: 'Book marked as lost and member notified', fine_amount: fine });
     } catch (err) {
@@ -171,7 +185,7 @@ const payFine = async (req, res) => {
         const issueCheck = results[0];
 
         if (issueCheck.length === 0) return res.status(404).json({ success: false, message: 'Issue not found' });
-        
+
         const issue = issueCheck[0];
 
         await pool.query('CALL proc_pay_fine(?)', [id]);
@@ -179,8 +193,15 @@ const payFine = async (req, res) => {
         if (issue.member_email) {
             const html = generatePaymentReceiptHTML(issue.member_name, issue.book_title, issue.fine_amount);
             const text = `Hi ${issue.member_name},\n\nWe have successfully received your fine payment of ₹${issue.fine_amount} for the book "${issue.book_title}".\n\nYour dues for this specific issue have been fully cleared.\n\nThank you!\n\nRegards,\nLibrary Management Team`;
-            sendEmail(issue.member_email, 'Library Fine Payment Confirmation', text, html);
+            try {
+                sendEmail(issue.member_email, 'Library Fine Payment Confirmation', text, html);
+            } catch (err) {
+                console.warn('[API] Failed to send fine payment email', err);
+            }
         }
+
+        await invalidateCache('cache:/api/admin/stats*');
+        await invalidateCache('cache:/api/admin/overview-stats*');
 
         res.status(200).json({ success: true, message: 'Fine marked as paid and confirmation email sent' });
     } catch (err) {
@@ -202,9 +223,12 @@ const returnByBookId = async (req, res) => {
         let fine = 0;
         const due = new Date(issue.due_date);
         const ret = new Date(return_date);
-        if (ret > due) fine = Math.ceil(Math.abs(ret - due) / (1000*60*60*24)) * 1;
+        if (ret > due) fine = Math.ceil(Math.abs(ret - due) / (1000 * 60 * 60 * 24)) * 1;
 
         await pool.query('CALL proc_return_book(?, ?, ?, ?)', [issue.issue_id, copy_id, return_date, fine]);
+
+        await invalidateCache('cache:/api/admin/stats*');
+        await invalidateCache('cache:/api/admin/overview-stats*');
 
         res.status(200).json({ success: true, message: 'Returned successfully', fine_amount: fine });
     } catch (err) {
@@ -262,10 +286,10 @@ const lookupIssueByBookId = async (req, res) => {
 const getFinesAndLost = async (req, res) => {
     try {
         const [rows] = await pool.query('CALL proc_get_fines_and_lost()');
-        
+
         const today = new Date();
-        today.setHours(0,0,0,0);
-        
+        today.setHours(0, 0, 0, 0);
+
         const enhancedRows = rows.map(r => {
             if (r.status === 'issued') {
                 const due = new Date(r.due_date);
@@ -297,7 +321,7 @@ const sendFineReminder = async (req, res) => {
         const check = results[0];
 
         if (check.length === 0) return res.status(404).json({ success: false, message: 'Issue not found' });
-        
+
         const issue = check[0];
         if (!issue.member_email) return res.status(400).json({ success: false, message: 'Member has no email address' });
 
@@ -306,7 +330,7 @@ const sendFineReminder = async (req, res) => {
         if (issue.status === 'issued') {
             const due = new Date(issue.due_date);
             const today = new Date();
-            today.setHours(0,0,0,0);
+            today.setHours(0, 0, 0, 0);
             if (today > due) {
                 const diffDays = Math.ceil(Math.abs(today - due) / (1000 * 60 * 60 * 24));
                 fine = diffDays * 1;
@@ -320,7 +344,11 @@ const sendFineReminder = async (req, res) => {
         const text = `Hi ${issue.member_name},\n\nThis is a reminder regarding the book "${issue.book_title}".\nStatus: ${issue.status.toUpperCase()}\nPending Amount: ₹${fine}\n\nPlease visit the library to clear your dues.\n\nThank you.`;
         const html = generateFineReminderHTML(issue.member_name, issue.book_title, issue.status, fine);
 
-        sendEmail(issue.member_email, subject, text, html);
+        try {
+            sendEmail(issue.member_email, subject, text, html);
+        } catch (err) {
+            console.warn('[API] Failed to send fine reminder email', err);
+        }
         res.status(200).json({ success: true, message: 'Reminder email queued successfully' });
     } catch (err) {
         console.error(err);

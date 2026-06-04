@@ -1,0 +1,28 @@
+version: 2
+updates:
+  # Scan the frontend package.json for outdated npm packages
+  - package-ecosystem: "npm"
+    directory: "/client"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "frontend"
+
+  # Scan the backend package.json for outdated npm packages
+  - package-ecosystem: "npm"
+    directory: "/server"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "backend"
+
+  # Scan GitHub Actions workflows for outdated versions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5

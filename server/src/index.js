@@ -11,6 +11,7 @@ const initDB = require('./config/initDB');
 const setupSocket = require('./config/socket');
 const { setupNotificationJob } = require('./jobs/notification.job');
 
+
 // =====================================================
 //  INITIALIZE DATABASE
 // =====================================================
@@ -53,6 +54,13 @@ server.listen(PORT, () => {
 // Graceful shutdown for nodemon restarts on Windows
 const gracefulShutdown = () => {
     console.log('Shutting down gracefully...');
+    
+    // Fallback: forcefully exit after 1 second if server.close() hangs (e.g. open WebSockets)
+    setTimeout(() => {
+        console.log('Force closing hanging connections to prevent EADDRINUSE...');
+        process.exit(0);
+    }, 1000).unref();
+
     server.close(() => {
         console.log('Server closed.');
         process.exit(0);
@@ -62,3 +70,13 @@ const gracefulShutdown = () => {
 process.once('SIGUSR2', gracefulShutdown);
 process.on('SIGINT', gracefulShutdown);
 process.on('SIGTERM', gracefulShutdown);
+
+// Trigger nodemon restart
+
+// Trigger nodemon restart again
+
+// Trigger nodemon restart 3
+
+// Trigger nodemon restart 4
+
+// Trigger nodemon restart 5

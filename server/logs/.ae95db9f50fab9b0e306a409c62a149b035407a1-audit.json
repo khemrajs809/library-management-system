@@ -1,0 +1,25 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 30
+    },
+    "auditLog": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\.ae95db9f50fab9b0e306a409c62a149b035407a1-audit.json",
+    "files": [
+        {
+            "date": 1780398855313,
+            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\fatal-rejections-2026-06-02.log",
+            "hash": "73bca0f238978c3fe66220228d656c5e581b8c2af8beb6f75d4b65c43824ad90"
+        },
+        {
+            "date": 1780447718133,
+            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\fatal-rejections-2026-06-03.log",
+            "hash": "8d2df578767e97685e8634675a9cc466cf6e6c926747d1c8dad4eec3de195b5c"
+        },
+        {
+            "date": 1780557147684,
+            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\fatal-rejections-2026-06-04.log",
+            "hash": "ac50d16005a09bc7fcabd202b55f919d2088474e82933a8e29f157f67ca0da6b"
+        }
+    ],
+    "hashType": "sha256"
+}

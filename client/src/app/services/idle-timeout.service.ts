@@ -1,5 +1,5 @@
 import { Injectable, inject, NgZone, signal } from '@angular/core';
-import { AuthService } from './auth';
+import { AuthService } from './auth.service';
 import { fromEvent, merge, Subject } from 'rxjs';
 import { takeUntil, throttleTime } from 'rxjs/operators';
 

@@ -1,7 +1,7 @@
 const cron = require('node-cron');
-const pool = require('../db');
+const pool = require('../config/db');
 const { sendEmail } = require('../common/services/email.service');
-const { generateGenericMessageHTML, generateFineReminderHTML } = require('../utils/email-templates');
+const { generateGenericMessageHTML, generateFineReminderHTML } = require('../utils/email.util');
 
 /**
  * Sets up the daily overdue notification cron job.

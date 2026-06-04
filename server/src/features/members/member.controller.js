@@ -1,8 +1,9 @@
-const pool = require('../../db');
+const pool = require('../../config/db');
 const Papa = require('papaparse');
 const { sendEmail } = require('../../common/services/email.service');
-const { generateGenericMessageHTML } = require('../../utils/email-templates');
+const { generateGenericMessageHTML } = require('../../utils/email.util');
 const { sanitizeObject } = require('../../common/services/sanitizer.service');
+const { invalidateCache } = require('../../utils/cache.util');
 
 // POST /api/members — Register a new member
 const addMember = async (req, res) => {
@@ -89,6 +90,10 @@ const b = req.body;
                 photo_url, govt_id_url, admission_receipt_url, security_deposit_url
             ]
         );
+
+        await invalidateCache('cache:/api/admin/stats*');
+        await invalidateCache('cache:/api/admin/overview-stats*');
+
         res.status(201).json({ success: true, message: 'Member created successfully', member_id, photo_url });
     } catch (err) {
         if (err.code === 'ER_DUP_ENTRY') {
@@ -289,6 +294,10 @@ const deleteMember = async (req, res) => {
         const [active] = await pool.query('CALL proc_check_member_active_issues(?)', [req.params.id]);
         if (active.length > 0) return res.status(400).json({ success: false, message: 'Cannot delete: member has active issued books.' });
         await pool.query('CALL proc_soft_delete_member(?)', [req.params.id]);
+
+        await invalidateCache('cache:/api/admin/stats*');
+        await invalidateCache('cache:/api/admin/overview-stats*');
+
         res.status(200).json({ success: true, message: 'Member moved to trash' });
     } catch (err) {
         console.error(err);
@@ -359,6 +368,11 @@ const importMembers = async (req, res) => {
         }
     }
 
+    if (results.added > 0) {
+        await invalidateCache('cache:/api/admin/stats*');
+        await invalidateCache('cache:/api/admin/overview-stats*');
+    }
+
     res.status(200).json({ success: true, message: `Import complete: ${results.added} added, ${results.failed.length} failed`, results });
 };
 
@@ -391,6 +405,10 @@ const getDeletedMembers = async (req, res) => {
 const restoreMember = async (req, res) => {
     try {
         await pool.query('CALL proc_restore_member(?)', [req.params.id]);
+
+        await invalidateCache('cache:/api/admin/stats*');
+        await invalidateCache('cache:/api/admin/overview-stats*');
+
         res.status(200).json({ success: true, message: 'Member restored successfully' });
     } catch (err) {
         console.error(err);
@@ -401,6 +419,10 @@ const restoreMember = async (req, res) => {
 const permanentDeleteMember = async (req, res) => {
     try {
         await pool.query('CALL proc_permanent_delete_member(?)', [req.params.id]);
+
+        await invalidateCache('cache:/api/admin/stats*');
+        await invalidateCache('cache:/api/admin/overview-stats*');
+
         res.status(200).json({ success: true, message: 'Member permanently deleted' });
     } catch (err) {
         console.error(err);

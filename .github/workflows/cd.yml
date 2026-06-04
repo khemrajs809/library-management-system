@@ -22,6 +22,9 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
@@ -34,6 +37,8 @@ jobs:
           context: ./server
           push: true
           tags: ${{ env.DOCKER_USERNAME }}/lms-backend:latest
+          cache-from: type=registry,ref=${{ env.DOCKER_USERNAME }}/lms-backend:buildcache
+          cache-to: type=registry,ref=${{ env.DOCKER_USERNAME }}/lms-backend:buildcache,mode=max
 
       - name: Build & Push Frontend
         uses: docker/build-push-action@v5
@@ -41,6 +46,8 @@ jobs:
           context: ./client
           push: true
           tags: ${{ env.DOCKER_USERNAME }}/lms-frontend:latest
+          cache-from: type=registry,ref=${{ env.DOCKER_USERNAME }}/lms-frontend:buildcache
+          cache-to: type=registry,ref=${{ env.DOCKER_USERNAME }}/lms-frontend:buildcache,mode=max
 
   deploy-to-production:
     name: 🚀 Deploy to Production Server

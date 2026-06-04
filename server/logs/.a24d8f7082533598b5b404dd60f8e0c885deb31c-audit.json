@@ -1,0 +1,25 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 30
+    },
+    "auditLog": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\.a24d8f7082533598b5b404dd60f8e0c885deb31c-audit.json",
+    "files": [
+        {
+            "date": 1780398855310,
+            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\fatal-exceptions-2026-06-02.log",
+            "hash": "ede3d23a20e13182e2069178140122880efcd319913787c7e34b0492cda8fc07"
+        },
+        {
+            "date": 1780447718130,
+            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\fatal-exceptions-2026-06-03.log",
+            "hash": "90f48a254b38d2a8dee8fb0c6bcb142bd807494499db9cd63b00c311c948a11a"
+        },
+        {
+            "date": 1780557147681,
+            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\fatal-exceptions-2026-06-04.log",
+            "hash": "eb8dc3d344662e3c67bebbf09f3140fdbc3b9e7ebbd3de0ae52876b93a8741fa"
+        }
+    ],
+    "hashType": "sha256"
+}

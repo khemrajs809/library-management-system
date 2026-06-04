@@ -1,5 +1,5 @@
 const svgCaptcha = require('svg-captcha');
-const pool = require('../../db');
+const pool = require('../../config/db');
 const crypto = require('crypto');
 
 const generateCaptcha = async (req, res) => {

@@ -1,13 +1,17 @@
-const pool = require('../../db');
+const pool = require('../../config/db');
 const bcrypt = require('bcryptjs');
 const Papa = require('papaparse');
 const { sanitizeObject } = require('../../common/services/sanitizer.service');
+const zxcvbn = require('zxcvbn');
 
 // POST /api/admin/librarians — Create a new librarian account
 const createLibrarian = async (req, res) => {
     let { name, email, password } = req.body;
     let lib_id = req.body.libId || req.body.lib_id;
     try {
+        if (!password || zxcvbn(password).score < 3) {
+            return res.status(400).json({ success: false, message: 'Password is too weak. Please use a stronger password.' });
+        }
         // Auto-generate lib_id if not provided
         if (!lib_id) {
             let unique = false;
@@ -54,8 +58,8 @@ const updateLibrarianPassword = async (req, res) => {
     const { id } = req.params;
     const { password } = req.body;
 
-    if (!password || password.length < 6) {
-        return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
+    if (!password || zxcvbn(password).score < 3) {
+        return res.status(400).json({ success: false, message: 'Password is too weak. Please use a stronger password.' });
     }
 
     try {

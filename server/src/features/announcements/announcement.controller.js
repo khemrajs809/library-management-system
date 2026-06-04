@@ -1,4 +1,4 @@
-const pool = require('../../db');
+const pool = require('../../config/db');
 const { invalidateCache } = require('../../utils/cache.util');
 
 // GET /api/announcements/active - Public: Fetch current active announcements

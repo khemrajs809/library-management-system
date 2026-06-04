@@ -1,0 +1,73 @@
+@import "../../../librarian-dashboard.component.css";
+@import "../../circulation-desk.component.css";
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.ds-data-value {
+    color: #0f172a !important;
+    font-weight: 800 !important;
+    font-size: 1rem !important;
+}
+
+.ds-id-pill {
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    font-size: 0.75rem !important;
+}
+
+.ds-admin-table th {
+    background: #145277 !important; /* Requested Navy */
+    color: white !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 0.08em !important;
+    padding: 12px 15px !important;
+    text-transform: uppercase;
+}
+
+.ds-admin-table tbody tr:nth-child(odd) {
+    background-color: #fff1e6 !important; /* Requested warm beige */
+}
+
+.ds-admin-table tbody tr:nth-child(even) {
+    background-color: #f0efeb !important; /* Requested light gray */
+}
+
+.ds-admin-table tbody tr:hover {
+    background-color: #e2e8f0 !important;
+}
+
+.t-label {
+    font-weight: 800 !important;
+    color: #475569 !important;
+    font-size: 0.7rem !important;
+}
+
+.t-val {
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    font-size: 0.85rem !important;
+}
+
+/* Utilities for extraction */
+.p-5-center { padding: 5rem; text-align: center; }
+.text-gray-mt1 { color: #64748b; font-weight: 600; margin-top: 1rem; }
+.text-center { text-align: center; }
+.font-1-bold { font-size: 1rem; font-weight: 800; color: #1e293b; display: inline-block; }
+.pill-gray-fit { background: #f1f5f9; color: #475569; border-color: #cbd5e1; font-size: 0.7rem; width: fit-content; display: inline-block; }
+.flex-align-gap8 { display: flex; align-items: center; gap: 8px; }
+.font-095-bold { font-weight: 800; font-size: 0.95rem; color: #1e293b; }
+.flex-gap6-mt8 { display: flex; gap: 6px; margin-top: 8px; }
+.pill-sm-pad { font-size: 0.65rem; padding: 2px 6px; }
+.pill-blue-sm-pad { background: #eff6ff; color: #1e40af; border-color: #bfdbfe; font-size: 0.6rem; padding: 2px 6px; }
+.flex-align-gap8-mt8 { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.pill-yellow-sm { background: #fffbeb; color: #92400e; border-color: #fde68a; font-size: 0.7rem; }
+.font-085-gray { font-size: 0.85rem; color: #64748b; font-weight: 600; }
+.text-xs-gray-uc { font-size: 0.65rem; font-weight: 900; color: #94a3b8; text-transform: uppercase; }
+.font-11-bold { font-size: 1.1rem; font-weight: 900; color: #1e293b; }
+.icon-3rem-mb1 { font-size: 3rem; margin-bottom: 1rem; display: block; }
+.text-gray-semibold { color: #94a3b8; font-weight: 600; }

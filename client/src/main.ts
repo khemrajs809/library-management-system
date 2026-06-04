@@ -1,6 +1,6 @@
 import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/app.config';
-import { App } from './app/app';
+import { App } from './app/app.component';
 import { isDevMode } from '@angular/core';
 
 // Intercept and suppress specific Angular development logs without disabling HMR

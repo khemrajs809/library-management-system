@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const pool = require('../db');
+const pool = require('./db');
 const { initSessionDb } = require('../features/sessions/session.service');
 
 const syncProcedures = async () => {
@@ -49,6 +49,7 @@ const initDB = async () => {
     try {
         await syncProcedures();
         await pool.query('CALL initialize_database_schema()');
+        await pool.query('CALL optimize_database_schema()');
         console.log('Database synchronized and historical data healed successfully.');
         await initSessionDb();
     } catch (err) {

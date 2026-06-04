@@ -28,5 +28,8 @@ COPY --from=builder /usr/src/app/package*.json ./
 # Expose the API port
 EXPOSE 5005
 
+# Secure container by running as unprivileged node user
+USER node
+
 # Run the backend using standard node (no nodemon overhead in production)
 CMD ["node", "src/index.js"]

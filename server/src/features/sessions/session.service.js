@@ -1,4 +1,4 @@
-const pool = require('../../db');
+const pool = require('../../config/db');
 
 /**
  * Self-healing Database Initialization for login sessions and user session actions

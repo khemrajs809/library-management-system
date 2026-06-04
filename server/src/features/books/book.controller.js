@@ -1,4 +1,4 @@
-const pool = require('../../db');
+const pool = require('../../config/db');
 const Papa = require('papaparse');
 const bookService = require('./book.service');
 const { invalidateCache } = require('../../utils/cache.util');

@@ -1,0 +1,992 @@
+
+
+-- Table: active_sessions_view
+undefined;
+
+-- Table: activity_log
+CREATE TABLE `activity_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `action` varchar(255) NOT NULL,
+  `details` text DEFAULT NULL,
+  `performed_by` varchar(100) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+-- Indexes for activity_log:
+[
+  {
+    "Table": "activity_log",
+    "Non_unique": "0",
+    "Key_name": "PRIMARY",
+    "Seq_in_index": 1,
+    "Column_name": "id",
+    "Collation": "A",
+    "Cardinality": "0",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  }
+]
+
+-- Table: announcements
+CREATE TABLE `announcements` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(36) DEFAULT uuid(),
+  `title` varchar(255) NOT NULL,
+  `message` text NOT NULL,
+  `short_message` varchar(255) DEFAULT NULL,
+  `type` enum('info','success','warning','error','emergency','maintenance','holiday','event','update','system','arrival','hours','policy','staff') DEFAULT 'info',
+  `priority` enum('low','medium','high','critical') DEFAULT 'low',
+  `is_active` tinyint(1) DEFAULT 1,
+  `is_popup` tinyint(1) DEFAULT 0,
+  `scroll_speed` int(11) DEFAULT 20,
+  `text_color` varchar(10) DEFAULT '#ffffff',
+  `background_color` varchar(10) DEFAULT '#b91c1c',
+  `border_color` varchar(10) DEFAULT '#991b1b',
+  `icon_name` varchar(50) DEFAULT 'info',
+  `show_icon` tinyint(1) DEFAULT 1,
+  `show_close_button` tinyint(1) DEFAULT 1,
+  `pause_on_hover` tinyint(1) DEFAULT 1,
+  `repeat_loop` tinyint(1) DEFAULT 1,
+  `animation_type` varchar(50) DEFAULT 'marquee',
+  `clickable_link` text DEFAULT NULL,
+  `open_in_new_tab` tinyint(1) DEFAULT 1,
+  `start_time` datetime NOT NULL,
+  `end_time` datetime NOT NULL,
+  `display_order` int(11) DEFAULT 0,
+  `target_roles` varchar(255) DEFAULT 'all',
+  `target_pages` varchar(255) DEFAULT 'all',
+  `device_visibility` enum('all','desktop','mobile') DEFAULT 'all',
+  `language_code` varchar(10) DEFAULT 'en',
+  `view_count` int(11) DEFAULT 0,
+  `click_count` int(11) DEFAULT 0,
+  `last_shown_at` datetime DEFAULT NULL,
+  `created_by` varchar(50) DEFAULT NULL,
+  `updated_by` varchar(50) DEFAULT NULL,
+  `is_deleted` tinyint(1) DEFAULT 0,
+  `deleted_at` datetime DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `is_active` (`is_active`,`is_deleted`,`start_time`,`end_time`),
+  KEY `priority` (`priority`,`display_order`)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- Indexes for announcements:
+[
+  {
+    "Table": "announcements",
+    "Non_unique": "0",
+    "Key_name": "PRIMARY",
+    "Seq_in_index": 1,
+    "Column_name": "id",
+    "Collation": "A",
+    "Cardinality": "20",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  },
+  {
+    "Table": "announcements",
+    "Non_unique": "1",
+    "Key_name": "is_active",
+    "Seq_in_index": 1,
+    "Column_name": "is_active",
+    "Collation": "A",
+    "Cardinality": "2",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "YES",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  },
+  {
+    "Table": "announcements",
+    "Non_unique": "1",
+    "Key_name": "is_active",
+    "Seq_in_index": 2,
+    "Column_name": "is_deleted",
+    "Collation": "A",
+    "Cardinality": "3",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "YES",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  },
+  {
+    "Table": "announcements",
+    "Non_unique": "1",
+    "Key_name": "is_active",
+    "Seq_in_index": 3,
+    "Column_name": "start_time",
+    "Collation": "A",
+    "Cardinality": "20",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  },
+  {
+    "Table": "announcements",
+    "Non_unique": "1",
+    "Key_name": "is_active",
+    "Seq_in_index": 4,
+    "Column_name": "end_time",
+    "Collation": "A",
+    "Cardinality": "20",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  },
+  {
+    "Table": "announcements",
+    "Non_unique": "1",
+    "Key_name": "priority",
+    "Seq_in_index": 1,
+    "Column_name": "priority",
+    "Collation": "A",
+    "Cardinality": "2",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "YES",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  },
+  {
+    "Table": "announcements",
+    "Non_unique": "1",
+    "Key_name": "priority",
+    "Seq_in_index": 2,
+    "Column_name": "display_order",
+    "Collation": "A",
+    "Cardinality": "2",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "YES",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  }
+]
+
+-- Table: audit_logs
+CREATE TABLE `audit_logs` (
+  `log_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(50) DEFAULT NULL,
+  `user_role` varchar(20) DEFAULT NULL,
+  `action` varchar(255) DEFAULT NULL,
+  `details` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`log_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=345 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+-- Indexes for audit_logs:
+[
+  {
+    "Table": "audit_logs",
+    "Non_unique": "0",
+    "Key_name": "PRIMARY",
+    "Seq_in_index": 1,
+    "Column_name": "log_id",
+    "Collation": "A",
+    "Cardinality": "295",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  }
+]
+
+-- Table: book_copies
+CREATE TABLE `book_copies` (
+  `copy_id` varchar(50) NOT NULL,
+  `book_id` varchar(50) DEFAULT NULL,
+  `status` enum('available','issued','lost','damaged') DEFAULT 'available',
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`copy_id`),
+  KEY `book_id` (`book_id`),
+  CONSTRAINT `1` FOREIGN KEY (`book_id`) REFERENCES `books` (`book_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+-- Indexes for book_copies:
+[
+  {
+    "Table": "book_copies",
+    "Non_unique": "0",
+    "Key_name": "PRIMARY",
+    "Seq_in_index": 1,
+    "Column_name": "copy_id",
+    "Collation": "A",
+    "Cardinality": "185",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  },
+  {
+    "Table": "book_copies",
+    "Non_unique": "1",
+    "Key_name": "book_id",
+    "Seq_in_index": 1,
+    "Column_name": "book_id",
+    "Collation": "A",
+    "Cardinality": "37",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "YES",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  }
+]
+
+-- Table: books
+CREATE TABLE `books` (
+  `book_id` varchar(20) NOT NULL,
+  `title` varchar(200) NOT NULL,
+  `quantity` int(11) DEFAULT 1,
+  `available` int(11) DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `isbn` varchar(50) DEFAULT NULL,
+  `price` decimal(10,2) DEFAULT 0.00,
+  `author` varchar(100) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `cover_url` varchar(255) DEFAULT NULL,
+  `stream` varchar(100) DEFAULT NULL,
+  `year` int(11) DEFAULT NULL,
+  `publication_year` int(11) DEFAULT NULL,
+  `is_deleted` tinyint(1) DEFAULT 0,
+  `publisher` varchar(200) DEFAULT NULL,
+  `edition` varchar(100) DEFAULT NULL,
+  `shelf_location` varchar(100) DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`book_id`),
+  KEY `idx_books_title` (`title`),
+  KEY `idx_books_isbn` (`isbn`),
+  KEY `idx_books_author` (`author`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+-- Indexes for books:
+[
+  {
+    "Table": "books",
+    "Non_unique": "0",
+    "Key_name": "PRIMARY",
+    "Seq_in_index": 1,
+    "Column_name": "book_id",
+    "Collation": "A",
+    "Cardinality": "35",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  },
+  {
+    "Table": "books",
+    "Non_unique": "1",
+    "Key_name": "idx_books_title",
+    "Seq_in_index": 1,
+    "Column_name": "title",
+    "Collation": "A",
+    "Cardinality": "35",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  },
+  {
+    "Table": "books",
+    "Non_unique": "1",
+    "Key_name": "idx_books_isbn",
+    "Seq_in_index": 1,
+    "Column_name": "isbn",
+    "Collation": "A",
+    "Cardinality": "35",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "YES",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  },
+  {
+    "Table": "books",
+    "Non_unique": "1",
+    "Key_name": "idx_books_author",
+    "Seq_in_index": 1,
+    "Column_name": "author",
+    "Collation": "A",
+    "Cardinality": "35",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "YES",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  }
+]
+
+-- Table: captchas
+CREATE TABLE `captchas` (
+  `id` varchar(100) NOT NULL,
+  `text` varchar(10) NOT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+-- Indexes for captchas:
+[
+  {
+    "Table": "captchas",
+    "Non_unique": "0",
+    "Key_name": "PRIMARY",
+    "Seq_in_index": 1,
+    "Column_name": "id",
+    "Collation": "A",
+    "Cardinality": "0",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  }
+]
+
+-- Table: issues
+CREATE TABLE `issues` (
+  `issue_id` int(11) NOT NULL AUTO_INCREMENT,
+  `book_id` varchar(20) DEFAULT NULL,
+  `member_id` varchar(20) DEFAULT NULL,
+  `issue_date` date NOT NULL,
+  `due_date` date NOT NULL,
+  `return_date` date DEFAULT NULL,
+  `fine_amount` decimal(10,2) DEFAULT 0.00,
+  `status` enum('issued','returned','lost') DEFAULT 'issued',
+  `fine_paid` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`issue_id`),
+  KEY `member_id` (`member_id`),
+  KEY `fk_issues_book_id` (`book_id`),
+  KEY `idx_issues_status` (`status`),
+  KEY `idx_issues_due_date` (`due_date`),
+  CONSTRAINT `2` FOREIGN KEY (`member_id`) REFERENCES `members` (`member_id`),
+  CONSTRAINT `fk_issues_book_id` FOREIGN KEY (`book_id`) REFERENCES `books` (`book_id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+-- Indexes for issues:
+[
+  {
+    "Table": "issues",
+    "Non_unique": "0",
+    "Key_name": "PRIMARY",
+    "Seq_in_index": 1,
+    "Column_name": "issue_id",
+    "Collation": "A",
+    "Cardinality": "13",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  },
+  {
+    "Table": "issues",
+    "Non_unique": "1",
+    "Key_name": "member_id",
+    "Seq_in_index": 1,
+    "Column_name": "member_id",
+    "Collation": "A",
+    "Cardinality": "6",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "YES",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  },
+  {
+    "Table": "issues",
+    "Non_unique": "1",
+    "Key_name": "fk_issues_book_id",
+    "Seq_in_index": 1,
+    "Column_name": "book_id",
+    "Collation": "A",
+    "Cardinality": "13",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "YES",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  },
+  {
+    "Table": "issues",
+    "Non_unique": "1",
+    "Key_name": "idx_issues_status",
+    "Seq_in_index": 1,
+    "Column_name": "status",
+    "Collation": "A",
+    "Cardinality": "3",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "YES",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  },
+  {
+    "Table": "issues",
+    "Non_unique": "1",
+    "Key_name": "idx_issues_due_date",
+    "Seq_in_index": 1,
+    "Column_name": "due_date",
+    "Collation": "A",
+    "Cardinality": "3",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  }
+]
+
+-- Table: login_attempts
+CREATE TABLE `login_attempts` (
+  `email` varchar(255) NOT NULL,
+  `attempts` int(11) DEFAULT 0,
+  `lockout_until` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+-- Indexes for login_attempts:
+[
+  {
+    "Table": "login_attempts",
+    "Non_unique": "0",
+    "Key_name": "PRIMARY",
+    "Seq_in_index": 1,
+    "Column_name": "email",
+    "Collation": "A",
+    "Cardinality": "5",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  }
+]
+
+-- Table: members
+CREATE TABLE `members` (
+  `member_id` varchar(20) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `dob` date NOT NULL,
+  `photo_url` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `phone` varchar(15) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `is_deleted` tinyint(1) DEFAULT 0,
+  `gender` enum('Male','Female','Other') DEFAULT NULL,
+  `permanent_address` text DEFAULT NULL,
+  `current_address` text DEFAULT NULL,
+  `course` varchar(100) DEFAULT NULL,
+  `department` varchar(100) DEFAULT NULL,
+  `year_semester` varchar(50) DEFAULT NULL,
+  `membership_type` enum('Student','Faculty','Research Scholar','Other') DEFAULT 'Student',
+  `no_dues_status` tinyint(1) DEFAULT 1,
+  `govt_id_url` varchar(255) DEFAULT NULL,
+  `admission_receipt_url` varchar(255) DEFAULT NULL,
+  `security_deposit_url` varchar(255) DEFAULT NULL,
+  `roll_number` varchar(50) DEFAULT NULL,
+  `academic_session` varchar(50) DEFAULT NULL,
+  `hod_name` varchar(100) DEFAULT NULL,
+  `guardian_name` varchar(100) DEFAULT NULL,
+  `guardian_phone` varchar(15) DEFAULT NULL,
+  `blood_group` varchar(5) DEFAULT NULL,
+  `membership_expiry` date DEFAULT NULL,
+  `max_book_limit` int(11) DEFAULT 5,
+  `account_status` enum('Active','Suspended','Blacklisted') DEFAULT 'Active',
+  `curr_house` varchar(100) DEFAULT NULL,
+  `curr_street` varchar(150) DEFAULT NULL,
+  `curr_area` varchar(150) DEFAULT NULL,
+  `curr_city` varchar(100) DEFAULT NULL,
+  `curr_state` varchar(100) DEFAULT NULL,
+  `curr_pincode` varchar(10) DEFAULT NULL,
+  `perm_house` varchar(100) DEFAULT NULL,
+  `perm_street` varchar(150) DEFAULT NULL,
+  `perm_area` varchar(150) DEFAULT NULL,
+  `perm_city` varchar(100) DEFAULT NULL,
+  `perm_state` varchar(100) DEFAULT NULL,
+  `perm_pincode` varchar(10) DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`member_id`),
+  KEY `idx_members_email` (`email`),
+  KEY `idx_members_phone` (`phone`),
+  KEY `idx_members_roll` (`roll_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+-- Indexes for members:
+[
+  {
+    "Table": "members",
+    "Non_unique": "0",
+    "Key_name": "PRIMARY",
+    "Seq_in_index": 1,
+    "Column_name": "member_id",
+    "Collation": "A",
+    "Cardinality": "39",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  },
+  {
+    "Table": "members",
+    "Non_unique": "1",
+    "Key_name": "idx_members_email",
+    "Seq_in_index": 1,
+    "Column_name": "email",
+    "Collation": "A",
+    "Cardinality": "39",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "YES",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  },
+  {
+    "Table": "members",
+    "Non_unique": "1",
+    "Key_name": "idx_members_phone",
+    "Seq_in_index": 1,
+    "Column_name": "phone",
+    "Collation": "A",
+    "Cardinality": "39",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "YES",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  },
+  {
+    "Table": "members",
+    "Non_unique": "1",
+    "Key_name": "idx_members_roll",
+    "Seq_in_index": 1,
+    "Column_name": "roll_number",
+    "Collation": "A",
+    "Cardinality": "39",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "YES",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  }
+]
+
+-- Table: otps
+CREATE TABLE `otps` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(20) NOT NULL,
+  `otp_code` varchar(6) NOT NULL,
+  `expires_at` timestamp NOT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=154 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+-- Indexes for otps:
+[
+  {
+    "Table": "otps",
+    "Non_unique": "0",
+    "Key_name": "PRIMARY",
+    "Seq_in_index": 1,
+    "Column_name": "id",
+    "Collation": "A",
+    "Cardinality": "0",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  },
+  {
+    "Table": "otps",
+    "Non_unique": "1",
+    "Key_name": "user_id",
+    "Seq_in_index": 1,
+    "Column_name": "user_id",
+    "Collation": "A",
+    "Cardinality": "0",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  }
+]
+
+-- Table: project_notes
+CREATE TABLE `project_notes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `project_details` text DEFAULT NULL,
+  `features` text DEFAULT NULL,
+  `pattern_password` varchar(255) NOT NULL DEFAULT '12369',
+  `english_details` text DEFAULT NULL,
+  `hinglish_details` text DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+-- Indexes for project_notes:
+[
+  {
+    "Table": "project_notes",
+    "Non_unique": "0",
+    "Key_name": "PRIMARY",
+    "Seq_in_index": 1,
+    "Column_name": "id",
+    "Collation": "A",
+    "Cardinality": "1",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  }
+]
+
+-- Table: token_blacklist
+CREATE TABLE `token_blacklist` (
+  `token` varchar(512) NOT NULL,
+  `expires_at` timestamp NOT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `user_id` varchar(50) DEFAULT NULL,
+  `status` enum('active','inactive') DEFAULT 'active',
+  `login_time` timestamp NULL DEFAULT current_timestamp(),
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
+  `user_name` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `role` varchar(50) DEFAULT NULL,
+  `logout_time` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`token`),
+  KEY `fk_blacklist_user_id` (`user_id`),
+  CONSTRAINT `fk_blacklist_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+-- Indexes for token_blacklist:
+[
+  {
+    "Table": "token_blacklist",
+    "Non_unique": "0",
+    "Key_name": "PRIMARY",
+    "Seq_in_index": 1,
+    "Column_name": "token",
+    "Collation": "A",
+    "Cardinality": "0",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  },
+  {
+    "Table": "token_blacklist",
+    "Non_unique": "1",
+    "Key_name": "fk_blacklist_user_id",
+    "Seq_in_index": 1,
+    "Column_name": "user_id",
+    "Collation": "A",
+    "Cardinality": "0",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "YES",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  }
+]
+
+-- Table: user_login_sessions
+CREATE TABLE `user_login_sessions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(20) DEFAULT NULL,
+  `user_name` varchar(100) DEFAULT NULL,
+  `email` varchar(100) NOT NULL,
+  `login_time` timestamp NULL DEFAULT current_timestamp(),
+  `logout_time` timestamp NULL DEFAULT NULL,
+  `last_activity_time` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
+  `browser` varchar(100) DEFAULT NULL,
+  `os` varchar(100) DEFAULT NULL,
+  `device_type` varchar(50) DEFAULT NULL,
+  `location` varchar(100) DEFAULT NULL,
+  `status` enum('successful','failed','blocked','suspicious') DEFAULT 'successful',
+  `failure_reason` varchar(255) DEFAULT NULL,
+  `session_status` enum('online','offline','expired') DEFAULT 'online',
+  `risk_score` int(11) DEFAULT 0,
+  `risk_level` varchar(20) DEFAULT 'Low',
+  `token` varchar(500) DEFAULT NULL,
+  `role` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_login_time` (`login_time`),
+  KEY `idx_status` (`status`),
+  KEY `idx_ip_address` (`ip_address`),
+  CONSTRAINT `fk_sessions_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=91 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+-- Indexes for user_login_sessions:
+[
+  {
+    "Table": "user_login_sessions",
+    "Non_unique": "0",
+    "Key_name": "PRIMARY",
+    "Seq_in_index": 1,
+    "Column_name": "id",
+    "Collation": "A",
+    "Cardinality": "90",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  },
+  {
+    "Table": "user_login_sessions",
+    "Non_unique": "1",
+    "Key_name": "idx_user_id",
+    "Seq_in_index": 1,
+    "Column_name": "user_id",
+    "Collation": "A",
+    "Cardinality": "3",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "YES",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  },
+  {
+    "Table": "user_login_sessions",
+    "Non_unique": "1",
+    "Key_name": "idx_login_time",
+    "Seq_in_index": 1,
+    "Column_name": "login_time",
+    "Collation": "A",
+    "Cardinality": "90",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "YES",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  },
+  {
+    "Table": "user_login_sessions",
+    "Non_unique": "1",
+    "Key_name": "idx_status",
+    "Seq_in_index": 1,
+    "Column_name": "status",
+    "Collation": "A",
+    "Cardinality": "3",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "YES",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  },
+  {
+    "Table": "user_login_sessions",
+    "Non_unique": "1",
+    "Key_name": "idx_ip_address",
+    "Seq_in_index": 1,
+    "Column_name": "ip_address",
+    "Collation": "A",
+    "Cardinality": "2",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "YES",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  }
+]
+
+-- Table: user_session_actions
+CREATE TABLE `user_session_actions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `session_id` int(11) NOT NULL,
+  `action_type` varchar(100) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `path` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_session_id` (`session_id`),
+  CONSTRAINT `1` FOREIGN KEY (`session_id`) REFERENCES `user_login_sessions` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=130 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+-- Indexes for user_session_actions:
+[
+  {
+    "Table": "user_session_actions",
+    "Non_unique": "0",
+    "Key_name": "PRIMARY",
+    "Seq_in_index": 1,
+    "Column_name": "id",
+    "Collation": "A",
+    "Cardinality": "112",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  },
+  {
+    "Table": "user_session_actions",
+    "Non_unique": "1",
+    "Key_name": "idx_session_id",
+    "Seq_in_index": 1,
+    "Column_name": "session_id",
+    "Collation": "A",
+    "Cardinality": "16",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  }
+]
+
+-- Table: users
+CREATE TABLE `users` (
+  `id` varchar(20) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `role` enum('admin','librarian') NOT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `status` enum('active','inactive') DEFAULT 'active',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`),
+  KEY `idx_users_role` (`role`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+-- Indexes for users:
+[
+  {
+    "Table": "users",
+    "Non_unique": "0",
+    "Key_name": "PRIMARY",
+    "Seq_in_index": 1,
+    "Column_name": "id",
+    "Collation": "A",
+    "Cardinality": "4",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  },
+  {
+    "Table": "users",
+    "Non_unique": "0",
+    "Key_name": "email",
+    "Seq_in_index": 1,
+    "Column_name": "email",
+    "Collation": "A",
+    "Cardinality": "4",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  },
+  {
+    "Table": "users",
+    "Non_unique": "1",
+    "Key_name": "idx_users_role",
+    "Seq_in_index": 1,
+    "Column_name": "role",
+    "Collation": "A",
+    "Cardinality": "2",
+    "Sub_part": null,
+    "Packed": null,
+    "Null": "",
+    "Index_type": "BTREE",
+    "Comment": "",
+    "Index_comment": "",
+    "Ignored": "NO"
+  }
+]

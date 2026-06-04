@@ -1,0 +1,9 @@
+const AUTH_CONSTANTS = {
+    TOKEN_EXPIRATION: '3h',
+    COOKIE_MAX_AGE: 3 * 60 * 60 * 1000, // 3 hours
+    LOCKOUT_THRESHOLD: 5,
+    LOCKOUT_DURATION_MS: 1 * 60 * 1000, // 1 minute
+    OTP_EXPIRATION_MINUTES: 10
+};
+
+module.exports = AUTH_CONSTANTS;

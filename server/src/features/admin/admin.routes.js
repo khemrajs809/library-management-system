@@ -17,8 +17,8 @@ const {
     updateLibrarianStatus
 } = require('./admin.controller');
 const announcementController = require('../announcements/announcement.controller');
-const authController = require('../auth/auth.controller');
 const { authLimiter } = require('../../middlewares/rateLimiter.middleware');
+const cacheMiddleware = require('../../middlewares/cache.middleware');
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -38,10 +38,10 @@ router.post('/import-books', verifyToken, upload.single('file'), auditLog('Bulk 
 router.post('/import-members', verifyToken, upload.single('file'), auditLog('Bulk Import Members'), importMembers);
 
 // Public/Librarian: Stats (Common dashboard data)
-router.get('/stats', verifyToken, getStats);
+router.get('/stats', verifyToken, cacheMiddleware(300), getStats);
 
 // Protected: Full overview stats for admin dashboard
-router.get('/overview-stats', verifyToken, checkRole(['admin']), getOverviewStats);
+router.get('/overview-stats', verifyToken, checkRole(['admin']), cacheMiddleware(300), getOverviewStats);
 
 // Protected: Audit Logs
 router.get('/audit-logs', verifyToken, checkRole(['admin']), getAuditLogs);

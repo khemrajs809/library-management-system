@@ -1,7 +1,7 @@
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { catchError, throwError } from 'rxjs';
-import { AuthService } from '../services/auth';
+import { catchError, throwError, of } from 'rxjs';
+import { AuthService } from '../services/auth.service';
 import { ToastService } from '../services/toast.service';
 /**
  * Functional HTTP interceptor that automatically attaches the JWT token
@@ -12,15 +12,33 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const toastService = inject(ToastService);
 
+  // Extract CSRF Token manually for cross-origin local development
+  let xsrfToken = null;
+  if (typeof document !== 'undefined') {
+    const match = document.cookie.match(/(?:^|;)\s*XSRF-TOKEN=([^;]*)/);
+    if (match) xsrfToken = match[1];
+  }
+
   // Clone the request and add withCredentials to send the HttpOnly cookie
-  const authReq = req.clone({
+  let authReq = req.clone({
     withCredentials: true
   });
+
+  if (xsrfToken && ['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) {
+    authReq = authReq.clone({
+      headers: req.headers.set('x-xsrf-token', xsrfToken)
+    });
+  }
 
   // Handle the response and catch 401 Unauthorized errors
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401) {
+      // Suppress 403 Forbidden CSRF errors during Server-Side Rendering (SSR)
+      if (error.status === 403 && typeof document === 'undefined') {
+        return of(null as any);
+      }
+
+      if (error.status === 401 && typeof document !== 'undefined') {
         // Session expired or invalid token
         toastService.error('Your session has expired. Please log in again.');
         authService.logout();

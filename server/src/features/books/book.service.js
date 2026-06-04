@@ -1,4 +1,4 @@
-const pool = require('../../db');
+const pool = require('../../config/db');
 
 class BookService {
     async createBook(data, cover_url) {

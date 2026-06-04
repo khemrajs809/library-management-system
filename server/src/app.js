@@ -3,7 +3,8 @@ const cookieParser = require('cookie-parser');
 const path = require('path');
 
 // --- Security & Middleware ---
-const { helmetConfig, corsConfig, hppConfig } = require('./middlewares/security.middleware');
+const { helmetConfig, corsConfig, hppConfig, csrfProtection } = require('./middlewares/security.middleware');
+const logger = require('./config/logger');
 const { adminLimiter, bookLimiter, memberLimiter, issueLimiter, notesLimiter, publicLimiter, authLimiter } = require('./middlewares/rateLimiter.middleware');
 const { validateResult, loginValidation } = require('./middlewares/validation.middleware');
 const caseConverter = require('./middlewares/caseConverter.middleware');
@@ -14,11 +15,15 @@ const bookRoutes = require('./features/books/book.routes');
 const memberRoutes = require('./features/members/member.routes');
 const issueRoutes = require('./features/issues/issue.routes');
 const notesRoutes = require('./features/notes/notes.routes');
-const authController = require('./features/auth/auth.controller');
+const authRoutes = require('./features/auth/auth.routes');
 const captchaRoutes = require('./features/captcha/captcha.routes');
 const publicRoutes = require('./features/announcements/announcement.routes');
 
 const app = express();
+
+// Trust proxy is strictly required if deploying behind Cloudflare / WAF to prevent rate limiters from blocking all users
+app.set('trust proxy', 1);
+// Node server restart triggered
 
 // =====================================================
 //  GLOBAL MIDDLEWARES
@@ -29,8 +34,27 @@ app.use(express.json());
 app.use(caseConverter);
 app.use(cookieParser());
 app.use(hppConfig); // Prevents HTTP Parameter Pollution
+app.use(csrfProtection); // Blocks Cross-Site Request Forgery on all mutations
+
+// Enterprise Request Tracing Middleware
 app.use((req, res, next) => {
-    console.log(`${new Date().toISOString()} - ${req.method} ${req.originalUrl}`);
+    const start = Date.now();
+    res.on('finish', () => {
+        const duration = Date.now() - start;
+        const logData = {
+            method: req.method,
+            url: req.originalUrl,
+            status: res.statusCode,
+            duration: `${duration}ms`,
+            ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress
+        };
+        
+        if (res.statusCode >= 400) {
+            logger.warn(`API Request Failed`, logData);
+        } else {
+            logger.info(`API Request Successful`, logData);
+        }
+    });
     next();
 });
 // Removed global dynamicRateLimiter in favor of module-specific limiters
@@ -48,15 +72,7 @@ app.get('/', (req, res) => {
 });
 
 // Authentication (public)
-app.post('/api/login', authLimiter, loginValidation, validateResult, authController.login);
-app.get('/api/login/status', authLimiter, (req, res) => {
-    res.status(200).json({ success: true, message: 'Not locked out' });
-});
-app.post('/api/verify-otp', authLimiter, authController.verifyOTP);
-app.post('/api/resend-otp', authLimiter, authController.resendOTP);
-app.post('/api/forgot-password', authLimiter, authController.forgotPassword);
-app.post('/api/reset-password', authLimiter, authController.resetPassword);
-app.post('/api/logout', authController.logout);
+app.use('/api', authRoutes);
 
 // Captcha
 app.use('/api/captcha', captchaRoutes);
@@ -74,12 +90,20 @@ app.use((req, res) => {
     res.status(404).json({ success: false, message: 'Route not found' });
 });
 
-// Global error handler
+// Global error handler (Enterprise Exception Interceptor)
 app.use((err, req, res, next) => {
-    console.error('Unhandled error:', err);
+    logger.error('Unhandled Exception Caught:', {
+        message: err.message,
+        stack: err.stack,
+        url: req.originalUrl,
+        method: req.method,
+        body: req.body,
+        ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    });
+    
     res.status(500).json({ 
         success: false, 
-        message: err.message || 'Internal server error' 
+        message: 'Internal server error. Our engineering team has been notified.' 
     });
 });
 

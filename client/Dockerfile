@@ -30,5 +30,8 @@ COPY --from=builder /usr/src/app/package*.json ./
 # Expose the default SSR port
 EXPOSE 4000
 
+# Secure container by running as unprivileged node user
+USER node
+
 # Start the SSR server
 CMD ["node", "dist/client/server/server.mjs"]

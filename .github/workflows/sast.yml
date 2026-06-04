@@ -1,0 +1,50 @@
+name: Enterprise SAST (Static Application Security Testing)
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  security-audit:
+    name: Code Quality & Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    # 1. Dependency Vulnerability Scan (Supply Chain Security)
+    - name: Run Backend npm audit
+      working-directory: ./server
+      run: npm audit --audit-level=high
+
+    # 2. Strict PII/Secret Leakage Prevention
+    # This manually searches for 'console.log' statements in production components
+    - name: Scan for console.log (PII Leakage Prevention)
+      run: |
+        echo "Scanning Angular frontend for console.log statements..."
+        if grep -rnw './client/src' -e 'console.log' --exclude-dir=node_modules --exclude=logger.service.ts --exclude='*.spec.ts'; then
+          echo "❌ ERROR: console.log() detected in source code. This is a security risk for PII leakage."
+          echo "Please use the global LoggerService instead."
+          exit 1
+        else
+          echo "✅ No unauthorized console.log() statements found."
+        fi
+
+    # 3. Hardcoded Secret Detection
+    - name: Detect Hardcoded Secrets / Passwords
+      run: |
+        echo "Scanning backend for hardcoded secrets..."
+        if grep -rnwi './server/src' -e 'password =' -e 'secret =' -e 'token =' --exclude-dir=node_modules; then
+          echo "⚠️ WARNING: Potential hardcoded secret or password detected in source files. Ensure all secrets are in .env variables."
+        else
+          echo "✅ No hardcoded secrets detected."
+        fi

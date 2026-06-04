@@ -32,9 +32,37 @@ jobs:
         working-directory: ./server
         run: npm audit --audit-level=high
 
+  code-quality-audit:
+    name: 🎨 Code Quality Audit (Linting)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install Client Dependencies
+        working-directory: ./client
+        run: npm ci
+
+      - name: Lint Client
+        working-directory: ./client
+        run: npm run lint
+
+      - name: Install Server Dependencies
+        working-directory: ./server
+        run: npm ci
+
+      - name: Lint Server
+        working-directory: ./server
+        run: npm run lint
+
   build-verification:
     name: 🏗️ Build Verification
-    needs: security-audit
+    needs: [security-audit, code-quality-audit]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
