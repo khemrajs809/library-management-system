@@ -12,6 +12,7 @@ import { BookTableComponent } from './components/book-list/book-list.component';
 import { BookCopiesModalComponent } from './components/book-copies-modal/book-copies-modal.component';
 import { BookDetailsModalComponent } from './components/book-details-modal/book-details-modal.component';
 import { RefreshService } from '../../../services/refresh.service';
+import { ReservationService } from '../../../services/reservation.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -32,6 +33,7 @@ export class BookManagerComponent implements OnInit, OnDestroy {
   private bookService = inject(BookService);
   private toastService = inject(ToastService);
   private modalService = inject(ModalService);
+  private reservationService = inject(ReservationService);
   public refreshService = inject(RefreshService);
   private refreshSub?: Subscription;
 
@@ -481,6 +483,25 @@ export class BookManagerComponent implements OnInit, OnDestroy {
     this.isViewingDetails.set(false);
     this.selectedBook.set(null);
     this.bookHistory.set([]);
+  }
+
+  handleWaitlistReserve(memberId: string) {
+    if (!memberId) {
+      this.toastService.error('Please enter a Member ID to reserve.');
+      return;
+    }
+    const book = this.selectedBook();
+    if (!book) return;
+
+    this.reservationService.createReservation(memberId.trim(), book.bookId).subscribe({
+      next: (r) => {
+        this.toastService.success(r.message || 'Waitlist updated');
+        this.addActivity(`Added ${memberId} to waitlist for ${book.title}`, 'success');
+      },
+      error: (e) => {
+        this.toastService.error(e.error?.message || 'Failed to add to waitlist');
+      }
+    });
   }
 
   toggleViewMode() {

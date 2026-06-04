@@ -356,7 +356,7 @@ export class CirculationDeskComponent {
   }
 
   markAsLost(issueId: number) {
-    console.log('Marking issue as lost:', issueId);
+    console.info('Marking issue as lost:', issueId);
     this.modalService.show({
       title: 'Mark as Lost',
       message: 'Are you sure you want to mark this book as lost? A penalty (Book Price + ₹150) will be applied to the member\'s account.',
@@ -364,10 +364,10 @@ export class CirculationDeskComponent {
       confirmText: 'Mark as Lost',
       cancelText: 'Cancel',
       onConfirm: () => {
-        console.log('Confirmed lost for:', issueId);
+        console.info('Confirmed lost for:', issueId);
         this.issueService.markAsLost(issueId).subscribe({
           next: (r: any) => {
-            console.log('Lost marked successfully:', r);
+            console.info('Lost marked successfully:', r);
             this.toastService.success(`Marked as lost. Penalty: ₹${r.fineAmount}`);
             this.addActivity(`Marked issue #${issueId} as lost`, 'error');
             this.loadIssues();

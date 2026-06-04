@@ -18,6 +18,7 @@ const notesRoutes = require('./features/notes/notes.routes');
 const authRoutes = require('./features/auth/auth.routes');
 const captchaRoutes = require('./features/captcha/captcha.routes');
 const publicRoutes = require('./features/announcements/announcement.routes');
+const reservationRoutes = require('./features/reservations/reservation.routes');
 
 const app = express();
 
@@ -84,6 +85,7 @@ app.use('/api/members', memberLimiter, memberRoutes);
 app.use('/api/issues', issueLimiter, issueRoutes);
 app.use('/api/notes', notesLimiter, notesRoutes);
 app.use('/api/announcements', publicLimiter, publicRoutes);
+app.use('/api/reservations', issueLimiter, reservationRoutes);
 
 // 404 handler
 app.use((req, res) => {

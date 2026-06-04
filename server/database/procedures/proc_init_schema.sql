@@ -10,6 +10,18 @@ BEGIN
     ALTER TABLE books ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP NULL;
     ALTER TABLE members ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP NULL;
 
+    -- --- NEW RESERVATION TABLE ---
+    CREATE TABLE IF NOT EXISTS reservations (
+        reservation_id INT AUTO_INCREMENT PRIMARY KEY,
+        member_id VARCHAR(50) NOT NULL,
+        book_id VARCHAR(50) NOT NULL,
+        status ENUM('pending', 'fulfilled', 'cancelled') DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        fulfilled_at TIMESTAMP NULL,
+        FOREIGN KEY (member_id) REFERENCES members(member_id) ON DELETE CASCADE,
+        FOREIGN KEY (book_id) REFERENCES books(book_id) ON DELETE CASCADE
+    );
+
     -- --- NEW SECURITY TABLES ---
     CREATE TABLE IF NOT EXISTS audit_logs (
         id INT AUTO_INCREMENT PRIMARY KEY,

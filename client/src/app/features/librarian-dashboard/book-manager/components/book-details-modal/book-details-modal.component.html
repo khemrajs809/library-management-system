@@ -66,6 +66,18 @@
             </div>
           </div>
 
+          <!-- WAITLIST SECTION -->
+          @if (book.availableCopies === 0) {
+            <div class="ds-style-68f50402 mt-3" style="background-color: #fff3cd; border: 1px solid #ffe69c;">
+              <h2 class="ds-style-7feea750" style="color: #664d03;">Waitlist / Reservation</h2>
+              <p style="font-size: 0.9rem; color: #664d03; margin-bottom: 10px;">This book is currently out of stock. You can add a member to the waitlist. They will be notified automatically when a copy is returned.</p>
+              <div style="display: flex; gap: 10px;">
+                <input type="text" #waitlistMemberId placeholder="Enter Member ID (e.g. M123)" class="form-control" style="flex: 1;" />
+                <button class="btn btn-primary" style="background-color: #0d6efd;" (click)="onReserve.emit(waitlistMemberId.value); waitlistMemberId.value=''">Add to Waitlist</button>
+              </div>
+            </div>
+          }
+
           <!-- Scrollable Content -->
           <div class="ds-style-5f0c9bf4">
             <div class="ds-style-4f9b52c3">

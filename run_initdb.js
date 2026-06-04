@@ -1,4 +1,4 @@
-const pool = require('./server/src/db');
+const pool = require('./server/src/config/db');
 const initDB = require('./server/src/config/initDB');
 
 async function run() {

@@ -1,5 +1,5 @@
 # Stage 1: Build the Angular App
-FROM node:24-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /usr/src/app
 
@@ -14,7 +14,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Production SSR Server
-FROM node:24-alpine
+FROM node:20-alpine
 
 ENV NODE_ENV=production
 

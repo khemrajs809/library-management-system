@@ -74,7 +74,7 @@ export class IdleTimeoutService {
 
         if (remainingGrace <= 0) {
           this.ngZone.run(() => {
-            console.log('[IdleTimeout] Total inactivity period reached. Logging out...');
+            console.info('[IdleTimeout] Total inactivity period reached. Logging out...');
             this.authService.logout();
           });
           clearInterval(this.countdownInterval);

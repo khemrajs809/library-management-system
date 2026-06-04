@@ -1,5 +1,5 @@
 # Stage 1: Build & Install
-FROM node:24-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /usr/src/app
 
@@ -13,7 +13,7 @@ RUN npm ci --only=production
 COPY . .
 
 # Stage 2: Production Image
-FROM node:24-alpine
+FROM node:20-alpine
 
 # Set Node environment to production
 ENV NODE_ENV=production

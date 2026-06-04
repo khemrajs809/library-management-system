@@ -2,6 +2,7 @@ const pool = require('../../config/db');
 const { generateLostBookHTML, generatePaymentReceiptHTML, generateFineReminderHTML } = require('../../utils/email.util');
 const { invalidateCache } = require('../../utils/cache.util');
 const { sendEmail } = require('../../common/services/email.service');
+const { generateGenericMessageHTML } = require('../../utils/email.util');
 
 // POST /api/issues — Issue a specific book copy to a member
 const issueBook = async (req, res) => {
@@ -107,6 +108,27 @@ const returnBook = async (req, res) => {
         if (ret > due) fine = Math.ceil(Math.abs(ret - due) / (1000 * 60 * 60 * 24)) * 1;
 
         await pool.query('CALL proc_return_book(?, ?, ?, ?)', [issue_id, issue.book_id, return_date, fine]);
+
+        // --- WAITLIST FULFILLMENT LOGIC ---
+        const [waitlistRows] = await pool.query('CALL proc_get_waitlist_for_book(?)', [issue.actual_book_id]);
+        if (waitlistRows && waitlistRows.length > 0 && waitlistRows[0].length > 0) {
+            const nextInLine = waitlistRows[0][0];
+            
+            // Fulfill the reservation
+            await pool.query('CALL proc_fulfill_reservation(?)', [nextInLine.reservation_id]);
+
+            // Notify the member
+            const title = 'Your Reserved Book is Available!';
+            const text = `Hi ${nextInLine.member_name},\n\nThe book you reserved is now available at the library! Please come pick it up within the next 48 hours.`;
+            const html = generateGenericMessageHTML(nextInLine.member_name, title, text);
+            
+            try {
+                sendEmail(nextInLine.member_email, title, text, html);
+            } catch (emailErr) {
+                console.warn('[API] Failed to send waitlist email', emailErr);
+            }
+        }
+        // ---------------------------------
 
         await invalidateCache('cache:/api/admin/stats*');
         await invalidateCache('cache:/api/admin/overview-stats*');
@@ -227,8 +249,31 @@ const returnByBookId = async (req, res) => {
 
         await pool.query('CALL proc_return_book(?, ?, ?, ?)', [issue.issue_id, copy_id, return_date, fine]);
 
+        // --- WAITLIST FULFILLMENT LOGIC ---
+        // We need the parent book_id to check waitlists
+        const [copyDetails] = await pool.query('SELECT book_id FROM book_copies WHERE copy_id = ?', [copy_id]);
+        if (copyDetails && copyDetails.length > 0) {
+            const parentBookId = copyDetails[0].book_id;
+            const [waitlistRows] = await pool.query('CALL proc_get_waitlist_for_book(?)', [parentBookId]);
+            if (waitlistRows && waitlistRows.length > 0 && waitlistRows[0].length > 0) {
+                const nextInLine = waitlistRows[0][0];
+                
+                await pool.query('CALL proc_fulfill_reservation(?)', [nextInLine.reservation_id]);
+
+                const title = 'Your Reserved Book is Available!';
+                const text = `Hi ${nextInLine.member_name},\n\nThe book you reserved is now available at the library! Please come pick it up within the next 48 hours.`;
+                const html = generateGenericMessageHTML(nextInLine.member_name, title, text);
+                
+                try {
+                    sendEmail(nextInLine.member_email, title, text, html);
+                } catch (emailErr) {
+                    console.warn('[API] Failed to send waitlist email', emailErr);
+                }
+            }
+        }
+        // ---------------------------------
+
         await invalidateCache('cache:/api/admin/stats*');
-        await invalidateCache('cache:/api/admin/overview-stats*');
 
         res.status(200).json({ success: true, message: 'Returned successfully', fine_amount: fine });
     } catch (err) {

@@ -43,7 +43,8 @@
   [copies]="selectedBookCopies()"
   [copyPage]="copyPage()"
   (onClose)="closeDetails()"
-  (onEdit)="editBook($event)"
+  (onEdit)="editBook($event); closeDetails()"
+  (onReserve)="handleWaitlistReserve($event)"
   (onSetCopyPage)="setCopyPage($event)"
   (onPrevCopyPage)="prevCopyPage()"
   (onNextCopyPage)="nextCopyPage()">

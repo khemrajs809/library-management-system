@@ -18,6 +18,7 @@ export class BookDetailsModalComponent {
 
   @Output() onClose = new EventEmitter<void>();
   @Output() onEdit = new EventEmitter<Book>();
+  @Output() onReserve = new EventEmitter<string>();
   @Output() onSetCopyPage = new EventEmitter<number>();
   @Output() onPrevCopyPage = new EventEmitter<void>();
   @Output() onNextCopyPage = new EventEmitter<void>();
