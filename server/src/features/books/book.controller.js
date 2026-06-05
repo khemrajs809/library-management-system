@@ -22,7 +22,7 @@ const addBook = async (req, res) => {
         let unique = false;
         while (!unique) {
             book_id = 'BK-' + Math.floor(1000 + Math.random() * 9000);
-            const rows = await pool.query('SELECT 1 FROM books WHERE book_id = ?', [book_id]);
+            const rows = await pool.query('CALL proc_check_book_exists(?)', [book_id]);
             if (rows.length === 0) unique = true;
         }
     }
@@ -117,11 +117,11 @@ const importBooks = async (req, res) => {
         if (!book_id || !isbn || !title) continue;
         const qty = parseInt(quantity) || 1;
         try {
-            await pool.query('INSERT INTO books (book_id, isbn, title, quantity, available, price, author, stream, publication_year, publisher, edition, shelf_location) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
-                [book_id, isbn, title, qty, qty, parseFloat(price)||0, author||null, stream||null, publication_year||null, publisher||null, edition||null, shelf_location||null]);
+            await pool.query('CALL proc_create_book(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+                [book_id, isbn, title, qty, parseFloat(price)||0, author||null, stream||null, publication_year||null, publisher||null, edition||null, shelf_location||null, null]);
             for (let i = 1; i <= qty; i++) {
                 const copyId = i === 1 ? book_id : `${book_id}-${i}`;
-                await pool.query('INSERT IGNORE INTO book_copies (copy_id, book_id, status) VALUES (?, ?, ?)', [copyId, book_id, 'available']);
+                await pool.query('CALL proc_create_book_copy(?, ?, ?)', [copyId, book_id, 'available']);
             }
             results.added++;
         } catch (err) {
@@ -137,7 +137,7 @@ const generateUniqueId = async (req, res) => {
     let newId = '';
     while (!unique) {
         newId = 'BK-' + Math.floor(1000 + Math.random() * 9000);
-        const rows = await pool.query('SELECT 1 FROM books WHERE book_id = ?', [newId]);
+        const rows = await pool.query('CALL proc_check_book_exists(?)', [newId]);
         if (rows.length === 0) unique = true;
     }
     res.json({ success: true, id: newId });
@@ -153,7 +153,7 @@ const generateUniqueIsbn = async (req, res) => {
         const title = Math.floor(10000 + Math.random() * 90000);
         const check = Math.floor(Math.random() * 10);
         newIsbn = `${prefix}-${group}-${publisher}-${title}-${check}`;
-        const rows = await pool.query('SELECT 1 FROM books WHERE isbn = ?', [newIsbn]);
+        const rows = await pool.query('CALL proc_check_isbn_exists(?)', [newIsbn]);
         if (rows.length === 0) unique = true;
     }
     res.json({ success: true, isbn: newIsbn });

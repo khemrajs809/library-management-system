@@ -230,3 +230,11 @@ BEGIN
     WHERE i.status = 'lost' OR i.fine_amount > 0 OR (i.status = 'issued' AND i.due_date < CURDATE())
     ORDER BY CASE WHEN i.status = 'issued' THEN 0 ELSE 1 END, i.due_date ASC;
 END;
+
+/* NEXT_PROCEDURE */
+
+-- 17. Get book_id from a copy_id
+CREATE PROCEDURE proc_get_book_id_from_copy(IN p_copy_id VARCHAR(60))
+BEGIN
+    SELECT book_id FROM book_copies WHERE copy_id = p_copy_id;
+END;

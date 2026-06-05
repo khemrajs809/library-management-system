@@ -126,6 +126,12 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.generalError.set('');
     this.captchaError.set('');
     
+    console.log('[DEBUG] Dispatching login request:', { 
+      email: this.credentials.email, 
+      captchaId: this.credentials.captchaId, 
+      captchaText: this.credentials.captchaText 
+    });
+    
     this.authService.login(this.credentials).subscribe({
       next: (res) => {
         // 4 second simulated delay for effect

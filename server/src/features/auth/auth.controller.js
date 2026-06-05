@@ -7,6 +7,8 @@ class AuthController {
             const { email, password, captchaId, captchaText, captcha_id, captcha_text } = req.body;
             const finalCaptchaId = captchaId || captcha_id;
             const finalCaptchaText = captchaText || captcha_text;
+            
+            console.log('[DEBUG] Login Request Received:', { email, captchaId: finalCaptchaId, captchaText: finalCaptchaText });
 
             const clientInfo = {
                 ipAddress: req.ip || req.connection?.remoteAddress || '',
@@ -22,6 +24,7 @@ class AuthController {
                 email: result.user.email.replace(/(.{2})(.*)(?=@)/, (gp1, gp2, gp3) => gp1 + '*'.repeat(gp3.length))
             });
         } catch (err) {
+            console.error('[DEBUG] Authentication Failed:', err.message, err.status);
             if (err.status) {
                 return res.status(err.status).json({ success: false, message: err.message });
             }

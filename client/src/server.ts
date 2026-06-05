@@ -1,3 +1,13 @@
+// Suppress the specific NODE_TLS_REJECT_UNAUTHORIZED warning
+const originalEmit = process.emit;
+// @ts-ignore
+process.emit = function (name, data, ...args) {
+  if (name === 'warning' && typeof data === 'object' && data.name === 'Warning' && data.message.includes('NODE_TLS_REJECT_UNAUTHORIZED')) {
+    return false;
+  }
+  // @ts-ignore
+  return originalEmit.apply(process, [name, data, ...args]);
+};
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'; // Bypass self-signed cert error during local SSR development
 
 import {

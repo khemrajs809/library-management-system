@@ -198,3 +198,19 @@ BEGIN
     ORDER BY i.issue_date DESC
     LIMIT 50;
 END;
+
+/* NEXT_PROCEDURE */
+
+-- 15. Check if book exists
+CREATE PROCEDURE proc_check_book_exists(IN p_book_id VARCHAR(50))
+BEGIN
+    SELECT 1 FROM books WHERE book_id = p_book_id;
+END;
+
+/* NEXT_PROCEDURE */
+
+-- 16. Check if ISBN exists
+CREATE PROCEDURE proc_check_isbn_exists(IN p_isbn VARCHAR(20))
+BEGIN
+    SELECT 1 FROM books WHERE isbn = p_isbn;
+END;

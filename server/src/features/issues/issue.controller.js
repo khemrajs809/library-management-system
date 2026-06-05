@@ -110,7 +110,7 @@ const returnBook = async (req, res) => {
         await pool.query('CALL proc_return_book(?, ?, ?, ?)', [issue_id, issue.book_id, return_date, fine]);
 
         // --- WAITLIST FULFILLMENT LOGIC ---
-        const [waitlistRows] = await pool.query('CALL proc_get_waitlist_for_book(?)', [issue.actual_book_id]);
+        const waitlistRows = await pool.query('CALL proc_get_waitlist_for_book(?)', [issue.actual_book_id]);
         if (waitlistRows && waitlistRows.length > 0 && waitlistRows[0].length > 0) {
             const nextInLine = waitlistRows[0][0];
             
@@ -203,7 +203,7 @@ const getIssueHistory = async (req, res) => {
 const payFine = async (req, res) => {
     const { id } = req.params;
     try {
-        const [results] = await pool.query('CALL proc_get_issue_for_payment(?)', [id]);
+        const results = await pool.query('CALL proc_get_issue_for_payment(?)', [id]);
         const issueCheck = results[0];
 
         if (issueCheck.length === 0) return res.status(404).json({ success: false, message: 'Issue not found' });
@@ -251,10 +251,10 @@ const returnByBookId = async (req, res) => {
 
         // --- WAITLIST FULFILLMENT LOGIC ---
         // We need the parent book_id to check waitlists
-        const [copyDetails] = await pool.query('SELECT book_id FROM book_copies WHERE copy_id = ?', [copy_id]);
+        const [copyDetails] = await pool.query('CALL proc_get_book_id_from_copy(?)', [copy_id]);
         if (copyDetails && copyDetails.length > 0) {
             const parentBookId = copyDetails[0].book_id;
-            const [waitlistRows] = await pool.query('CALL proc_get_waitlist_for_book(?)', [parentBookId]);
+            const waitlistRows = await pool.query('CALL proc_get_waitlist_for_book(?)', [parentBookId]);
             if (waitlistRows && waitlistRows.length > 0 && waitlistRows[0].length > 0) {
                 const nextInLine = waitlistRows[0][0];
                 
@@ -362,7 +362,7 @@ const getFinesAndLost = async (req, res) => {
 const sendFineReminder = async (req, res) => {
     const { id } = req.params;
     try {
-        const [results] = await pool.query('CALL proc_get_issue_for_payment(?)', [id]);
+        const results = await pool.query('CALL proc_get_issue_for_payment(?)', [id]);
         const check = results[0];
 
         if (check.length === 0) return res.status(404).json({ success: false, message: 'Issue not found' });

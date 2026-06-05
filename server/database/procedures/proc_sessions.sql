@@ -139,3 +139,47 @@ BEGIN
         logout_time = NOW()
     WHERE id = p_session_id;
 END;
+
+/* NEXT_PROCEDURE */
+
+-- 11. Initialize Session Tables (DDL)
+CREATE PROCEDURE proc_init_session_tables()
+BEGIN
+    CREATE TABLE IF NOT EXISTS user_login_sessions (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id VARCHAR(20) NULL,
+        user_name VARCHAR(100) NULL,
+        email VARCHAR(100) NOT NULL,
+        login_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        logout_time TIMESTAMP NULL,
+        last_activity_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        ip_address VARCHAR(45) NULL,
+        user_agent TEXT NULL,
+        browser VARCHAR(100) NULL,
+        os VARCHAR(100) NULL,
+        device_type VARCHAR(50) NULL,
+        location VARCHAR(100) NULL,
+        status ENUM('successful', 'failed', 'blocked', 'suspicious') DEFAULT 'successful',
+        failure_reason VARCHAR(255) NULL,
+        session_status ENUM('online', 'offline', 'expired') DEFAULT 'online',
+        role VARCHAR(50) NULL,
+        risk_score INT DEFAULT 0,
+        risk_level VARCHAR(20) DEFAULT 'Low',
+        token VARCHAR(500) NULL,
+        INDEX idx_user_id (user_id),
+        INDEX idx_login_time (login_time),
+        INDEX idx_status (status),
+        INDEX idx_ip_address (ip_address)
+    );
+
+    CREATE TABLE IF NOT EXISTS user_session_actions (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        session_id INT NOT NULL,
+        action_type VARCHAR(100) NOT NULL,
+        description VARCHAR(255) NOT NULL,
+        path VARCHAR(255) NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (session_id) REFERENCES user_login_sessions(id) ON DELETE CASCADE,
+        INDEX idx_session_id (session_id)
+    );
+END;
