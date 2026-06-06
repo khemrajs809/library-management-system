@@ -15,8 +15,7 @@ const convertKeys = (obj, converter) => {
         return obj.map(v => convertKeys(v, converter));
     } else if (isPlainObject(obj)) {
         return Object.keys(obj).reduce((result, key) => {
-            // Check if key is something like _id (don't break mongo style ids if any exist, though this is MariaDB)
-            // But we specifically want to convert member_id to memberId
+          
             const newKey = converter(key);
             result[newKey] = convertKeys(obj[key], converter);
             return result;

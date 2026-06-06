@@ -26,9 +26,9 @@ const app = express();
 app.set('trust proxy', 1);
 // Node server restart triggered
 
-// =====================================================
+// 
 //  GLOBAL MIDDLEWARES
-// =====================================================
+// 
 app.use(helmetConfig);
 app.use(corsConfig);
 app.use(express.json());

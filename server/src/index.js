@@ -12,14 +12,14 @@ const setupSocket = require('./config/socket');
 const { setupNotificationJob } = require('./jobs/notification.job');
 
 
-// =====================================================
+// 
 //  INITIALIZE DATABASE
-// =====================================================
+// 
 initDB();
 
-// =====================================================
+// 
 //  CREATE SERVER (HTTP/HTTPS)
-// =====================================================
+// 
 let server;
 
 // Try to load HTTPS certificates if they exist

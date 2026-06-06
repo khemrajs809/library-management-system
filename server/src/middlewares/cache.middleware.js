@@ -1,5 +1,5 @@
 /**
- * Enterprise Cache Middleware
+ * Cache Middleware
  * Note: Temporarily modified to act as a pass-through to ensure 
  * 100% real-time data from MariaDB without Docker/Redis complexity.
  * @param {number} ttlSeconds - Time To Live in seconds
