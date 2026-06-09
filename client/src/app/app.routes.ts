@@ -9,5 +9,7 @@ export const routes: Routes = [
     { path: 'admin/staff', loadComponent: () => import('./features/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent), canActivate: [authGuard] },
     { path: 'admin/dashboard', loadComponent: () => import('./features/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent), canActivate: [authGuard] },
     { path: 'librarian/dashboard', loadComponent: () => import('./features/librarian-dashboard/librarian-dashboard.component').then(m => m.LibrarianDashboardComponent), canActivate: [authGuard] },
+    { path: 'books', loadComponent: () => import('./features/books/book-catalog.component').then(m => m.BookCatalogComponent) },
+    { path: 'books/:id', loadComponent: () => import('./features/books/book-details.component').then(m => m.BookDetailsComponent) },
     { path: '**', redirectTo: '' }
 ];

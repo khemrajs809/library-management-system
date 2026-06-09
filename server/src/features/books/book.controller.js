@@ -45,14 +45,45 @@ const addBook = async (req, res) => {
     }
 };
 
-// GET /api/books — List books with real-time copy availability and pagination
+// GET /api/books — List books with real-time copy availability, search, and pagination
 const getBooks = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 50;
         
-        const result = await bookService.getBooks(req.query.q, page, limit);
+        const result = await bookService.getBooks(req.query.q, req.query.author, req.query.stream, req.query.availability, page, limit);
         res.status(200).json({ success: true, ...result });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
+const getBookById = async (req, res) => {
+    try {
+        const book = await bookService.getBookById(req.params.id);
+        if (!book) return res.status(404).json({ success: false, message: 'Book not found' });
+        res.status(200).json({ success: true, data: book });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
+const getFilterOptions = async (req, res) => {
+    try {
+        const options = await bookService.getFilterOptions();
+        res.status(200).json({ success: true, data: options });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
+const getRelatedBooks = async (req, res) => {
+    try {
+        const books = await bookService.getRelatedBooks(req.params.id);
+        res.status(200).json({ success: true, data: books });
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, message: 'Internal server error' });
@@ -201,4 +232,4 @@ const getBookHistory = async (req, res) => {
     }
 };
 
-module.exports = { addBook, getBooks, getBookCopies, updateBook, deleteBook, importBooks, generateUniqueId, generateUniqueIsbn, getDeletedBooks, restoreBook, permanentDeleteBook, getBookHistory };
+module.exports = { addBook, getBooks, getBookById, getRelatedBooks, getBookCopies, updateBook, deleteBook, importBooks, generateUniqueId, generateUniqueIsbn, getDeletedBooks, restoreBook, permanentDeleteBook, getBookHistory, getFilterOptions };

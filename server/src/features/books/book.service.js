@@ -18,13 +18,13 @@ class BookService {
         }
     }
 
-    async getBooks(searchQuery, page = 1, limit = 8) {
+    async getBooks(searchQuery, author, stream, availability, page = 1, limit = 8) {
         const offset = (page - 1) * limit;
-        const [countResult] = await pool.query('CALL proc_get_books_search_count(?)', [searchQuery || null]);
+        const [countResult] = await pool.query('CALL proc_get_books_search_count(?, ?, ?, ?)', [searchQuery || null, author || null, stream || null, availability || null]);
         const total = Number(countResult[0].total);
 
-        const [results] = await pool.query('CALL proc_get_books(?, ?, ?)', [searchQuery || null, limit, offset]);
-        const rows = results;
+        const results = await pool.query('CALL proc_get_books(?, ?, ?, ?, ?, ?)', [searchQuery || null, author || null, stream || null, availability || null, limit, offset]);
+        const rows = results[0] || [];
         
         return {
             data: rows.map(row => ({
@@ -41,9 +41,35 @@ class BookService {
         };
     }
 
+    async getBookById(id) {
+        const results = await pool.query('CALL proc_get_book_by_id(?)', [id]);
+        const rows = results[0] || [];
+        
+        if (rows && rows.length > 0) {
+            return {
+                ...rows[0],
+                total_copies: Number(rows[0].total_copies),
+                available_copies: Number(rows[0].available_copies)
+            };
+        }
+        return null;
+    }
+
+    async getRelatedBooks(id) {
+        const book = await this.getBookById(id);
+        if (!book || !book.stream) return [];
+        const results = await pool.query('CALL proc_get_books(?, ?, ?, ?, ?, ?)', [null, null, book.stream, null, 5, 0]);
+        const rows = results[0] || [];
+        return rows.filter(b => b.book_id !== id).map(row => ({
+            ...row,
+            total_copies: Number(row.total_copies),
+            available_copies: Number(row.available_copies)
+        }));
+    }
+
     async getBookCopies(bookId) {
-        const [results] = await pool.query('CALL proc_get_book_copies(?)', [bookId]);
-        return results;
+        const results = await pool.query('CALL proc_get_book_copies(?)', [bookId]);
+        return results[0] || [];
     }
 
     async updateBook(id, data, cover_url) {
@@ -92,8 +118,8 @@ class BookService {
     }
 
     async getDeletedBooks() {
-        const [results] = await pool.query('CALL proc_get_deleted_books()');
-        return results;
+        const results = await pool.query('CALL proc_get_deleted_books()');
+        return results[0] || [];
     }
 
     async restoreBook(id) {
@@ -105,8 +131,17 @@ class BookService {
     }
 
     async getBookHistory(bookId) {
-        const [results] = await pool.query('CALL proc_get_book_history(?)', [bookId]);
-        return results;
+        const results = await pool.query('CALL proc_get_book_history(?)', [bookId]);
+        return results[0] || [];
+    }
+
+    async getFilterOptions() {
+        const streams = await pool.query("SELECT DISTINCT stream FROM books WHERE is_deleted=0 AND stream IS NOT NULL AND stream != '' ORDER BY stream");
+        const authors = await pool.query("SELECT DISTINCT author FROM books WHERE is_deleted=0 AND author IS NOT NULL AND author != '' ORDER BY author");
+        return {
+            streams: streams.map(r => r.stream),
+            authors: authors.map(r => r.author)
+        };
     }
 }
 

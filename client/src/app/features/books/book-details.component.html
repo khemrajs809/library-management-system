@@ -1,0 +1,128 @@
+<div class="details-container">
+  
+  <header class="details-header">
+    <div class="header-content">
+      <button (click)="goBack()" class="back-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to Catalog
+      </button>
+    </div>
+  </header>
+
+  <main class="details-main">
+    <div *ngIf="isLoading()" class="loading-state">
+      <app-spinner></app-spinner>
+    </div>
+
+    <div *ngIf="!isLoading() && book()" class="book-profile">
+      
+      <!-- Left Column: Cover & Status -->
+      <aside class="book-profile-left">
+        <div class="cover-card">
+          <img [src]="book()?.coverUrl || '/assets/cover-placeholder.png'" [alt]="book()?.title">
+          <div class="status-banner" [class.status-available]="book()?.availableCopies > 0" [class.status-unavailable]="book()?.availableCopies <= 0">
+            {{ book()?.availableCopies > 0 ? 'AVAILABLE NOW' : 'OUT OF STOCK' }}
+          </div>
+        </div>
+
+        <div class="stats-card">
+          <h3>Inventory Status</h3>
+          <div class="stat-row">
+            <span class="stat-label">Total Copies</span>
+            <span class="stat-value font-bold">{{ book()?.totalCopies }}</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Available</span>
+            <span class="stat-value text-green font-bold">{{ book()?.availableCopies }}</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Currently Issued</span>
+            <span class="stat-value text-red font-bold">{{ book()?.totalCopies - book()?.availableCopies }}</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Right Column: Info & Related -->
+      <section class="book-profile-right">
+        <div class="info-card">
+          <span class="category-tag">{{ book()?.stream || 'General' }}</span>
+          <h1 class="book-title">{{ book()?.title }}</h1>
+          <h2 class="book-author">By {{ book()?.author || 'Unknown Author' }}</h2>
+          
+          <div class="location-banner">
+            <svg class="location-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <div class="location-text">
+              <span class="location-label">Shelf Location</span>
+              <span class="location-value">{{ book()?.shelfLocation || 'Not Assigned' }}</span>
+            </div>
+          </div>
+
+          <p class="book-description">
+            Experience the profound knowledge embedded in <strong>{{ book()?.title }}</strong>. 
+            This copy belongs to the {{ book()?.stream }} stream.
+          </p>
+
+          <div class="metadata-grid">
+            <div class="meta-item">
+              <div class="meta-text">
+                <label>ISBN Number</label>
+                <span>{{ book()?.isbn }}</span>
+              </div>
+              <span class="meta-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5v14"></path><path d="M8 5v14"></path><path d="M12 5v14"></path><path d="M17 5v14"></path><path d="M21 5v14"></path></svg>
+              </span>
+            </div>
+            <div class="meta-item">
+              <div class="meta-text">
+                <label>Publisher</label>
+                <span>{{ book()?.publisher || 'N/A' }}</span>
+              </div>
+              <span class="meta-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><path d="M9 22v-4h6v4"></path><path d="M8 6h.01"></path><path d="M16 6h.01"></path><path d="M12 6h.01"></path><path d="M12 10h.01"></path><path d="M12 14h.01"></path><path d="M16 10h.01"></path><path d="M16 14h.01"></path><path d="M8 10h.01"></path><path d="M8 14h.01"></path></svg>
+              </span>
+            </div>
+            <div class="meta-item">
+              <div class="meta-text">
+                <label>Publication Year</label>
+                <span>{{ book()?.publicationYear || 'N/A' }}</span>
+              </div>
+              <span class="meta-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              </span>
+            </div>
+            <div class="meta-item">
+              <div class="meta-text">
+                <label>Edition</label>
+                <span>{{ book()?.edition || 'Standard' }}</span>
+              </div>
+              <span class="meta-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Related Books Section -->
+        <div class="related-section" *ngIf="relatedBooks().length > 0">
+          <h3>Similar Books in {{ book()?.stream }}</h3>
+          <div class="related-grid">
+            <div class="related-card" *ngFor="let rb of relatedBooks()" [routerLink]="['/books', rb.bookId]">
+              <img [src]="rb.coverUrl || '/assets/cover-placeholder.png'" [alt]="rb.title">
+              <div class="related-info">
+                <h4>{{ rb.title }}</h4>
+                <p>{{ rb.author }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </main>
+</div>

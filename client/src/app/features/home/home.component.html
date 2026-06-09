@@ -8,12 +8,17 @@
           <span class="text-red">Necessities</span> Of Life."
         </h1>
         <p>Empowering minds through seamless access to knowledge and state-of-the-art management tools.</p>
-        <div class="hero-btns">
-          <a routerLink="/login" class="btn btn-red animated-btn">
+        <div class="hero-btns mt-6">
+          <a routerLink="/login" class="btn btn-red animated-btn" style="min-width: 140px;">
             <span class="btn-text-slider text-getstarted" [class.slide-left]="buttonText === 'Login'">Get Started</span>
             <span class="btn-text-slider text-login"      [class.slide-in]="buttonText === 'Login'">Login</span>
           </a>
-          <a routerLink="/learn-more" class="btn btn-outline">Learn More</a>
+          <a routerLink="/books" class="btn btn-outline" style="min-width: 140px;" title="Specially designed for Students & Educators">
+            View Books
+          </a>
+          <a routerLink="/learn-more" class="btn btn-outline text-gray-500 border-none hover:bg-gray-100">
+            Learn More
+          </a>
         </div>
       </div>
 
