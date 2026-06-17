@@ -18,6 +18,10 @@ export class AdminService {
     return this.http.get(`${this.baseUrl}/overview-stats`);
   }
 
+  getMonitoringStats(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/monitoring-stats`);
+  }
+
   getLibrarians(): Observable<any> {
     return this.http.get(`${this.baseUrl}/librarians`);
   }

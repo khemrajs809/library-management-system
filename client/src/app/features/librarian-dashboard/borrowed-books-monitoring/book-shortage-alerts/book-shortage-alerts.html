@@ -1,0 +1,73 @@
+<div class="shortages-container">
+  <div class="header">
+    <h2><i class="fas fa-exclamation-triangle"></i> Critical Book Shortages & Inventory Impact</h2>
+    <p class="subtitle">Books with high waitlists that are currently unavailable due to delayed returns.</p>
+  </div>
+
+  <div class="shortages-grid">
+    @for (book of shortages; track book.id) {
+      <div class="shortage-card">
+        
+        <!-- Top Section: Book Info -->
+        <div class="book-header">
+          <img [src]="book.cover" [alt]="book.title" class="book-cover">
+          <div class="book-details">
+            <span class="severity-badge" [ngClass]="{
+              'critical': book.severity === 'Critical',
+              'high': book.severity === 'High',
+              'medium': book.severity === 'Medium'
+            }">{{ book.severity }} Shortage</span>
+            <h3>{{ book.title }}</h3>
+            <p class="author">By {{ book.author }}</p>
+            <p class="publisher">{{ book.publisher }}</p>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Middle Section: Stats -->
+        <div class="inventory-stats">
+          <div class="stat-col">
+            <span class="label">Total Copies</span>
+            <span class="value">{{ book.totalCopies }}</span>
+          </div>
+          <div class="stat-col text-danger">
+            <span class="label">Borrowed</span>
+            <span class="value">{{ book.borrowedCopies }}</span>
+          </div>
+          <div class="stat-col text-success">
+            <span class="label">Available</span>
+            <span class="value">{{ book.availableCopies }}</span>
+          </div>
+          <div class="stat-col text-warning">
+            <span class="label">Waitlist</span>
+            <span class="value">{{ book.waitingRequests }}</span>
+          </div>
+        </div>
+
+        <!-- Bottom Section: Impact Report -->
+        <div class="impact-report">
+          <h4>Availability Impact</h4>
+          <div class="impact-row">
+            <span><i class="fas fa-history"></i> Days Out of Stock:</span>
+            <span class="bold text-danger">{{ book.daysOutOfStock }} days</span>
+          </div>
+          <div class="impact-row">
+            <span><i class="fas fa-truck-loading"></i> Expected Return:</span>
+            <span class="bold">{{ book.expectedReturnDate ? (book.expectedReturnDate | date:'mediumDate') : 'Unknown' }}</span>
+          </div>
+          <div class="impact-row">
+            <span><i class="fas fa-users"></i> Pending Requests:</span>
+            <span class="bold">{{ book.waitingRequests }} members waiting</span>
+          </div>
+        </div>
+        
+        <div class="card-actions">
+          <button class="btn btn-outline-danger"><i class="fas fa-bullhorn"></i> Recall Books</button>
+          <button class="btn btn-outline"><i class="fas fa-eye"></i> View Borrowers</button>
+        </div>
+
+      </div>
+    }
+  </div>
+</div>

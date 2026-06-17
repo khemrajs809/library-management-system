@@ -26,11 +26,15 @@
 /* Primary Search */
 .primary-search-section {
   width: 100%;
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .search-container {
+  flex-grow: 1;
   display: flex;
   align-items: center;
   background: white;
@@ -593,6 +597,10 @@
 }
 
 @media (max-width: 768px) {
+  .primary-search-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
   .search-container {
     flex-wrap: wrap;
     border-radius: 16px;
@@ -602,6 +610,10 @@
     width: 100%;
     order: -1;
     margin-bottom: 0.5rem;
+  }
+  app-custom-clock {
+    display: flex;
+    justify-content: center;
   }
   .toggle-filters-btn, .primary-search-btn {
     flex: 1;

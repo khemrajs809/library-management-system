@@ -10,7 +10,7 @@ export class IdleTimeoutService {
   private authService = inject(AuthService);
   private ngZone = inject(NgZone);
 
-  private readonly INACTIVITY_THRESHOLD_SECONDS = 60; // 1 minute of silence before countdown starts
+  private readonly INACTIVITY_THRESHOLD_SECONDS = 3600; // 1 hour of silence before countdown starts
   private readonly GRACE_PERIOD_SECONDS = 9 * 60; // 10 minutes countdown
 
   public idleRemaining = signal<number>(this.GRACE_PERIOD_SECONDS);

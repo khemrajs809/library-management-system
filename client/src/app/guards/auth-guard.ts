@@ -12,14 +12,8 @@ export const authGuard = (route: ActivatedRouteSnapshot, state: RouterStateSnaps
     const role = authService.userRole();
     const url = state.url;
 
-    // Detect Direct Navigation (Copy-Paste / Manual URL Entry)
-    // We allow navigation only if it's marked as internal (from login or in-app navigation)
-    if (!authService.isInternalNavigation()) {
-      console.warn('Security Warning: Direct navigation detected. Logging out.');
-      toast.error('Security Alert: Manual URL manipulation detected. Session terminated.');
-      authService.logout();
-      return false;
-    }
+    // We removed the overly strict direct navigation check
+    // to allow normal page reloads and copy-pasted URLs.
 
     // Role-based Access Control
     if (url.startsWith('/admin') && role !== 'admin') {

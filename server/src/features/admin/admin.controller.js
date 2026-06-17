@@ -381,4 +381,52 @@ const updateLibrarianStatus = async (req, res) => {
     }
 };
 
-module.exports = { createLibrarian, getLibrarians, updateLibrarianPassword, deleteLibrarian, getStats, importBooks, importMembers, getOverviewStats, generateUniqueLibrarianId, getAuditLogs, updateLibrarianStatus };
+const getMonitoringDashboardData = async (req, res) => {
+    try {
+        // Fix for BigInt serialization issue in MariaDB
+        if (typeof BigInt !== 'undefined') {
+            BigInt.prototype.toJSON = function () { return this.toString() };
+        }
+
+        const [
+            kpiRes,
+            overdueMembersRes,
+            bookShortagesRes,
+            offendersRes,
+            fineStatsRes,
+            recentFinesRes,
+            trendsRes,
+            categoryDelaysRes
+        ] = await Promise.all([
+            pool.query('CALL proc_get_monitoring_kpis()'),
+            pool.query('CALL proc_get_overdue_members_list()'),
+            pool.query('CALL proc_get_book_shortages()'),
+            pool.query('CALL proc_get_repeat_offenders()'),
+            pool.query('CALL proc_get_fine_management_stats()'),
+            pool.query('CALL proc_get_recent_fine_collections()'),
+            pool.query('CALL proc_get_visual_analytics_trends()'),
+            pool.query('CALL proc_get_category_delays()')
+        ]);
+
+        res.status(200).json({
+            success: true,
+            data: {
+                kpis: kpiRes[0][0] || {},
+                overdueMembers: overdueMembersRes[0] || [],
+                bookShortages: bookShortagesRes[0] || [],
+                repeatOffenders: offendersRes[0] || [],
+                fineStats: fineStatsRes[0][0] || {},
+                recentCollections: recentFinesRes[0] || [],
+                visualAnalytics: {
+                    monthlyTrends: trendsRes[0] || [],
+                    categoryDelays: categoryDelaysRes[0] || []
+                }
+            }
+        });
+    } catch (err) {
+        console.error("Monitoring Dashboard Error:", err);
+        res.status(500).json({ success: false, message: 'Server error', error: err.message, stack: err.stack });
+    }
+};
+
+module.exports = { createLibrarian, getLibrarians, updateLibrarianPassword, deleteLibrarian, getStats, importBooks, importMembers, getOverviewStats, generateUniqueLibrarianId, getAuditLogs, updateLibrarianStatus, getMonitoringDashboardData };

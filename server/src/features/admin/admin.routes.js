@@ -14,7 +14,8 @@ const {
     getOverviewStats,
     generateUniqueLibrarianId,
     getAuditLogs,
-    updateLibrarianStatus
+    updateLibrarianStatus,
+    getMonitoringDashboardData
 } = require('./admin.controller');
 const announcementController = require('../announcements/announcement.controller');
 const { authLimiter } = require('../../middlewares/rateLimiter.middleware');
@@ -42,6 +43,9 @@ router.get('/stats', verifyToken, cacheMiddleware(300), getStats);
 
 // Protected: Full overview stats for admin dashboard
 router.get('/overview-stats', verifyToken, checkRole(['admin']), cacheMiddleware(300), getOverviewStats);
+
+// Protected: Librarian monitoring dashboard (Real Data)
+router.get('/monitoring-stats', verifyToken, checkRole(['admin', 'librarian']), getMonitoringDashboardData);
 
 // Protected: Audit Logs
 router.get('/audit-logs', verifyToken, checkRole(['admin']), getAuditLogs);

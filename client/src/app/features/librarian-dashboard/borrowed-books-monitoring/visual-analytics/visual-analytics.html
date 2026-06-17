@@ -1,0 +1,68 @@
+<div class="analytics-container">
+  
+  <div class="charts-grid">
+    <!-- Chart 1: Borrow vs Return Trend (CSS Bar Chart) -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3><i class="fas fa-chart-bar"></i> Borrowing vs Returns (6 Months)</h3>
+        <span class="badge badge-warning">Gap widening</span>
+      </div>
+      
+      <div class="css-bar-chart">
+        <div class="y-axis">
+          <span>{{ maxGraphValue }}</span>
+          <span>{{ maxGraphValue * 0.75 }}</span>
+          <span>{{ maxGraphValue * 0.5 }}</span>
+          <span>{{ maxGraphValue * 0.25 }}</span>
+          <span>0</span>
+        </div>
+        <div class="chart-area">
+          @for (data of monthlyTrends; track data.month) {
+            <div class="bar-group" [title]="data.month + ': ' + data.borrowed + ' Borrowed, ' + data.returned + ' Returned'">
+              <div class="bar borrowed" [style.height]="data.borrowedHeight">
+                <span class="val">{{ data.borrowed }}</span>
+              </div>
+              <div class="bar returned" [style.height]="data.returnedHeight">
+                <span class="val">{{ data.returned }}</span>
+              </div>
+              <span class="x-label">{{ data.month }}</span>
+            </div>
+          }
+        </div>
+      </div>
+      <div class="chart-legend">
+        <div class="legend-item"><span class="dot borrowed-dot"></span> Borrowed</div>
+        <div class="legend-item"><span class="dot returned-dot"></span> Returned</div>
+      </div>
+    </div>
+
+    <!-- Chart 2: Delays by Category (CSS Horizontal Bars) -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3><i class="fas fa-layer-group"></i> Delays by Category</h3>
+        <p class="subtitle">Percentage of total overdue books</p>
+      </div>
+
+      <div class="horizontal-bars">
+        @for (cat of categoryDelays; track cat.category) {
+          <div class="hbar-group">
+            <div class="hbar-label">
+              <span>{{ cat.category }}</span>
+              <span class="font-bold">{{ cat.delayPercent }}%</span>
+            </div>
+            <div class="hbar-track">
+              <div class="hbar-fill" [style.width.%]="cat.delayPercent" [style.background-color]="cat.color"></div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="insight-box mt-4">
+        <i class="fas fa-lightbulb text-warning"></i>
+        <p><b>Insight:</b> Computer Science books have the highest delay rate, directly causing the current stock shortages in that department.</p>
+      </div>
+
+    </div>
+  </div>
+
+</div>

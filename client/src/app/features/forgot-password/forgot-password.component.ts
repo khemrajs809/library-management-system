@@ -1,17 +1,18 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
 import { SpinnerComponent } from '../../shared/animations/spinner/spinner.component';
-
+import { ParticleAnimationComponent } from '../../shared/components/particle-animation/particle-animation.component';
 
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
-  imports: [RouterLink, FormsModule, SpinnerComponent],
+  imports: [RouterLink, FormsModule, SpinnerComponent, ParticleAnimationComponent],
   templateUrl: './forgot-password.component.html',
   styleUrl: './forgot-password.component.css',
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class ForgotPasswordComponent {
   private authService = inject(AuthService);

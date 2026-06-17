@@ -3,10 +3,11 @@ import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { ANIMATION_COMPONENTS } from '../../shared/animations/animations';
+import { ParticleAnimationComponent } from '../../shared/components/particle-animation/particle-animation.component';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, FormsModule, ...ANIMATION_COMPONENTS],
+  imports: [RouterLink, FormsModule, ...ANIMATION_COMPONENTS, ParticleAnimationComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
@@ -18,11 +19,13 @@ export class HomeComponent implements OnInit {
   ngOnInit() {
     if (this.authService.isLoggedIn()) {
       const role = this.authService.userRole();
-      if (role === 'admin') {
-        this.router.navigate(['/admin/dashboard']);
-      } else {
-        this.router.navigate(['/librarian/dashboard']);
-      }
+      setTimeout(() => {
+        if (role === 'admin') {
+          this.router.navigate(['/admin/dashboard'], { replaceUrl: true });
+        } else {
+          this.router.navigate(['/librarian/dashboard'], { replaceUrl: true });
+        }
+      }, 100);
       return;
     }
 

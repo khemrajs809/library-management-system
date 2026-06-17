@@ -1,0 +1,109 @@
+<div class="offenders-container">
+  
+  <!-- Risk Analysis -->
+  <div class="risk-insights-section">
+    <div class="header">
+      <h2><i class="fas fa-shield-alt"></i> Suspicious Students Analysis</h2>
+      <p class="subtitle">System-generated predictions based on historical borrowing patterns.</p>
+    </div>
+    
+    <div class="insights-grid">
+      @for (insight of riskInsights; track insight.title) {
+        <div class="insight-card">
+          <div class="icon-wrapper"><i class="fas" [ngClass]="insight.icon"></i></div>
+          <div class="insight-content">
+            <h3>{{ insight.title }}</h3>
+            <div class="value">{{ insight.value }}</div>
+            <p>{{ insight.desc }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Repeat Offenders List -->
+  <div class="offenders-list-section">
+    <div class="header">
+      <h2><i class="fas fa-user-times"></i> Suspicious Students List</h2>
+      <p class="subtitle">Members who consistently return books past the due date.</p>
+    </div>
+
+    <div class="table-responsive">
+      <table class="lms-table">
+        <thead>
+          <tr>
+            <th>Member</th>
+            <th>Borrowing History</th>
+            <th>Delay Metrics</th>
+            <th>Risk Score</th>
+            <th>System Recommendation</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (offender of offenders; track offender.id) {
+            <tr>
+              <td>
+                <div class="member-cell">
+                  <img [src]="offender.avatar" class="avatar">
+                  <span class="name">{{ offender.name }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="history-stats">
+                  <span>Total: <b>{{ offender.totalBorrowed }}</b></span>
+                  <span class="text-danger">Late: <b>{{ offender.lateReturns }}</b></span>
+                </div>
+              </td>
+              <td>
+                <div class="delay-stats">
+                  <span>Avg Delay: <b>{{ offender.avgDelayDays }} days</b></span>
+                  <span>Fines Paid: <b>₹{{ offender.totalFinesPaid }}</b></span>
+                </div>
+              </td>
+              <td>
+                <div class="risk-score">
+                  <div class="score-circle" [ngClass]="{
+                    'high': offender.riskScore >= 80,
+                    'medium': offender.riskScore >= 60 && offender.riskScore < 80,
+                    'low': offender.riskScore < 60
+                  }">{{ offender.riskScore }}</div>
+                </div>
+              </td>
+              <td>
+                <p class="recommendation"><i class="fas fa-lightbulb text-warning"></i> {{ offender.recommendation }}</p>
+              </td>
+              <td>
+                <div class="actions">
+                  <button class="btn btn-outline" (click)="warnMember(offender)"><i class="fas fa-envelope"></i> Warn</button>
+                  <button class="btn btn-danger" (click)="sendNotice(offender)"><i class="fas fa-file-alt"></i> Notice</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Messaging Modal -->
+  @if (isMessageModalOpen()) {
+    <div class="modal-overlay" (click)="closeMessageModal()">
+      <div class="message-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Send Message to {{ selectedMemberForMessage()?.name }}</h3>
+        </div>
+        <div class="modal-body">
+          <label>Message Content:</label>
+          <textarea rows="6" [ngModel]="messageContent()" (ngModelChange)="messageContent.set($event)"></textarea>
+          <p class="hint">This message will be sent via Email/SMS depending on the member's communication preferences.</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" (click)="closeMessageModal()">Cancel</button>
+          <button class="btn btn-primary" (click)="sendMessage()">Send Message</button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

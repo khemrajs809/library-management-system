@@ -35,7 +35,7 @@ const issueBook = async (req, res) => {
         const issue_date = new Date().toISOString().split('T')[0];
         const due_date = new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-        await pool.query('CALL proc_issue_book(?, ?, ?, ?)', [copy_id, member_id, issue_date, due_date]);
+        await pool.query('CALL proc_issue_book(?, ?, ?, ?)', [member_id, copy_id, issue_date, due_date]);
 
         await invalidateCache('cache:/api/admin/stats*');
         await invalidateCache('cache:/api/admin/overview-stats*');

@@ -1,0 +1,89 @@
+<div class="overview-section">
+  <div class="header">
+    <h2><i class="fas fa-chart-line"></i> Key Metrics Overview</h2>
+    <span class="updated-time">Last updated: Just now</span>
+  </div>
+
+  <div class="stats-grid">
+    <!-- Card 1 -->
+    <div class="stat-card primary">
+      <div class="icon-bg"><i class="fas fa-book-reader"></i></div>
+      <div class="stat-content">
+        <h3>Total Borrowed</h3>
+        <div class="value">{{ stats.totalBorrowed }}</div>
+        <div class="trend positive"><i class="fas fa-arrow-up"></i> 12% this month</div>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="stat-card warning">
+      <div class="icon-bg"><i class="fas fa-calendar-day"></i></div>
+      <div class="stat-content">
+        <h3>Due Today</h3>
+        <div class="value">{{ stats.dueToday }}</div>
+        <div class="trend neutral">Requires follow-up</div>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="stat-card danger">
+      <div class="icon-bg"><i class="fas fa-exclamation-circle"></i></div>
+      <div class="stat-content">
+        <h3>Overdue Books</h3>
+        <div class="value">{{ stats.overdue }}</div>
+        <div class="trend negative"><i class="fas fa-arrow-up"></i> 5% vs last week</div>
+      </div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="stat-card critical">
+      <div class="icon-bg"><i class="fas fa-biohazard"></i></div>
+      <div class="stat-content">
+        <h3>Critical Delay (30+ days)</h3>
+        <div class="value">{{ stats.criticalDelay }}</div>
+        <div class="trend negative"><i class="fas fa-exclamation-triangle"></i> Urgent action needed</div>
+      </div>
+    </div>
+
+    <!-- Card 5 -->
+    <div class="stat-card info">
+      <div class="icon-bg"><i class="fas fa-users-slash"></i></div>
+      <div class="stat-content">
+        <h3>Members w/ Overdue</h3>
+        <div class="value">{{ stats.membersWithOverdue }}</div>
+        <div class="trend neutral">Out of 2,450 total active</div>
+      </div>
+    </div>
+
+    <!-- Card 6 -->
+    <div class="stat-card success">
+      <div class="icon-bg"><i class="fas fa-rupee-sign"></i></div>
+      <div class="stat-content">
+        <h3>Pending Fines</h3>
+        <div class="value">₹{{ stats.pendingFines }}</div>
+        <div class="trend positive"><i class="fas fa-wallet"></i> ₹1,200 collected today</div>
+      </div>
+    </div>
+
+    <!-- Card 7 -->
+    <div class="stat-card purple">
+      <div class="icon-bg"><i class="fas fa-exclamation-triangle"></i></div>
+      <div class="stat-content">
+        <h3>Shortage Alerts</h3>
+        <div class="value">{{ stats.shortageAlerts }}</div>
+        <div class="trend negative">High demand books unavailable</div>
+      </div>
+    </div>
+
+    <!-- Card 8 -->
+    <div class="stat-card dark">
+      <div class="icon-bg"><i class="fas fa-star"></i></div>
+      <div class="stat-content">
+        <h3>Most Borrowed</h3>
+        <div class="value text-sm">{{ stats.mostBorrowedBook }}</div>
+        <div class="trend neutral">42 active checkouts</div>
+      </div>
+    </div>
+
+  </div>
+</div>

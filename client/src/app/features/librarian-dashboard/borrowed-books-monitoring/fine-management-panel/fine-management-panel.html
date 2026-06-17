@@ -1,0 +1,60 @@
+<div class="fines-container">
+  <div class="header">
+    <h2><i class="fas fa-wallet"></i> Fine Management & Recovery</h2>
+    <p class="subtitle">Track outstanding fines and monthly collection performance.</p>
+  </div>
+
+  <div class="fines-grid">
+    <!-- Stats Column -->
+    <div class="stats-column">
+      <div class="fine-card danger">
+        <h3>Total Outstanding Fines</h3>
+        <div class="amount">₹{{ fineStats.totalOutstanding }}</div>
+        <p>Across {{ fineStats.pendingFinesCount }} active members</p>
+      </div>
+
+      <div class="fine-card success">
+        <h3>Collected This Month</h3>
+        <div class="amount">₹{{ fineStats.collectedThisMonth }}</div>
+        <div class="progress-bar">
+          <div class="progress" [style.width.%]="fineStats.recoveryRate"></div>
+        </div>
+        <p>{{ fineStats.recoveryRate }}% monthly recovery rate</p>
+      </div>
+      
+      <button class="btn btn-primary w-100 mt-2"><i class="fas fa-paper-plane"></i> Send Bulk Payment Links</button>
+    </div>
+
+    <!-- Recent Collections Table -->
+    <div class="table-column">
+      <div class="card-box">
+        <h3><i class="fas fa-history"></i> Recent Collections</h3>
+        <table class="lms-table">
+          <thead>
+            <tr>
+              <th>Trans ID</th>
+              <th>Member</th>
+              <th>Date</th>
+              <th>Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (trx of recentCollections; track trx.id) {
+              <tr>
+                <td class="font-mono text-sm text-gray">{{ trx.id }}</td>
+                <td class="font-medium">{{ trx.member }}</td>
+                <td class="text-sm">{{ trx.date | date:'short' }}</td>
+                <td class="font-bold text-success">₹{{ trx.amount }}</td>
+                <td><span class="badge badge-success">{{ trx.status }}</span></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        <div class="view-all">
+          <a href="#">View Full Fine Report <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

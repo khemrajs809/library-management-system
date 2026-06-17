@@ -9,6 +9,7 @@
         <li [class.active]="activeTab === 'register_member'" (click)="setTab('register_member')">Register Member</li>
         <li [class.active]="activeTab === 'issues'" (click)="setTab('issues')">Circulation Desk</li>
         <li [class.active]="activeTab === 'scanner_mode'" (click)="setTab('scanner_mode')">Book Return</li>
+        <li [class.active]="activeTab === 'monitoring'" (click)="setTab('monitoring')">Monitoring Dashboard</li>
         <li [class.active]="activeTab === 'fine_manager'" (click)="setTab('fine_manager')">Fines & Lost Books</li>
         <li [class.active]="activeTab === 'history'" (click)="setTab('history')">Return History</li>
       </ul>
@@ -35,6 +36,11 @@
       <!-- ─── Fines & Lost Books ─── -->
       @if (activeTab === 'fine_manager') {
       @defer { <app-fine-manager></app-fine-manager> }
+      }
+
+      <!-- ─── Borrowed Books Monitoring ─── -->
+      @if (activeTab === 'monitoring') {
+      @defer { <app-borrowed-books-monitoring></app-borrowed-books-monitoring> }
       }
     </div>
   </div>

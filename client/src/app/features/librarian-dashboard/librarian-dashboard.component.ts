@@ -17,11 +17,12 @@ import { FineManagerComponent } from './fine-manager/fine-manager.component';
 import { ModalService } from '../../services/modal.service';
 import { MemberProfileComponent } from './member-profile/member-profile.component';
 import { RefreshService } from '../../services/refresh.service';
+import { BorrowedBooksMonitoring } from './borrowed-books-monitoring/borrowed-books-monitoring';
 
 @Component({
   selector: 'app-librarian-dashboard',
   standalone: true,
-  imports: [BookManagerComponent, MemberManagerComponent, CirculationDeskComponent, FineManagerComponent, MemberProfileComponent],
+  imports: [BookManagerComponent, MemberManagerComponent, CirculationDeskComponent, FineManagerComponent, MemberProfileComponent, BorrowedBooksMonitoring],
   templateUrl: './librarian-dashboard.component.html',
   styleUrl: './librarian-dashboard.component.css',
 })

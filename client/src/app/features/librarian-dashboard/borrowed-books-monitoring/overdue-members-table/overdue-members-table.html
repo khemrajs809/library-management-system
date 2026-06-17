@@ -1,0 +1,160 @@
+<div class="table-container">
+  <!-- Toolbar: Search and Filters -->
+  <div class="toolbar">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" placeholder="Search by name, ID, or book..." [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)">
+    </div>
+    <div class="filters">
+      <div class="auto-message-toggle">
+        <span class="toggle-label">Auto-Messaging</span>
+        <label class="switch">
+          <input type="checkbox" [ngModel]="autoMessagingEnabled()" (ngModelChange)="toggleAutoMessaging($event)">
+          <span class="slider round"></span>
+        </label>
+      </div>
+      <select [ngModel]="filterStatus()" (ngModelChange)="filterStatus.set($event)">
+        <option value="All">All Statuses</option>
+        <option value="Due Soon">Due Soon</option>
+        <option value="Overdue">Overdue</option>
+        <option value="Critical Delay">Critical Delay</option>
+        <option value="Lost Book Suspected">Lost Book Suspected</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Data Table -->
+  <div class="table-responsive">
+    <table class="lms-table">
+      <thead>
+        <tr>
+          <th>MEMBER DETAILS</th>
+          <th>BOOK INFORMATION</th>
+          <th>STATUS</th>
+          <th>FINE DETAILS</th>
+          <th>TIMELINE & DAYS</th>
+          <th>CONTACT & REF</th>
+          <th>ACTIONS</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (member of filteredMembers; track member.id) {
+          <tr>
+            <td>
+              <div class="member-details-cell">
+                <img [src]="member.avatar" alt="Avatar" class="avatar-img">
+                <div class="member-text">
+                  <div class="member-name-text">{{ member.name }}</div>
+                  <div class="member-meta-text">#{{ member.memberId }} | {{ member.type || 'N/A' }}</div>
+                  <div class="member-sponsor-text"><i class="fas fa-user-alt" style="font-size:0.7rem;"></i> Parent/Guardian</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="book-details-cell">
+                <div class="book-title-text">{{ member.bookName }}</div>
+                <div class="book-author-text">Library Book</div>
+                <div class="book-meta-text">Accession: <span class="accession-badge">#BK-{{ member.isbn.substring(0,4) || '1000' }}</span></div>
+                <div class="book-isbn-text">ISBN: {{ member.isbn }}</div>
+              </div>
+            </td>
+            <td>
+              <div class="status-cell">
+                <div class="status-badge" [ngClass]="member.status.toLowerCase().includes('lost') ? 'status-lost' : 'status-issued'">
+                  {{ member.status.toLowerCase().includes('lost') ? 'LOST' : 'ISSUED' }}
+                </div>
+                <div class="book-value-text">Value: ₹500.00</div>
+              </div>
+            </td>
+            <td>
+              <div class="fine-cell">
+                <div class="fine-amount-text" [class.fine-high]="member.fineAmount > 0">₹{{ member.fineAmount }}</div>
+                <div class="fine-status-badge" [ngClass]="member.fineAmount > 0 ? 'status-unpaid' : 'status-paid'">
+                  {{ member.fineAmount > 0 ? 'UNPAID' : 'PAID' }}
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="timeline-cell">
+                <div class="due-row">
+                  <span class="due-label">DUE</span>
+                  <span class="due-date">{{ member.dueDate | date:'dd MMM yy' }}</span>
+                </div>
+                @if (member.daysOverdue > 0) {
+                  <div class="delay-row">
+                    <i class="fas fa-clock"></i> {{ member.daysOverdue }} days delay
+                  </div>
+                }
+              </div>
+            </td>
+            <td>
+              <div class="contact-cell">
+                <div><i class="fas fa-phone-alt"></i> {{ member.mobile }}</div>
+                <div class="contact-email">{{ member.email }}</div>
+                <div><i class="fas fa-archive"></i> Rack A-01</div>
+              </div>
+            </td>
+            <td>
+              <div class="action-cell">
+                <button class="btn-action-pill btn-remind" title="Send Reminder" (click)="sendReminder(member)"><i class="fas fa-bell"></i> Remind</button>
+                <button class="btn-action-pill btn-warn" title="Send Warning" (click)="sendWarn(member)"><i class="fas fa-exclamation-triangle"></i> Warn</button>
+                <button class="btn-action-pill btn-notice" title="Send Notice" (click)="sendNotice(member)"><i class="fas fa-exclamation-circle"></i> Notice</button>
+                <button class="btn-action-pill btn-download" title="Download PDF Notice" (click)="downloadNotice(member)"><i class="fas fa-file-download"></i> PDF</button>
+              </div>
+            </td>
+          </tr>
+        }
+        @if (filteredMembers.length === 0) {
+          <tr>
+            <td colspan="7" class="empty-state">
+              <i class="fas fa-check-circle"></i>
+              <p>No overdue members found matching your criteria.</p>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  
+  <!-- Pagination -->
+  <div class="pagination-wrapper">
+    <span class="page-info">Showing {{ filteredMembers.length }} entries</span>
+    <div class="custom-pagination">
+      <button class="btn-page-nav prev"><i class="fas fa-chevron-left"></i> Previous</button>
+      <button class="btn-page-number active">1</button>
+      <button class="btn-page-number">2</button>
+      <button class="btn-page-number">3</button>
+      <button class="btn-page-number">4</button>
+      <button class="btn-page-nav next">Next <i class="fas fa-chevron-right"></i></button>
+    </div>
+  </div>
+
+  <!-- Messaging Modal -->
+  @if (isMessageModalOpen()) {
+    <div class="modal-overlay" (click)="closeMessageModal()">
+      <div class="message-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Send Message to {{ selectedMemberForMessage()?.name }}</h3>
+        </div>
+        <div class="modal-body">
+          <label>Message Content:</label>
+          <textarea rows="6" [ngModel]="messageContent()" (ngModelChange)="messageContent.set($event)"></textarea>
+          <p class="hint">This message will be sent via Email/SMS depending on the member's communication preferences.</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" (click)="closeMessageModal()">Cancel</button>
+          <button class="btn btn-primary" (click)="sendMessage()">Send Message</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Toast Notification -->
+  @if (toastVisible()) {
+    <div class="toast-notification">
+      <i class="fas fa-info-circle"></i>
+      <span>{{ toastMessage() }}</span>
+    </div>
+  }
+
+</div>

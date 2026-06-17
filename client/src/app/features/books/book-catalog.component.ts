@@ -6,11 +6,12 @@ import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { BookService } from '../../services/book.service';
 import { SpinnerComponent } from '../../shared/animations/spinner/spinner.component';
+import { CustomClockComponent } from '../../shared/components/custom-clock/custom-clock.component';
 
 @Component({
   selector: 'app-book-catalog',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SpinnerComponent],
+  imports: [CommonModule, FormsModule, RouterModule, SpinnerComponent, CustomClockComponent],
   templateUrl: './book-catalog.component.html',
   styleUrl: './book-catalog.component.css'
 })

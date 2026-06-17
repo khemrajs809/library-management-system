@@ -1,0 +1,37 @@
+<div class="glass-clock">
+  <div class="clock-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+  </div>
+
+  <div class="clock-time">
+    <div class="clock">
+      <div class="hours" #hoursContainer>
+        <div class="first">
+          <div class="number">{{ initHours[0] }}</div>
+        </div>
+        <div class="second">
+          <div class="number">{{ initHours[1] }}</div>
+        </div>
+      </div>
+      <div class="tick">:</div>
+      <div class="minutes" #minutesContainer>
+        <div class="first">
+          <div class="number">{{ initMinutes[0] }}</div>
+        </div>
+        <div class="second">
+          <div class="number">{{ initMinutes[1] }}</div>
+        </div>
+      </div>
+      <div class="tick">:</div>
+      <div class="seconds" #secondsContainer>
+        <div class="first">
+          <div class="number">{{ initSeconds[0] }}</div>
+        </div>
+        <div class="second">
+          <div class="number">{{ initSeconds[1] }}</div>
+        </div>
+      </div>
+      <div class="ampm">{{ amPm }}</div>
+    </div>
+  </div>
+</div>

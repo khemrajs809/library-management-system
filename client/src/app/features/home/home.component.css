@@ -47,6 +47,8 @@
     align-items: center;
     gap: 60px;
     width: 100%;
+    position: relative;
+    z-index: 1;
 }
 
 .hero-text {
@@ -205,6 +207,8 @@
     height: auto;
     filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.06));
     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    z-index: 1;
 }
 
 .hero-logo:hover {
