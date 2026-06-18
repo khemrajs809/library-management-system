@@ -11,8 +11,8 @@ const createReservation = async (req, res) => {
 
     try {
         // 1. Check if the book actually has 0 copies available
-        const [availableCopies] = await pool.query('CALL proc_find_available_copies(?)', [book_id]);
-        if (availableCopies.length > 0) {
+        const availableCopies = await pool.query('CALL proc_find_available_copies(?)', [book_id]);
+        if (availableCopies[0] && availableCopies[0].length > 0) {
             return res.status(400).json({ success: false, message: 'This book has available copies. Please issue it directly instead of reserving.' });
         }
 

@@ -1,4 +1,9 @@
 const express = require('express');
+
+if (typeof BigInt !== 'undefined') {
+    BigInt.prototype.toJSON = function () { return this.toString() };
+}
+
 const cookieParser = require('cookie-parser');
 const path = require('path');
 

@@ -62,8 +62,8 @@ const b = req.body;
     }
 
     if (email) {
-        const [emailCheck] = await pool.query('CALL proc_check_member_email(?, NULL)', [email]);
-        if (emailCheck.length > 0) {
+        const emailCheck = await pool.query('CALL proc_check_member_email(?, NULL)', [email]);
+        if (emailCheck[0] && emailCheck[0].length > 0) {
             return res.status(409).json({ success: false, message: 'Email is already registered to another member' });
         }
     }
@@ -123,8 +123,8 @@ const getMembers = async (req, res) => {
 
         let totalCount = 0;
 
-        const [countResult] = await pool.query('CALL proc_get_members_count(?)', [q || null]);
-        totalCount = Number(countResult[0].total);
+        const countResult = await pool.query('CALL proc_get_members_count(?)', [q || null]);
+        totalCount = Number(countResult[0]?.[0]?.total || 0);
 
         const [rows] = await pool.query('CALL proc_get_members(?, ?, ?)', [q || null, limit, offset]);
 
@@ -247,8 +247,8 @@ const b = req.body;
     }
 
     if (email) {
-        const [emailCheck] = await pool.query('CALL proc_check_member_email(?, ?)', [email, id]);
-        if (emailCheck.length > 0) {
+        const emailCheck = await pool.query('CALL proc_check_member_email(?, ?)', [email, id]);
+        if (emailCheck[0] && emailCheck[0].length > 0) {
             return res.status(409).json({ success: false, message: 'Email is already registered to another member' });
         }
     }
@@ -445,12 +445,12 @@ const sendMemberEmail = async (req, res) => {
 
     try {
         // Authenticate that the email belongs to a registered member
-        const [memberCheck] = await pool.query('CALL proc_check_member_email(?, NULL)', [to]);
-        if (memberCheck.length === 0) {
+        const memberCheck = await pool.query('CALL proc_check_member_email(?, NULL)', [to]);
+        if (!memberCheck[0] || memberCheck[0].length === 0) {
             return res.status(404).json({ success: false, message: 'Email address not found in active member records' });
         }
 
-        const memberName = memberCheck[0].name || memberCheck[0].first_name || '';
+        const memberName = memberCheck[0][0].name || memberCheck[0][0].first_name || '';
         const html = generateGenericMessageHTML(memberName, subject, message);
         const result = await sendEmail(to, subject, message, html);
         

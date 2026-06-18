@@ -50,8 +50,8 @@ class AuthRepository {
     }
 
     async logoutSession(token) {
-        const [result] = await pool.query('CALL proc_logout_session(?)', [token]);
-        return result[0]?.affected_rows || 0;
+        const result = await pool.query('CALL proc_logout_session(?)', [token]);
+        return result[0]?.[0]?.affected_rows || 0;
     }
 
     async insertTokenBlacklist(token, userId, userName, email, role, status, expiresAt, ipAddress, userAgent) {

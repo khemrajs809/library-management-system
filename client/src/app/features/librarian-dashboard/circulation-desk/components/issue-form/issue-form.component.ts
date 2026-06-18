@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, OnDestro
 
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType } from '@zxing/library';
+import { UPLOADS_BASE } from '../../../../../core/api.config';
 
 @Component({
   selector: 'app-issue-form',
@@ -12,15 +13,24 @@ import { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType } from '@zxing/
 })
 export class IssueFormComponent implements OnDestroy {
   @Input() recentActivity: any[] = [];
+  @Input() members: any[] = [];
+  @Input() books: any[] = [];
+  
   @Output() onIssue = new EventEmitter<{ memberId: string, bookId: string }>();
   
   @ViewChild('memberInput') memberInput!: ElementRef;
   @ViewChild('bookInput') bookInput!: ElementRef;
 
+  readonly uploadsBase = UPLOADS_BASE;
+
   memberId = '';
   bookId = '';
   isScanningMember = false;
   isScanningBook = false;
+  
+  previewMember: any = null;
+  previewBook: any = null;
+  previewCopyId: string = '';
   
   private codeReader = new BrowserMultiFormatReader();
 
@@ -36,11 +46,50 @@ export class IssueFormComponent implements OnDestroy {
   }
 
   onMemberIdEnter(val: string) {
-    this.memberId = val;
+    this.memberId = val.trim();
+    if (!this.memberId) {
+      this.previewMember = null;
+      return;
+    }
+    const found = this.members.find(m => m.memberId === this.memberId);
+    this.previewMember = found || null;
   }
 
   onBookIdEnter(val: string) {
-    this.bookId = val;
+    this.bookId = val.trim();
+    if (!this.bookId) {
+      this.previewBook = null;
+      this.previewCopyId = '';
+      return;
+    }
+    
+    // Check if it's a copy ID (e.g., BK-5021-3)
+    let parentBookId = this.bookId;
+    let possibleCopyPart = '';
+    
+    const lastDash = this.bookId.lastIndexOf('-');
+    if (lastDash > 0) {
+      const suffix = this.bookId.substring(lastDash + 1);
+      // If suffix is a number, it's likely a copy ID
+      if (!isNaN(Number(suffix))) {
+        parentBookId = this.bookId.substring(0, lastDash);
+        possibleCopyPart = this.bookId;
+      }
+    }
+
+    // Attempt lookup
+    let found = this.books.find(b => b.bookId === this.bookId);
+    if (!found && parentBookId !== this.bookId) {
+       found = this.books.find(b => b.bookId === parentBookId);
+    }
+    
+    if (found) {
+       this.previewBook = found;
+       this.previewCopyId = possibleCopyPart || found.bookId;
+    } else {
+       this.previewBook = null;
+       this.previewCopyId = '';
+    }
   }
 
   onIssueSubmit() {
@@ -51,15 +100,15 @@ export class IssueFormComponent implements OnDestroy {
     });
     this.memberId = '';
     this.bookId = '';
+    this.previewMember = null;
+    this.previewBook = null;
+    this.previewCopyId = '';
     setTimeout(() => this.memberInput?.nativeElement.focus(), 100);
   }
 
   private async startCamera(videoId: string, onScan: (text: string) => void) {
     try {
-      // Ensure any previous session is stopped
       this.codeReader.reset();
-      
-      // Wait a tiny bit for the DOM element to be ready
       await new Promise(resolve => setTimeout(resolve, 200));
 
       const videoElement = document.getElementById(videoId) as HTMLVideoElement;
@@ -84,6 +133,7 @@ export class IssueFormComponent implements OnDestroy {
       this.isScanningBook = false;
       this.startCamera('member-reader', (text) => {
         this.memberId = text;
+        this.onMemberIdEnter(text);
         this.toggleMemberScanner();
         setTimeout(() => this.bookInput?.nativeElement.focus(), 200);
       });
@@ -98,6 +148,7 @@ export class IssueFormComponent implements OnDestroy {
       this.isScanningMember = false;
       this.startCamera('book-reader', (text) => {
         this.bookId = text;
+        this.onBookIdEnter(text);
         this.toggleBookScanner();
       });
     } else {

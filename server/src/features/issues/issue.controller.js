@@ -42,8 +42,14 @@ const issueBook = async (req, res) => {
 
         res.status(201).json({ success: true, message: 'Book issued successfully', due_date });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, message: 'Internal server error' });
+        console.error('Issue Book Error:', err);
+        let msg = 'Internal server error';
+        if (err.sqlState === '45000') {
+            msg = err.message.replace(/^.*?SQLState: 45000\)\s*/, '');
+        } else if (err.code === 'ER_NO_REFERENCED_ROW_2' || err.sqlState === '23000') {
+            msg = 'Database constraint error: Unable to process the issue request.';
+        }
+        res.status(500).json({ success: false, message: msg });
     }
 };
 
@@ -251,7 +257,7 @@ const returnByBookId = async (req, res) => {
 
         // --- WAITLIST FULFILLMENT LOGIC ---
         // We need the parent book_id to check waitlists
-        const [copyDetails] = await pool.query('CALL proc_get_book_id_from_copy(?)', [copy_id]);
+        const copyDetails = await pool.query('CALL proc_get_book_id_from_copy(?)', [copy_id]);
         if (copyDetails && copyDetails.length > 0) {
             const parentBookId = copyDetails[0].book_id;
             const waitlistRows = await pool.query('CALL proc_get_waitlist_for_book(?)', [parentBookId]);

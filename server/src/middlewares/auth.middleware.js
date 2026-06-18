@@ -27,9 +27,9 @@ const verifyToken = async (req, res, next) => {
 
     try {
         // Check if session is inactive
-        const [sessionCheck] = await pool.query('CALL proc_check_token_status(?)', [token]);
-        if (sessionCheck.length > 0 && sessionCheck[0].status === 'inactive') {
-            return res.status(401).json({ success: false, message: 'Token has been revoked. Please log in again.' });
+        const sessionCheck = await pool.query('CALL proc_check_token_status(?)', [token]);
+        if (sessionCheck[0] && sessionCheck[0].length > 0 && sessionCheck[0][0].status === 'inactive') {
+            return res.status(401).json({ success: false, message: 'Session revoked. Please login again.' });
         }
 
         // Decrypt and verify JWE

@@ -112,7 +112,7 @@ const getSessionActions = async (req, res) => {
 const terminateSession = async (req, res) => {
     const { id } = req.params;
     try {
-        const [session] = await pool.query('CALL proc_get_session_for_termination(?)', [id]);
+        const session = await pool.query('CALL proc_get_session_for_termination(?)', [id]);
         if (session.length === 0) {
             return res.status(404).json({ success: false, message: 'Session not found' });
         }

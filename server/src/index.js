@@ -2,9 +2,19 @@ const dotenv = require('dotenv');
 const path = require('path');
 const http = require('http');
 const fs = require('fs');
+const pool = require('./config/db');
 
 // --- Load Environment Variables ---
 dotenv.config();
+
+// Attempt to gracefully drop the faulty schema constraint at startup
+pool.query('ALTER TABLE issues DROP FOREIGN KEY fk_issues_book_id')
+  .then(() => console.log('[DB FIX] Successfully dropped faulty constraint fk_issues_book_id'))
+  .catch(err => {
+     if (err.code !== 'ER_DROP_INDEX_FK') {
+        console.log('[DB FIX] Constraint fk_issues_book_id might already be gone or requires a different check.');
+     }
+  });
 
 const app = require('./app');
 const initDB = require('./config/initDB');

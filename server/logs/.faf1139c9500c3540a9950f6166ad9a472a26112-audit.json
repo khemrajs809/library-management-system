@@ -6,16 +6,6 @@
     "auditLog": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\.faf1139c9500c3540a9950f6166ad9a472a26112-audit.json",
     "files": [
         {
-            "date": 1780398855300,
-            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\application-2026-06-02.log",
-            "hash": "d6bb8b3931d4e3f67fdce9d59d631382bb99a427d19dc8dfa51c6ab7639c5228"
-        },
-        {
-            "date": 1780447718120,
-            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\application-2026-06-03.log",
-            "hash": "7e71ed16777a1b916f8b5f4a927d6b443f6958fb4793600d83d7f1d2d1144d99"
-        },
-        {
             "date": 1780557147675,
             "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\application-2026-06-04.log",
             "hash": "555c66172d5b62b9f8aa638fa6d7dd66aa4ab0a1d839429b142f9da7a9b38751"
@@ -49,6 +39,11 @@
             "date": 1781586655277,
             "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\application-2026-06-16.log",
             "hash": "1f3fd2ccc2ef4cde257f50e882682f16b3103aa7332ed1ef3ee721be57d50740"
+        },
+        {
+            "date": 1781759220380,
+            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\application-2026-06-18.log",
+            "hash": "d43e88c797c36345e42efb57acaf9829d34d4f97280943d71d86e8568ba330d4"
         }
     ],
     "hashType": "sha256"

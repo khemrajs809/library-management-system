@@ -126,12 +126,12 @@ const logSession = async ({
             }
         }
 
-        const [result] = await pool.query(
+        const result = await pool.query(
             'CALL proc_log_session(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [userId, userName, email, realIp, userAgent, browser, os, device_type, location, status, failureReason, status === 'successful' ? 'online' : 'offline', riskScore, riskLevel, token, role]
         );
         
-        return Number(result[0].insert_id);
+        return Number(result[0]?.[0]?.insert_id);
     } catch (err) {
         console.error('Error logging user session:', err);
         return null;
@@ -144,10 +144,10 @@ const logSession = async ({
 const logSessionAction = async (token, actionType, description, path = null) => {
     try {
         if (!token) return;
-        const [session] = await pool.query('CALL proc_find_active_session_by_token(?)', [token]);
-        if (session.length === 0) return;
+        const session = await pool.query('CALL proc_find_active_session_by_token(?)', [token]);
+        if (!session[0] || session[0].length === 0) return;
 
-        const sessionId = session[0].id;
+        const sessionId = session[0][0].id;
         await pool.query('CALL proc_log_session_action(?, ?, ?, ?)', [sessionId, actionType, description, path]);
     } catch (err) {
         console.error('Error logging session action:', err);

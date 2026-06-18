@@ -107,9 +107,8 @@ class AuthService {
                 const text = `Your one-time security code is: ${otp}. It will expire in 10 minutes.`;
                 const html = generateOTPHTML(user.name || user.email, otp, 'login');
 
-                try {
-                    sendEmail(user.email, subject, text, html);
-                } catch (err) {
+                const emailSent = await sendEmail(user.email, subject, text, html);
+                if (!emailSent) {
                     console.warn(`[API] Could not send OTP email for ${user.email}.`);
                     if (process.env.NODE_ENV !== 'production') {
                         console.warn(`[DEV MODE] Bypass: Your OTP is ${otp}`);
@@ -264,9 +263,8 @@ class AuthService {
         const text = `Your new security code is: ${otp}. It will expire in 10 minutes. Previous codes are now invalid.`;
         const html = generateOTPHTML(user.name || user.email, otp, 'mfa');
 
-        try {
-            sendEmail(user.email, subject, text, html);
-        } catch (err) {
+        const emailSent = await sendEmail(user.email, subject, text, html);
+        if (!emailSent) {
             console.warn(`[API] Could not send OTP email for ${user.email}.`);
             if (process.env.NODE_ENV !== 'production') {
                 console.warn(`[DEV MODE] Bypass: Your new security code is ${otp}`);
@@ -296,9 +294,8 @@ class AuthService {
         const text = `You requested a password reset. Your security code is: ${otp}. This code expires in 10 minutes.`;
         const html = generateOTPHTML(user.name || user.email, otp, 'password-reset');
 
-        try {
-            sendEmail(user.email, subject, text, html);
-        } catch (err) {
+        const emailSent = await sendEmail(user.email, subject, text, html);
+        if (!emailSent) {
             console.warn(`[API] Could not send Reset email for ${user.email}.`);
             if (process.env.NODE_ENV !== 'production') {
                 console.warn(`[DEV MODE] Bypass: Your password reset code is ${otp}`);

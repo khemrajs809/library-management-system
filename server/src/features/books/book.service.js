@@ -20,8 +20,9 @@ class BookService {
 
     async getBooks(searchQuery, author, stream, availability, page = 1, limit = 8) {
         const offset = (page - 1) * limit;
-        const [countResult] = await pool.query('CALL proc_get_books_search_count(?, ?, ?, ?)', [searchQuery || null, author || null, stream || null, availability || null]);
-        const total = Number(countResult[0].total);
+        const countResult = await pool.query('CALL proc_get_books_search_count(?, ?, ?, ?)', [searchQuery || null, author || null, stream || null, availability || null]);
+        const totalRow = countResult[0]?.[0];
+        const total = totalRow ? Number(totalRow.total) : 0;
 
         const results = await pool.query('CALL proc_get_books(?, ?, ?, ?, ?, ?)', [searchQuery || null, author || null, stream || null, availability || null, limit, offset]);
         const rows = results[0] || [];
@@ -136,8 +137,8 @@ class BookService {
     }
 
     async getFilterOptions() {
-        const streams = await pool.query("SELECT DISTINCT stream FROM books WHERE is_deleted=0 AND stream IS NOT NULL AND stream != '' ORDER BY stream");
-        const authors = await pool.query("SELECT DISTINCT author FROM books WHERE is_deleted=0 AND author IS NOT NULL AND author != '' ORDER BY author");
+        const [streams] = await pool.query("SELECT DISTINCT stream FROM books WHERE is_deleted=0 AND stream IS NOT NULL AND stream != '' ORDER BY stream");
+        const [authors] = await pool.query("SELECT DISTINCT author FROM books WHERE is_deleted=0 AND author IS NOT NULL AND author != '' ORDER BY author");
         return {
             streams: streams.map(r => r.stream),
             authors: authors.map(r => r.author)

@@ -6,6 +6,8 @@
       <div class="side-panel">
         <app-issue-form
           [recentActivity]="recentActivity()"
+          [members]="members()"
+          [books]="books()"
           (onIssue)="executeIssue($event.memberId, $event.bookId)">
         </app-issue-form>
       </div>

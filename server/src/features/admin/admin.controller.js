@@ -84,11 +84,11 @@ const updateLibrarianPassword = async (req, res) => {
 // GET /api/admin/stats — Overview metrics for dashboard
 const getStats = async (req, res) => {
     try {
-        const [rowsBooks] = await pool.query('CALL proc_get_total_books_count()');
-        const [rowsMembers] = await pool.query('CALL proc_get_total_members_count()');
-        const [rowsIssued] = await pool.query('CALL proc_get_total_issued_count()');
-        const [rowsReturned] = await pool.query('CALL proc_get_total_returned_count()');
-        const [rowsOverdue] = await pool.query('CALL proc_get_total_overdue_count()');
+        const rowsBooks = await pool.query('CALL proc_get_total_books_count()');
+        const rowsMembers = await pool.query('CALL proc_get_total_members_count()');
+        const rowsIssued = await pool.query('CALL proc_get_total_issued_count()');
+        const rowsReturned = await pool.query('CALL proc_get_total_returned_count()');
+        const rowsOverdue = await pool.query('CALL proc_get_total_overdue_count()');
         
         // 1. Line Chart (Rental rate vs User conversion for 12 months)
         const currentYear = new Date().getFullYear();
@@ -117,8 +117,8 @@ const getStats = async (req, res) => {
         const barData = streamStats.map(r => Number(r.count));
 
         // 4. Restricted Members Count (for the stat card)
-        const [restrictedCountRes] = await pool.query(`CALL proc_get_restricted_members_count()`);
-        const restrictedMembersCount = Number(restrictedCountRes[0].count);
+        const restrictedCountRes = await pool.query(`CALL proc_get_restricted_members_count()`);
+        const restrictedMembersCount = Number(restrictedCountRes[0]?.[0]?.count || 0);
 
         // 5. Top 5 Popular Books
         const [rowsPop] = await pool.query(`CALL proc_get_popular_books()`);
@@ -131,12 +131,12 @@ const getStats = async (req, res) => {
         res.status(200).json({
             success: true,
             data: {
-                totalTitles: Number(rowsBooks[0].count),
+                totalTitles: Number(rowsBooks[0]?.[0]?.count || 0),
                 totalBooks: allCopies,
-                totalMembers: Number(rowsMembers[0].count),
-                totalIssued: Number(rowsIssued[0].count),
-                totalReturned: Number(rowsReturned[0].count),
-                totalOverdue: Number(rowsOverdue[0].count),
+                totalMembers: Number(rowsMembers[0]?.[0]?.count || 0),
+                totalIssued: Number(rowsIssued[0]?.[0]?.count || 0),
+                totalReturned: Number(rowsReturned[0]?.[0]?.count || 0),
+                totalOverdue: Number(rowsOverdue[0]?.[0]?.count || 0),
                 lineChart: { issues: lineChartIssues, members: lineChartMembers },
                 donutChart: { all: allCopies, available: newCopies, damaged: damageCopies, lost: lostCopies, issued: issuedCopies },
                 barChart: { labels: barLabels, data: barData },
@@ -288,8 +288,8 @@ const getOverviewStats = async (req, res) => {
         }));
 
         // Fine Amount
-        const [fineResult] = await pool.query('CALL proc_get_total_unpaid_fine()');
-        const totalFine = Number(fineResult[0]?.total) || 0;
+        const fineResult = await pool.query('CALL proc_get_total_unpaid_fine()');
+        const totalFine = Number(fineResult[0]?.[0]?.total) || 0;
 
         // Library Collection Summary
         const [
@@ -328,8 +328,8 @@ const getAuditLogs = async (req, res) => {
         const limit = parseInt(req.query.limit) || 20;
         const offset = (page - 1) * limit;
 
-        const [countResult] = await pool.query('CALL proc_get_total_audit_logs_count()');
-        const total = Number(countResult[0].total);
+        const countResult = await pool.query('CALL proc_get_total_audit_logs_count()');
+        const total = Number(countResult[0]?.[0]?.total || 0);
 
         const [rows] = await pool.query('CALL proc_get_audit_logs(?, ?)', [limit, offset]);
         
