@@ -1,4 +1,5 @@
 const pool = require('../../config/db');
+const { withTransaction } = require('../../common/services/dbTransaction.service');
 const { generateLostBookHTML, generatePaymentReceiptHTML, generateFineReminderHTML } = require('../../utils/email.util');
 const { invalidateCache } = require('../../utils/cache.util');
 const { sendEmail } = require('../../common/services/email.service');
@@ -6,48 +7,99 @@ const { generateGenericMessageHTML } = require('../../utils/email.util');
 
 // POST /api/issues — Issue a specific book copy to a member
 const issueBook = async (req, res) => {
-    const member_id = req.body.memberId || req.body.member_id;
-    const copy_id = req.body.bookId || req.body.book_id;
-    if (!member_id || !copy_id) return res.status(400).json({ success: false, message: 'Member ID and Copy ID required' });
+    const member_id = (req.body.memberId || req.body.member_id || '').trim();
+    const input_book_id = (req.body.bookId || req.body.book_id || '').trim();
+    if (!member_id || !input_book_id) return res.status(400).json({ success: false, message: 'Member ID and Book/Copy ID required' });
 
     try {
-        const results = await pool.query('CALL proc_check_issue_eligibility(?, ?)', [member_id, copy_id]);
-        const memberCheck = results[0];
-        const copyCheck = results[1];
-        const alreadyIssuedCheck = results[2];
-        const fineCheck = results[3];
-        const issueCount = results[4];
+        const txResult = await withTransaction(async (conn) => {
+            // 1. Verify Member
+            const members = await conn.query('SELECT * FROM members WHERE member_id = ? AND is_deleted = 0', [member_id]);
+            if (!members || members.length === 0) {
+                return { errorStatus: 404, message: 'Member not found' };
+            }
+            const member = members[0];
+            if (member.account_status && member.account_status !== 'Active') {
+                return { errorStatus: 400, message: `Member account is ${member.account_status}` };
+            }
 
-        if (memberCheck.length === 0) return res.status(404).json({ success: false, message: 'Member not found' });
-        if (copyCheck.length === 0) return res.status(404).json({ success: false, message: 'Book copy not found' });
-        if (copyCheck[0].status !== 'available') return res.status(400).json({ success: false, message: `This copy is currently ${copyCheck[0].status}.` });
+            // 2. Resolve available copy
+            let parentBookId = input_book_id;
+            const lastDash = input_book_id.lastIndexOf('-');
+            if (lastDash > 0 && !isNaN(Number(input_book_id.substring(lastDash + 1)))) {
+                parentBookId = input_book_id.substring(0, lastDash);
+            }
 
-        if (alreadyIssuedCheck.length > 0) {
-            return res.status(400).json({ success: false, message: 'Member already has a copy of this book issued.' });
+            // First check if input copy itself is available
+            let targetCopy = null;
+            const directCopy = await conn.query('SELECT * FROM book_copies WHERE copy_id = ?', [input_book_id]);
+            if (directCopy && directCopy.length > 0 && directCopy[0].status === 'available') {
+                targetCopy = directCopy[0];
+            } else {
+                // Check if any copy of this book is available
+                const availCopies = await conn.query(
+                    'SELECT * FROM book_copies WHERE (copy_id = ? OR book_id = ?) AND status = "available" ORDER BY copy_id ASC LIMIT 1',
+                    [input_book_id, parentBookId]
+                );
+                if (availCopies && availCopies.length > 0) {
+                    targetCopy = availCopies[0];
+                } else if (directCopy && directCopy.length > 0) {
+                    return { errorStatus: 400, message: `Copy ${input_book_id} is currently ${directCopy[0].status} and no other available copies exist.` };
+                } else {
+                    return { errorStatus: 404, message: 'No available copies of this book found.' };
+                }
+            }
+
+            const copy_id = targetCopy.copy_id;
+            const book_id = targetCopy.book_id;
+
+            // 3. Eligibility checks
+            const alreadyIssued = await conn.query(
+                'SELECT i.issue_id FROM issues i JOIN book_copies bc ON i.book_id = bc.copy_id WHERE i.member_id = ? AND bc.book_id = ? AND i.status = "issued"',
+                [member_id, book_id]
+            );
+            if (alreadyIssued && alreadyIssued.length > 0) {
+                return { errorStatus: 400, message: 'Member already has a copy of this book issued.' };
+            }
+
+            const fines = await conn.query('SELECT SUM(fine_amount) as total_unpaid FROM issues WHERE member_id = ? AND fine_paid = 0', [member_id]);
+            if (Number(fines[0]?.total_unpaid || 0) > 0) {
+                return { errorStatus: 400, message: `Member has unpaid fines of ₹${fines[0].total_unpaid}.` };
+            }
+
+            const activeIssues = await conn.query('SELECT COUNT(*) as count FROM issues WHERE member_id = ? AND status = "issued"', [member_id]);
+            const maxLimit = member.max_book_limit || 3;
+            if (Number(activeIssues[0]?.count || 0) >= maxLimit) {
+                return { errorStatus: 400, message: `Member has reached their limit of ${maxLimit} issued books.` };
+            }
+
+            const issue_date = new Date().toISOString().split('T')[0];
+            const due_date = new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+            await conn.query(
+                'INSERT INTO issues (book_id, member_id, issue_date, due_date, status) VALUES (?, ?, ?, ?, "issued")',
+                [copy_id, member_id, issue_date, due_date]
+            );
+            await conn.query('UPDATE book_copies SET status = "issued" WHERE copy_id = ?', [copy_id]);
+
+            return { success: true, due_date, copy_id };
+        });
+
+        if (txResult && txResult.errorStatus) {
+            return res.status(txResult.errorStatus).json({ success: false, message: txResult.message });
         }
-
-        if (Number(fineCheck[0]?.total_unpaid || 0) > 0) {
-            return res.status(400).json({ success: false, message: `Member has pending fines of ₹${fineCheck[0].total_unpaid}.` });
-        }
-
-        if (Number(issueCount[0].count) >= 3) return res.status(400).json({ success: false, message: 'Member has already issued 3 books' });
-
-        const issue_date = new Date().toISOString().split('T')[0];
-        const due_date = new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-
-        await pool.query('CALL proc_issue_book(?, ?, ?, ?)', [member_id, copy_id, issue_date, due_date]);
 
         await invalidateCache('cache:/api/admin/stats*');
         await invalidateCache('cache:/api/admin/overview-stats*');
 
-        res.status(201).json({ success: true, message: 'Book issued successfully', due_date });
+        res.status(201).json({ success: true, message: `Book (${txResult.copy_id}) issued successfully`, due_date: txResult.due_date });
     } catch (err) {
         console.error('Issue Book Error:', err);
         let msg = 'Internal server error';
         if (err.sqlState === '45000') {
             msg = err.message.replace(/^.*?SQLState: 45000\)\s*/, '');
         } else if (err.code === 'ER_NO_REFERENCED_ROW_2' || err.sqlState === '23000') {
-            msg = 'Database constraint error: Unable to process the issue request.';
+            msg = 'Unable to process issue: please verify Member ID and Book Copy ID.';
         }
         res.status(500).json({ success: false, message: msg });
     }
@@ -102,44 +154,54 @@ const renewBook = async (req, res) => {
 const returnBook = async (req, res) => {
     const issue_id = req.body.issueId || req.body.issue_id;
     try {
-        const results = await pool.query('CALL proc_get_issue_details(?)', [issue_id]);
-        const issueCheck = results[0];
-        if (!issueCheck || issueCheck.length === 0 || issueCheck[0].status !== 'issued') return res.status(404).json({ success: false, message: 'Active issue not found' });
+        const txResult = await withTransaction(async (conn) => {
+            const results = await conn.query('CALL proc_get_issue_details(?)', [issue_id]);
+            const issueCheck = results[0];
+            if (!issueCheck || issueCheck.length === 0 || issueCheck[0].status !== 'issued') {
+                return { errorStatus: 404, message: 'Active issue not found' };
+            }
 
-        const issue = issueCheck[0];
-        const return_date = new Date().toISOString().split('T')[0];
-        let fine = 0;
-        const due = new Date(issue.due_date);
-        const ret = new Date(return_date);
-        if (ret > due) fine = Math.ceil(Math.abs(ret - due) / (1000 * 60 * 60 * 24)) * 1;
+            const issue = issueCheck[0];
+            const return_date = new Date().toISOString().split('T')[0];
+            let fine = 0;
+            const due = new Date(issue.due_date);
+            const ret = new Date(return_date);
+            if (ret > due) fine = Math.ceil(Math.abs(ret - due) / (1000 * 60 * 60 * 24)) * 1;
 
-        await pool.query('CALL proc_return_book(?, ?, ?, ?)', [issue_id, issue.book_id, return_date, fine]);
+            await conn.query('CALL proc_return_book(?, ?, ?, ?)', [issue_id, issue.book_id, return_date, fine]);
 
-        // --- WAITLIST FULFILLMENT LOGIC ---
-        const waitlistRows = await pool.query('CALL proc_get_waitlist_for_book(?)', [issue.actual_book_id]);
-        if (waitlistRows && waitlistRows.length > 0 && waitlistRows[0].length > 0) {
-            const nextInLine = waitlistRows[0][0];
-            
-            // Fulfill the reservation
-            await pool.query('CALL proc_fulfill_reservation(?)', [nextInLine.reservation_id]);
+            // --- WAITLIST FULFILLMENT LOGIC ---
+            const waitlistRows = await conn.query('CALL proc_get_waitlist_for_book(?)', [issue.actual_book_id]);
+            let notifyPayload = null;
+            if (waitlistRows && waitlistRows.length > 0 && waitlistRows[0].length > 0) {
+                const nextInLine = waitlistRows[0][0];
+                await conn.query('CALL proc_fulfill_reservation(?)', [nextInLine.reservation_id]);
+                notifyPayload = nextInLine;
+            }
 
-            // Notify the member
+            return { success: true, fine, notifyPayload };
+        });
+
+        if (txResult && txResult.errorStatus) {
+            return res.status(txResult.errorStatus).json({ success: false, message: txResult.message });
+        }
+
+        if (txResult && txResult.notifyPayload) {
+            const nextInLine = txResult.notifyPayload;
             const title = 'Your Reserved Book is Available!';
             const text = `Hi ${nextInLine.member_name},\n\nThe book you reserved is now available at the library! Please come pick it up within the next 48 hours.`;
             const html = generateGenericMessageHTML(nextInLine.member_name, title, text);
-            
             try {
                 sendEmail(nextInLine.member_email, title, text, html);
             } catch (emailErr) {
                 console.warn('[API] Failed to send waitlist email', emailErr);
             }
         }
-        // ---------------------------------
 
         await invalidateCache('cache:/api/admin/stats*');
         await invalidateCache('cache:/api/admin/overview-stats*');
 
-        res.status(200).json({ success: true, message: 'Returned successfully', fine_amount: fine });
+        res.status(200).json({ success: true, message: 'Returned successfully', fine_amount: txResult ? txResult.fine : 0 });
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, message: 'Internal server error' });

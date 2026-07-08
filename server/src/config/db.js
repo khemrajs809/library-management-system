@@ -8,8 +8,12 @@ const pool = mariadb.createPool({
      user: process.env.DB_USER || 'root', 
      password: process.env.DB_PASS || '',
      database: process.env.DB_NAME || 'library_db',
-     port: parseInt(process.env.DB_PORT) || 3306,
-     connectionLimit: 20
+     port: parseInt(process.env.DB_PORT, 10) || 3306,
+     connectionLimit: parseInt(process.env.DB_POOL_SIZE, 10) || 30,
+     acquireTimeout: 10000,
+     connectTimeout: 10000,
+     idleTimeout: 60,
+     minimumIdle: 5
 });
 
 async function getConnection() {

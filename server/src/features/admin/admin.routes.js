@@ -15,7 +15,9 @@ const {
     generateUniqueLibrarianId,
     getAuditLogs,
     updateLibrarianStatus,
-    getMonitoringDashboardData
+    getMonitoringDashboardData,
+    getCirculationAuditStatus,
+    runCirculationRepair
 } = require('./admin.controller');
 const announcementController = require('../announcements/announcement.controller');
 const { authLimiter } = require('../../middlewares/rateLimiter.middleware');
@@ -72,5 +74,9 @@ router.get('/announcements', verifyToken, checkRole(['admin']), announcementCont
 router.post('/announcements', verifyToken, checkRole(['admin']), auditLog('Create Announcement'), announcementController.createAnnouncement);
 router.patch('/announcements/:id/status', verifyToken, checkRole(['admin']), auditLog('Toggle Announcement Status'), announcementController.toggleStatus);
 router.delete('/announcements/:id', verifyToken, checkRole(['admin']), auditLog('Delete Announcement'), announcementController.deleteAnnouncement);
+
+// --- CIRCULATION INTEGRITY & REPAIR (ADMIN ONLY) ---
+router.get('/circulation/audit', verifyToken, checkRole(['admin', 'librarian']), getCirculationAuditStatus);
+router.post('/circulation/repair', verifyToken, checkRole(['admin']), auditLog('Reconcile Circulation Integrity'), runCirculationRepair);
 
 module.exports = router;

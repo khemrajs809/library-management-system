@@ -1,8 +1,10 @@
-import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, OnDestroy, inject } from '@angular/core';
 
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType } from '@zxing/library';
 import { UPLOADS_BASE } from '../../../../../core/api.config';
+import { MemberService } from '../../../../../services/member.service';
+import { BookService } from '../../../../../services/book.service';
 
 @Component({
   selector: 'app-issue-form',
@@ -12,6 +14,9 @@ import { UPLOADS_BASE } from '../../../../../core/api.config';
   styleUrl: './issue-form.component.css'
 })
 export class IssueFormComponent implements OnDestroy {
+  private memberService = inject(MemberService);
+  private bookService = inject(BookService);
+
   @Input() recentActivity: any[] = [];
   @Input() members: any[] = [];
   @Input() books: any[] = [];
@@ -51,8 +56,23 @@ export class IssueFormComponent implements OnDestroy {
       this.previewMember = null;
       return;
     }
-    const found = this.members.find(m => m.memberId === this.memberId);
-    this.previewMember = found || null;
+    const found = this.members.find(m => String(m.memberId || '').trim().toLowerCase() === this.memberId.toLowerCase());
+    if (found) {
+      this.previewMember = found;
+    } else {
+      this.memberService.getMember(this.memberId).subscribe({
+        next: (res) => {
+          if (res.success && res.data) {
+            this.previewMember = res.data;
+          } else {
+            this.previewMember = null;
+          }
+        },
+        error: () => {
+          this.previewMember = null;
+        }
+      });
+    }
   }
 
   onBookIdEnter(val: string) {
@@ -77,26 +97,39 @@ export class IssueFormComponent implements OnDestroy {
       }
     }
 
-    // Attempt lookup
-    let found = this.books.find(b => b.bookId === this.bookId);
+    // Attempt lookup case-insensitively
+    let found = this.books.find(b => String(b.bookId || '').trim().toLowerCase() === this.bookId.toLowerCase());
     if (!found && parentBookId !== this.bookId) {
-       found = this.books.find(b => b.bookId === parentBookId);
+       found = this.books.find(b => String(b.bookId || '').trim().toLowerCase() === parentBookId.toLowerCase());
     }
     
     if (found) {
        this.previewBook = found;
        this.previewCopyId = possibleCopyPart || found.bookId;
     } else {
-       this.previewBook = null;
-       this.previewCopyId = '';
+       this.bookService.getBookById(parentBookId).subscribe({
+         next: (res) => {
+           if (res.success && res.data) {
+             this.previewBook = res.data;
+             this.previewCopyId = possibleCopyPart || res.data.bookId;
+           } else {
+             this.previewBook = null;
+             this.previewCopyId = '';
+           }
+         },
+         error: () => {
+           this.previewBook = null;
+           this.previewCopyId = '';
+         }
+       });
     }
   }
 
   onIssueSubmit() {
     if (!this.memberId || !this.bookId) return;
     this.onIssue.emit({ 
-      memberId: this.memberId, 
-      bookId: this.bookId 
+      memberId: this.memberId.trim(), 
+      bookId: (this.previewCopyId || this.bookId).trim()
     });
     this.memberId = '';
     this.bookId = '';

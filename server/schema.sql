@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS issues (
     fine_amount  DECIMAL(10, 2) DEFAULT 0.00,
     fine_paid    TINYINT(1)     DEFAULT 0,
     status       ENUM('issued', 'returned', 'lost') DEFAULT 'issued',
-    FOREIGN KEY (book_id)   REFERENCES books(book_id),
+    FOREIGN KEY (book_id)   REFERENCES book_copies(copy_id) ON DELETE SET NULL,
     FOREIGN KEY (member_id) REFERENCES members(member_id)
 );
 

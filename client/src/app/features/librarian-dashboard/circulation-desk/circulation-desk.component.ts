@@ -219,8 +219,8 @@ export class CirculationDeskComponent {
 
   constructor() {
     this.loadIssues();
-    this.memberService.getMembers().subscribe({ next: (r) => this.members.set(r.data) });
-    this.bookService.getBooks().subscribe({ next: (r) => this.books.set(r.data) });
+    this.memberService.getMembers('', 1, 1000).subscribe({ next: (r) => this.members.set(r.data || []) });
+    this.bookService.getBooks('', 1, 1000).subscribe({ next: (r) => this.books.set(r.data || []) });
   }
 
   loadIssues() {
@@ -240,8 +240,8 @@ export class CirculationDeskComponent {
   refreshAll() {
     this.loadIssues();
     this.loadHistory();
-    this.memberService.getMembers().subscribe({ next: (r) => this.members.set(r.data) });
-    this.bookService.getBooks().subscribe({ next: (r) => this.books.set(r.data) });
+    this.memberService.getMembers('', 1, 1000).subscribe({ next: (r) => this.members.set(r.data || []) });
+    this.bookService.getBooks('', 1, 1000).subscribe({ next: (r) => this.books.set(r.data || []) });
   }
   
   isOverdue = (issue: Issue) => {

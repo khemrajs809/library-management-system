@@ -4,6 +4,7 @@ const Papa = require('papaparse');
 const { sanitizeObject } = require('../../common/services/sanitizer.service');
 const zxcvbn = require('zxcvbn');
 const { sendEmail } = require('../../common/services/email.service');
+const { runFullCirculationAudit, reconcileCirculationIntegrity } = require('../../common/services/circulationAudit.service');
 
 // POST /api/admin/librarians — Create a new librarian account
 const createLibrarian = async (req, res) => {
@@ -429,4 +430,26 @@ const getMonitoringDashboardData = async (req, res) => {
     }
 };
 
-module.exports = { createLibrarian, getLibrarians, updateLibrarianPassword, deleteLibrarian, getStats, importBooks, importMembers, getOverviewStats, generateUniqueLibrarianId, getAuditLogs, updateLibrarianStatus, getMonitoringDashboardData };
+// GET /api/admin/circulation/audit — Inspect circulation desk database integrity
+const getCirculationAuditStatus = async (req, res) => {
+    try {
+        const report = await runFullCirculationAudit();
+        res.status(200).json({ success: true, report });
+    } catch (err) {
+        console.error("Circulation Audit Error:", err);
+        res.status(500).json({ success: false, message: 'Failed to inspect circulation integrity' });
+    }
+};
+
+// POST /api/admin/circulation/repair — Self-heal orphaned or half-committed circulation states
+const runCirculationRepair = async (req, res) => {
+    try {
+        const summary = await reconcileCirculationIntegrity();
+        res.status(200).json({ success: true, message: 'Circulation integrity reconciled successfully', summary });
+    } catch (err) {
+        console.error("Circulation Repair Error:", err);
+        res.status(500).json({ success: false, message: 'Failed to reconcile circulation records' });
+    }
+};
+
+module.exports = { createLibrarian, getLibrarians, updateLibrarianPassword, deleteLibrarian, getStats, importBooks, importMembers, getOverviewStats, generateUniqueLibrarianId, getAuditLogs, updateLibrarianStatus, getMonitoringDashboardData, getCirculationAuditStatus, runCirculationRepair };
