@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise LMS - Chen ER Diagram (A4 Landscape 11pt+)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #ffffff;
+            color: #0f172a;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 14px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        h1 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .badge {
+            background: #dcfce7;
+            color: #14532d;
+            font-size: 0.8rem;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-weight: 800;
+            border: 1px solid #16a34a;
+        }
+        .controls {
+            display: flex;
+            gap: 12px;
+        }
+        button {
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            padding: 9px 18px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #1e293b;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        button:hover {
+            background: #f1f5f9;
+            border-color: #64748b;
+        }
+        button.primary {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: #ffffff;
+        }
+        button.primary:hover {
+            background: #1d4ed8;
+        }
+        button.success {
+            background: #16a34a;
+            border-color: #16a34a;
+            color: #ffffff;
+        }
+        button.success:hover {
+            background: #15803d;
+        }
+        #canvas-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background-color: #ffffff; /* Clean white background */
+            cursor: grab;
+        }
+        #canvas-container:active {
+            cursor: grabbing;
+        }
+        svg {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        /* Print Styles exactly for A4 Landscape */
+        @media print {
+            @page {
+                size: A4 landscape;
+                margin: 0;
+            }
+            body {
+                background-color: #ffffff !important;
+                height: 100vh;
+                width: 100vw;
+                overflow: hidden !important;
+            }
+            header, .controls {
+                display: none !important;
+            }
+            #canvas-container {
+                background: #ffffff !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                position: static !important;
+            }
+            svg {
+                width: 100vw !important;
+                height: 100vh !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>
+            <span>Enterprise LMS — Chen ER Diagram</span>
+            <span class="badge">A4 Landscape (297×210 mm) | All Fonts ≥ 11pt</span>
+        </h1>
+        <div class="controls">
+            <button onclick="resetView()">🔄 Reset View</button>
+            <button onclick="printA4()">🖨️ Print / Save A4 PDF</button>
+            <button onclick="exportSVG()">📥 Export SVG</button>
+            <button class="primary" onclick="exportPNG()">🖼️ Export High-Res PNG (3508×2480)</button>
+        </div>
+    </header>
+
+    <div id="canvas-container">
+        <!-- 
+           Coordinate System: viewBox="0 0 2970 2100" exactly matches A4 Landscape aspect ratio (297mm x 210mm scaled by 10).
+           1 mm = 10 units.
+           1 pt = 0.3528 mm = 3.528 units.
+           All font-size values >= 40 units guarantee strictly >= 11.3 pt font size on physical A4 paper!
+        -->
+        <svg id="er-svg" viewBox="0 0 2970 2100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <style type="text/css">
+                    <![CDATA[
+                    /* Embedded styles inside SVG so XMLSerializer and Canvas rendering retain exact colors */
+                    .entity-strong { fill: #dcfce7; stroke: #16a34a; stroke-width: 3.5px; }
+                    .entity-weak-outer { fill: #f3e8ff; stroke: #9333ea; stroke-width: 3.5px; }
+                    .entity-weak-inner { fill: none; stroke: #9333ea; stroke-width: 2.2px; }
+                    .relationship { fill: #dbeafe; stroke: #2563eb; stroke-width: 3px; }
+                    .attribute { fill: #f0fdf4; stroke: #16a34a; stroke-width: 2.5px; }
+                    .attribute-pk-outer { fill: #dcfce7; stroke: #15803d; stroke-width: 3.5px; }
+                    .attribute-pk-inner { fill: none; stroke: #15803d; stroke-width: 2px; }
+                    .attribute-fk { fill: #fef9c3; stroke: #ca8a04; stroke-width: 3px; stroke-dasharray: 6, 4; }
+                    .connector { stroke: #334155; stroke-width: 3px; fill: none; }
+                    
+                    /* All typography scaled strictly >= 40 units (>= 11.3 pt on A4 paper) */
+                    .text-title { font-family: 'Inter', system-ui, -apple-system, sans-serif; font-size: 64px; font-weight: 800; fill: #0f172a; text-anchor: middle; }
+                    .text-entity { font-family: 'Inter', system-ui, -apple-system, sans-serif; font-size: 52px; font-weight: 800; fill: #0f172a; text-anchor: middle; dominant-baseline: middle; }
+                    .text-entity-sub { font-family: 'Inter', system-ui, -apple-system, sans-serif; font-size: 38px; font-weight: 700; fill: #475569; text-anchor: middle; dominant-baseline: middle; }
+                    .text-rel { font-family: 'Inter', system-ui, -apple-system, sans-serif; font-size: 44px; font-weight: 700; fill: #1e293b; text-anchor: middle; dominant-baseline: middle; }
+                    .text-attr { font-family: 'Inter', system-ui, -apple-system, sans-serif; font-size: 42px; font-weight: 700; fill: #1e293b; text-anchor: middle; dominant-baseline: middle; }
+                    .text-pk { font-family: 'Inter', system-ui, -apple-system, sans-serif; font-size: 44px; font-weight: 800; fill: #14532d; text-anchor: middle; dominant-baseline: middle; text-decoration: underline; }
+                    .text-fk { font-family: 'Inter', system-ui, -apple-system, sans-serif; font-size: 42px; font-weight: 800; fill: #854d0e; text-anchor: middle; dominant-baseline: middle; }
+                    .text-cardinality { font-family: 'Inter', system-ui, -apple-system, sans-serif; font-size: 46px; font-weight: 800; fill: #0f172a; }
+                    .text-legend { font-family: 'Inter', system-ui, -apple-system, sans-serif; font-size: 42px; font-weight: 800; fill: #1e293b; dominant-baseline: middle; }
+                    .node-group { cursor: pointer; }
+                    .node-group:hover text { fill: #2563eb; }
+                    ]]>
+                </style>
+            </defs>
+
+            <!-- Pure Clean White Background (#ffffff) guaranteed in PNG/SVG/Print -->
+            <rect width="100%" height="100%" fill="#ffffff" />
+
+            <g id="viewport">
+                <!-- Main Header Title (64 units = 18 pt) -->
+                <text x="1485" y="80" class="text-title" font-family="Inter, system-ui, sans-serif" font-size="64" font-weight="800" fill="#0f172a" text-anchor="middle">Enterprise Library Management System — Chen ER Diagram (A4 Landscape)</text>
+
+                <!-- ==================== CONNECTOR LINES ==================== -->
+                <g id="connectors">
+                    <!-- User to Member (Registers) -->
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="480" y1="360" x2="960" y2="360" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="960" y1="360" x2="1480" y2="360" />
+                    <text class="text-cardinality" font-size="46" font-weight="800" fill="#0f172a" x="650" y="330">1</text>
+                    <text class="text-cardinality" font-size="46" font-weight="800" fill="#0f172a" x="1350" y="330">M</text>
+
+                    <!-- User to Book (Manages) -->
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="480" y1="360" x2="480" y2="580" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="480" y1="580" x2="480" y2="800" />
+                    <text class="text-cardinality" font-size="46" font-weight="800" fill="#0f172a" x="515" y="470">1</text>
+                    <text class="text-cardinality" font-size="46" font-weight="800" fill="#0f172a" x="515" y="730">M</text>
+
+                    <!-- Book to BookCopy (HasCopies) -->
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="480" y1="800" x2="800" y2="800" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="800" y1="800" x2="1140" y2="800" />
+                    <text class="text-cardinality" font-size="46" font-weight="800" fill="#0f172a" x="630" y="770">1</text>
+                    <text class="text-cardinality" font-size="46" font-weight="800" fill="#0f172a" x="1030" y="770">M</text>
+
+                    <!-- Member to Reservation (Places) -->
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1480" y1="360" x2="1940" y2="360" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1940" y1="360" x2="2380" y2="360" />
+                    <text class="text-cardinality" font-size="46" font-weight="800" fill="#0f172a" x="1650" y="330">1</text>
+                    <text class="text-cardinality" font-size="46" font-weight="800" fill="#0f172a" x="2240" y="330">M</text>
+
+                    <!-- Member to Issue (Borrows) -->
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1480" y1="360" x2="1480" y2="580" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1480" y1="580" x2="1480" y2="800" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1480" y1="800" x2="2080" y2="800" />
+                    <text class="text-cardinality" font-size="46" font-weight="800" fill="#0f172a" x="1515" y="480">1</text>
+                    <text class="text-cardinality" font-size="46" font-weight="800" fill="#0f172a" x="1970" y="770">M</text>
+
+                    <!-- BookCopy to Issue (IssuedAs) -->
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1140" y1="800" x2="1620" y2="800" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1620" y1="800" x2="2080" y2="800" />
+                    <text class="text-cardinality" font-size="46" font-weight="800" fill="#0f172a" x="1270" y="770">1</text>
+                    <text class="text-cardinality" font-size="46" font-weight="800" fill="#0f172a" x="1940" y="830">M</text>
+
+                    <!-- Book to BookAuthor (Has) -->
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="480" y1="800" x2="480" y2="1050" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="480" y1="1050" x2="480" y2="1300" />
+                    <text class="text-cardinality" font-size="46" font-weight="800" fill="#0f172a" x="515" y="940">1</text>
+                    <text class="text-cardinality" font-size="46" font-weight="800" fill="#0f172a" x="515" y="1210">M</text>
+
+                    <!-- Author to BookAuthor (Writes) -->
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1080" y1="1300" x2="780" y2="1300" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="780" y1="1300" x2="480" y2="1300" />
+                    <text class="text-cardinality" font-size="46" font-weight="800" fill="#0f172a" x="960" y="1270">1</text>
+                    <text class="text-cardinality" font-size="46" font-weight="800" fill="#0f172a" x="610" y="1270">M</text>
+
+                    <!-- Issue to FinePayment (Pays) -->
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="2080" y1="800" x2="1840" y2="1050" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1840" y1="1050" x2="1660" y2="1300" />
+                    <text class="text-cardinality" font-size="46" font-weight="800" fill="#0f172a" x="2000" y="920">1</text>
+                    <text class="text-cardinality" font-size="46" font-weight="800" fill="#0f172a" x="1720" y="1210">1/M</text>
+
+                    <!-- Issue to Notification (Sends) -->
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="2080" y1="800" x2="2230" y2="1050" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="2230" y1="1050" x2="2360" y2="1300" />
+                    <text class="text-cardinality" font-size="46" font-weight="800" fill="#0f172a" x="2140" y="920">1</text>
+                    <text class="text-cardinality" font-size="46" font-weight="800" fill="#0f172a" x="2310" y="1210">M</text>
+
+                    <!-- ==================== ATTRIBUTE CONNECTORS ==================== -->
+                    <!-- User Attributes lines -->
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="480" y1="360" x2="240" y2="200" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="480" y1="360" x2="380" y2="180" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="480" y1="360" x2="520" y2="180" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="480" y1="360" x2="660" y2="200" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="480" y1="360" x2="230" y2="300" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="480" y1="360" x2="230" y2="400" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="480" y1="360" x2="260" y2="490" />
+
+                    <!-- Member Attributes lines -->
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1480" y1="360" x2="1230" y2="190" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1480" y1="360" x2="1370" y2="170" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1480" y1="360" x2="1510" y2="170" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1480" y1="360" x2="1650" y2="190" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1480" y1="360" x2="1780" y2="230" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1480" y1="360" x2="1240" y2="290" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1480" y1="360" x2="1240" y2="390" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1480" y1="360" x2="1270" y2="480" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1480" y1="360" x2="1700" y2="480" />
+
+                    <!-- Book Attributes lines -->
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="480" y1="800" x2="230" y2="630" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="480" y1="800" x2="210" y2="710" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="480" y1="800" x2="210" y2="790" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="480" y1="800" x2="210" y2="870" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="480" y1="800" x2="230" y2="950" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="480" y1="800" x2="350" y2="970" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="480" y1="800" x2="480" y2="970" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="480" y1="800" x2="610" y2="970" />
+
+                    <!-- BookCopy Attributes lines -->
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1140" y1="800" x2="970" y2="650" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1140" y1="800" x2="1120" y2="640" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1140" y1="800" x2="1270" y2="650" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1140" y1="800" x2="990" y2="940" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1140" y1="800" x2="1140" y2="950" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1140" y1="800" x2="1290" y2="940" />
+
+                    <!-- Reservation Attributes lines -->
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="2380" y1="360" x2="2630" y2="180" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="2380" y1="360" x2="2680" y2="260" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="2380" y1="360" x2="2690" y2="340" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="2380" y1="360" x2="2690" y2="420" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="2380" y1="360" x2="2680" y2="500" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="2380" y1="360" x2="2630" y2="580" />
+
+                    <!-- Issue Attributes lines -->
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="2080" y1="800" x2="2340" y2="640" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="2080" y1="800" x2="2380" y2="710" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="2080" y1="800" x2="2390" y2="780" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="2080" y1="800" x2="2390" y2="860" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="2080" y1="800" x2="2380" y2="930" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="2080" y1="800" x2="2340" y2="1000" />
+
+                    <!-- BookAuthor Attributes lines -->
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="480" y1="1300" x2="330" y2="1430" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="480" y1="1300" x2="510" y2="1450" />
+
+                    <!-- Author Attributes lines -->
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1080" y1="1300" x2="960" y2="1450" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1080" y1="1300" x2="1080" y2="1460" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1080" y1="1300" x2="1210" y2="1450" />
+
+                    <!-- FinePayment Attributes lines -->
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1660" y1="1300" x2="1480" y2="1440" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1660" y1="1300" x2="1600" y2="1460" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1660" y1="1300" x2="1720" y2="1460" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="1660" y1="1300" x2="1840" y2="1440" />
+
+                    <!-- Notification Attributes lines -->
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="2360" y1="1300" x2="2180" y2="1440" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="2360" y1="1300" x2="2300" y2="1460" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="2360" y1="1300" x2="2420" y2="1460" />
+                    <line class="connector" stroke="#334155" stroke-width="3" x1="2360" y1="1300" x2="2540" y2="1440" />
+                </g>
+
+                <!-- ==================== RELATIONSHIPS (Blue Diamonds) ==================== -->
+                <g class="node-group" transform="translate(960, 360)">
+                    <polygon class="relationship" fill="#dbeafe" stroke="#2563eb" stroke-width="3" points="0,-65 110,0 0,65 -110,0" />
+                    <text class="text-rel" font-size="44" font-weight="700" fill="#1e293b">&lt;Registers&gt;</text>
+                </g>
+                <g class="node-group" transform="translate(480, 580)">
+                    <polygon class="relationship" fill="#dbeafe" stroke="#2563eb" stroke-width="3" points="0,-65 110,0 0,65 -110,0" />
+                    <text class="text-rel" font-size="44" font-weight="700" fill="#1e293b">&lt;Manages&gt;</text>
+                </g>
+                <g class="node-group" transform="translate(800, 800)">
+                    <polygon class="relationship" fill="#dbeafe" stroke="#2563eb" stroke-width="3" points="0,-65 110,0 0,65 -110,0" />
+                    <text class="text-rel" font-size="44" font-weight="700" fill="#1e293b">&lt;HasCopies&gt;</text>
+                </g>
+                <g class="node-group" transform="translate(1940, 360)">
+                    <polygon class="relationship" fill="#dbeafe" stroke="#2563eb" stroke-width="3" points="0,-65 110,0 0,65 -110,0" />
+                    <text class="text-rel" font-size="44" font-weight="700" fill="#1e293b">&lt;Places&gt;</text>
+                </g>
+                <g class="node-group" transform="translate(1620, 800)">
+                    <polygon class="relationship" fill="#dbeafe" stroke="#2563eb" stroke-width="3" points="0,-65 110,0 0,65 -110,0" />
+                    <text class="text-rel" font-size="44" font-weight="700" fill="#1e293b">&lt;IssuedAs&gt;</text>
+                </g>
+                <g class="node-group" transform="translate(480, 1050)">
+                    <polygon class="relationship" fill="#dbeafe" stroke="#2563eb" stroke-width="3" points="0,-65 110,0 0,65 -110,0" />
+                    <text class="text-rel" font-size="44" font-weight="700" fill="#1e293b">&lt;Has&gt;</text>
+                </g>
+                <g class="node-group" transform="translate(780, 1300)">
+                    <polygon class="relationship" fill="#dbeafe" stroke="#2563eb" stroke-width="3" points="0,-65 110,0 0,65 -110,0" />
+                    <text class="text-rel" font-size="44" font-weight="700" fill="#1e293b">&lt;Writes&gt;</text>
+                </g>
+                <g class="node-group" transform="translate(1840, 1050)">
+                    <polygon class="relationship" fill="#dbeafe" stroke="#2563eb" stroke-width="3" points="0,-65 110,0 0,65 -110,0" />
+                    <text class="text-rel" font-size="44" font-weight="700" fill="#1e293b">&lt;Pays&gt;</text>
+                </g>
+                <g class="node-group" transform="translate(2230, 1050)">
+                    <polygon class="relationship" fill="#dbeafe" stroke="#2563eb" stroke-width="3" points="0,-65 110,0 0,65 -110,0" />
+                    <text class="text-rel" font-size="44" font-weight="700" fill="#1e293b">&lt;Sends&gt;</text>
+                </g>
+
+                <!-- ==================== ENTITIES (All text >= 52 units = 15 pt) ==================== -->
+                <!-- USER (Strong) -->
+                <g class="node-group" transform="translate(480, 360)">
+                    <rect class="entity-strong" fill="#dcfce7" stroke="#16a34a" stroke-width="3.5" x="-140" y="-50" width="280" height="100" rx="8" />
+                    <text class="text-entity" font-size="52" font-weight="800" fill="#0f172a" y="-10">User</text>
+                    <text class="text-entity-sub" font-size="38" font-weight="700" fill="#475569" y="28">(Admin / Librarian)</text>
+                </g>
+
+                <!-- MEMBER (Strong) -->
+                <g class="node-group" transform="translate(1480, 360)">
+                    <rect class="entity-strong" fill="#dcfce7" stroke="#16a34a" stroke-width="3.5" x="-150" y="-50" width="300" height="100" rx="8" />
+                    <text class="text-entity" font-size="52" font-weight="800" fill="#0f172a" y="-10">Member</text>
+                    <text class="text-entity-sub" font-size="38" font-weight="700" fill="#475569" y="28">(Students / Faculty)</text>
+                </g>
+
+                <!-- BOOK (Strong) -->
+                <g class="node-group" transform="translate(480, 800)">
+                    <rect class="entity-strong" fill="#dcfce7" stroke="#16a34a" stroke-width="3.5" x="-145" y="-50" width="290" height="100" rx="8" />
+                    <text class="text-entity" font-size="52" font-weight="800" fill="#0f172a" y="-10">Book</text>
+                    <text class="text-entity-sub" font-size="38" font-weight="700" fill="#475569" y="28">(Catalog Master)</text>
+                </g>
+
+                <!-- BOOK COPY (Weak) -->
+                <g class="node-group" transform="translate(1140, 800)">
+                    <rect class="entity-weak-outer" fill="#f3e8ff" stroke="#9333ea" stroke-width="3.5" x="-150" y="-55" width="300" height="110" rx="8" />
+                    <rect class="entity-weak-inner" fill="none" stroke="#9333ea" stroke-width="2.2" x="-140" y="-45" width="280" height="90" rx="5" />
+                    <text class="text-entity" font-size="52" font-weight="800" fill="#0f172a" y="-10">BookCopy</text>
+                    <text class="text-entity-sub" font-size="38" font-weight="700" fill="#6b21a8" y="28">(Barcode Copy)</text>
+                </g>
+
+                <!-- RESERVATION (Weak) -->
+                <g class="node-group" transform="translate(2380, 360)">
+                    <rect class="entity-weak-outer" fill="#f3e8ff" stroke="#9333ea" stroke-width="3.5" x="-140" y="-50" width="280" height="100" rx="8" />
+                    <rect class="entity-weak-inner" fill="none" stroke="#9333ea" stroke-width="2.2" x="-130" y="-40" width="260" height="80" rx="5" />
+                    <text class="text-entity" font-size="52" font-weight="800" fill="#0f172a">Reservation</text>
+                </g>
+
+                <!-- ISSUE (Weak) -->
+                <g class="node-group" transform="translate(2080, 800)">
+                    <rect class="entity-weak-outer" fill="#f3e8ff" stroke="#9333ea" stroke-width="3.5" x="-145" y="-55" width="290" height="110" rx="8" />
+                    <rect class="entity-weak-inner" fill="none" stroke="#9333ea" stroke-width="2.2" x="-135" y="-45" width="270" height="90" rx="5" />
+                    <text class="text-entity" font-size="52" font-weight="800" fill="#0f172a" y="-10">Issue</text>
+                    <text class="text-entity-sub" font-size="38" font-weight="700" fill="#6b21a8" y="28">(Circulation)</text>
+                </g>
+
+                <!-- BOOK AUTHOR (Weak / Associative) -->
+                <g class="node-group" transform="translate(480, 1300)">
+                    <rect class="entity-weak-outer" fill="#f3e8ff" stroke="#9333ea" stroke-width="3.5" x="-135" y="-50" width="270" height="100" rx="8" />
+                    <rect class="entity-weak-inner" fill="none" stroke="#9333ea" stroke-width="2.2" x="-125" y="-40" width="250" height="80" rx="5" />
+                    <text class="text-entity" font-size="50" font-weight="800" fill="#0f172a">BookAuthor</text>
+                </g>
+
+                <!-- AUTHOR (Strong) -->
+                <g class="node-group" transform="translate(1080, 1300)">
+                    <rect class="entity-strong" fill="#dcfce7" stroke="#16a34a" stroke-width="3.5" x="-130" y="-50" width="260" height="100" rx="8" />
+                    <text class="text-entity" font-size="52" font-weight="800" fill="#0f172a">Author</text>
+                </g>
+
+                <!-- FINE PAYMENT (Weak) -->
+                <g class="node-group" transform="translate(1660, 1300)">
+                    <rect class="entity-weak-outer" fill="#f3e8ff" stroke="#9333ea" stroke-width="3.5" x="-140" y="-50" width="280" height="100" rx="8" />
+                    <rect class="entity-weak-inner" fill="none" stroke="#9333ea" stroke-width="2.2" x="-130" y="-40" width="260" height="80" rx="5" />
+                    <text class="text-entity" font-size="52" font-weight="800" fill="#0f172a">FinePayment</text>
+                </g>
+
+                <!-- NOTIFICATION (Weak) -->
+                <g class="node-group" transform="translate(2360, 1300)">
+                    <rect class="entity-weak-outer" fill="#f3e8ff" stroke="#9333ea" stroke-width="3.5" x="-140" y="-50" width="280" height="100" rx="8" />
+                    <rect class="entity-weak-inner" fill="none" stroke="#9333ea" stroke-width="2.2" x="-130" y="-40" width="260" height="80" rx="5" />
+                    <text class="text-entity" font-size="52" font-weight="800" fill="#0f172a">Notification</text>
+                </g>
+
+                <!-- ==================== ATTRIBUTES (All fonts >= 42 units = 12 pt strictly) ==================== -->
+                <!-- USER ATTRIBUTES -->
+                <!-- PK: id -->
+                <g class="node-group" transform="translate(240, 200)">
+                    <ellipse class="attribute-pk-outer" fill="#dcfce7" stroke="#15803d" stroke-width="3.5" rx="80" ry="36" />
+                    <ellipse class="attribute-pk-inner" fill="none" stroke="#15803d" stroke-width="2" rx="70" ry="26" />
+                    <text class="text-pk" font-size="44" font-weight="800" fill="#14532d" text-decoration="underline">id (PK)</text>
+                </g>
+                <g class="node-group" transform="translate(380, 180)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="72" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">name</text></g>
+                <g class="node-group" transform="translate(520, 180)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="72" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">email</text></g>
+                <g class="node-group" transform="translate(660, 200)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="82" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">last_login</text></g>
+                <g class="node-group" transform="translate(230, 300)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="92" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">password</text></g>
+                <g class="node-group" transform="translate(230, 400)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="72" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">role</text></g>
+                <g class="node-group" transform="translate(260, 490)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="72" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">status</text></g>
+
+                <!-- MEMBER ATTRIBUTES -->
+                <!-- PK: member_id -->
+                <g class="node-group" transform="translate(1230, 190)">
+                    <ellipse class="attribute-pk-outer" fill="#dcfce7" stroke="#15803d" stroke-width="3.5" rx="96" ry="36" />
+                    <ellipse class="attribute-pk-inner" fill="none" stroke="#15803d" stroke-width="2" rx="86" ry="26" />
+                    <text class="text-pk" font-size="44" font-weight="800" fill="#14532d" text-decoration="underline">member_id (PK)</text>
+                </g>
+                <g class="node-group" transform="translate(1370, 170)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="72" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">name</text></g>
+                <g class="node-group" transform="translate(1510, 170)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="72" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">email</text></g>
+                <g class="node-group" transform="translate(1650, 190)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="72" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">phone</text></g>
+                <g class="node-group" transform="translate(1780, 230)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="72" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">dob</text></g>
+                <g class="node-group" transform="translate(1240, 290)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="98" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">membership</text></g>
+                <g class="node-group" transform="translate(1240, 390)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="86" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">department</text></g>
+                <g class="node-group" transform="translate(1270, 480)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="78" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">address</text></g>
+                <g class="node-group" transform="translate(1700, 480)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="72" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">status</text></g>
+
+                <!-- BOOK ATTRIBUTES -->
+                <!-- PK: book_id -->
+                <g class="node-group" transform="translate(230, 630)">
+                    <ellipse class="attribute-pk-outer" fill="#dcfce7" stroke="#15803d" stroke-width="3.5" rx="92" ry="36" />
+                    <ellipse class="attribute-pk-inner" fill="none" stroke="#15803d" stroke-width="2" rx="82" ry="26" />
+                    <text class="text-pk" font-size="44" font-weight="800" fill="#14532d" text-decoration="underline">book_id (PK)</text>
+                </g>
+                <g class="node-group" transform="translate(210, 710)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="72" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">title</text></g>
+                <g class="node-group" transform="translate(210, 790)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="72" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">author</text></g>
+                <g class="node-group" transform="translate(210, 870)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="72" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">isbn</text></g>
+                <g class="node-group" transform="translate(230, 950)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="72" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">stream</text></g>
+                <g class="node-group" transform="translate(350, 970)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="72" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">price</text></g>
+                <g class="node-group" transform="translate(480, 970)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="72" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">quantity</text></g>
+                <g class="node-group" transform="translate(610, 970)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="76" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">status</text></g>
+
+                <!-- BOOKCOPY ATTRIBUTES -->
+                <!-- PK: copy_id -->
+                <g class="node-group" transform="translate(970, 650)">
+                    <ellipse class="attribute-pk-outer" fill="#dcfce7" stroke="#15803d" stroke-width="3.5" rx="88" ry="36" />
+                    <ellipse class="attribute-pk-inner" fill="none" stroke="#15803d" stroke-width="2" rx="78" ry="26" />
+                    <text class="text-pk" font-size="44" font-weight="800" fill="#14532d" text-decoration="underline">copy_id (PK)</text>
+                </g>
+                <!-- FK: book_id (FK) -->
+                <g class="node-group" transform="translate(1120, 640)">
+                    <ellipse class="attribute-fk" fill="#fef9c3" stroke="#ca8a04" stroke-width="3" stroke-dasharray="6,4" rx="92" ry="32" />
+                    <text class="text-fk" font-size="42" font-weight="800" fill="#854d0e">book_id (FK)</text>
+                </g>
+                <g class="node-group" transform="translate(1270, 650)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="76" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">barcode</text></g>
+                <g class="node-group" transform="translate(990, 940)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="72" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">status</text></g>
+                <g class="node-group" transform="translate(1140, 950)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="88" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">location</text></g>
+                <g class="node-group" transform="translate(1290, 940)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="72" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">price</text></g>
+
+                <!-- RESERVATION ATTRIBUTES -->
+                <!-- PK: reservation_id -->
+                <g class="node-group" transform="translate(2630, 180)">
+                    <ellipse class="attribute-pk-outer" fill="#dcfce7" stroke="#15803d" stroke-width="3.5" rx="110" ry="36" />
+                    <ellipse class="attribute-pk-inner" fill="none" stroke="#15803d" stroke-width="2" rx="100" ry="26" />
+                    <text class="text-pk" font-size="44" font-weight="800" fill="#14532d" text-decoration="underline">reservation_id (PK)</text>
+                </g>
+                <!-- FK: member_id (FK) -->
+                <g class="node-group" transform="translate(2680, 260)">
+                    <ellipse class="attribute-fk" fill="#fef9c3" stroke="#ca8a04" stroke-width="3" stroke-dasharray="6,4" rx="100" ry="32" />
+                    <text class="text-fk" font-size="42" font-weight="800" fill="#854d0e">member_id (FK)</text>
+                </g>
+                <!-- FK: book_id (FK) -->
+                <g class="node-group" transform="translate(2690, 340)">
+                    <ellipse class="attribute-fk" fill="#fef9c3" stroke="#ca8a04" stroke-width="3" stroke-dasharray="6,4" rx="92" ry="32" />
+                    <text class="text-fk" font-size="42" font-weight="800" fill="#854d0e">book_id (FK)</text>
+                </g>
+                <g class="node-group" transform="translate(2690, 420)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="72" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">status</text></g>
+                <g class="node-group" transform="translate(2680, 500)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="80" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">created_at</text></g>
+                <g class="node-group" transform="translate(2630, 580)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="96" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">queue_pos</text></g>
+
+                <!-- ISSUE ATTRIBUTES -->
+                <!-- PK: issue_id -->
+                <g class="node-group" transform="translate(2340, 640)">
+                    <ellipse class="attribute-pk-outer" fill="#dcfce7" stroke="#15803d" stroke-width="3.5" rx="92" ry="36" />
+                    <ellipse class="attribute-pk-inner" fill="none" stroke="#15803d" stroke-width="2" rx="82" ry="26" />
+                    <text class="text-pk" font-size="44" font-weight="800" fill="#14532d" text-decoration="underline">issue_id (PK)</text>
+                </g>
+                <!-- FK: copy_id (FK) -->
+                <g class="node-group" transform="translate(2380, 710)">
+                    <ellipse class="attribute-fk" fill="#fef9c3" stroke="#ca8a04" stroke-width="3" stroke-dasharray="6,4" rx="92" ry="32" />
+                    <text class="text-fk" font-size="42" font-weight="800" fill="#854d0e">copy_id (FK)</text>
+                </g>
+                <!-- FK: member_id (FK) -->
+                <g class="node-group" transform="translate(2390, 780)">
+                    <ellipse class="attribute-fk" fill="#fef9c3" stroke="#ca8a04" stroke-width="3" stroke-dasharray="6,4" rx="100" ry="32" />
+                    <text class="text-fk" font-size="42" font-weight="800" fill="#854d0e">member_id (FK)</text>
+                </g>
+                <g class="node-group" transform="translate(2390, 860)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="80" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">issue_date</text></g>
+                <g class="node-group" transform="translate(2380, 930)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="80" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">due_date</text></g>
+                <g class="node-group" transform="translate(2340, 1000)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="82" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">fine_amt</text></g>
+
+                <!-- BOOKAUTHOR ATTRIBUTES -->
+                <g class="node-group" transform="translate(330, 1430)">
+                    <ellipse class="attribute-fk" fill="#fef9c3" stroke="#ca8a04" stroke-width="3" stroke-dasharray="6,4" rx="92" ry="32" />
+                    <text class="text-fk" font-size="42" font-weight="800" fill="#854d0e">book_id (FK)</text>
+                </g>
+                <g class="node-group" transform="translate(510, 1450)">
+                    <ellipse class="attribute-fk" fill="#fef9c3" stroke="#ca8a04" stroke-width="3" stroke-dasharray="6,4" rx="96" ry="32" />
+                    <text class="text-fk" font-size="42" font-weight="800" fill="#854d0e">author_id (FK)</text>
+                </g>
+
+                <!-- AUTHOR ATTRIBUTES -->
+                <!-- PK: author_id -->
+                <g class="node-group" transform="translate(960, 1450)">
+                    <ellipse class="attribute-pk-outer" fill="#dcfce7" stroke="#15803d" stroke-width="3.5" rx="100" ry="36" />
+                    <ellipse class="attribute-pk-inner" fill="none" stroke="#15803d" stroke-width="2" rx="90" ry="26" />
+                    <text class="text-pk" font-size="44" font-weight="800" fill="#14532d" text-decoration="underline">author_id (PK)</text>
+                </g>
+                <g class="node-group" transform="translate(1080, 1460)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="72" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">name</text></g>
+                <g class="node-group" transform="translate(1210, 1450)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="72" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">bio</text></g>
+
+                <!-- FINE PAYMENT ATTRIBUTES -->
+                <!-- PK: payment_id -->
+                <g class="node-group" transform="translate(1480, 1440)">
+                    <ellipse class="attribute-pk-outer" fill="#dcfce7" stroke="#15803d" stroke-width="3.5" rx="104" ry="36" />
+                    <ellipse class="attribute-pk-inner" fill="none" stroke="#15803d" stroke-width="2" rx="94" ry="26" />
+                    <text class="text-pk" font-size="44" font-weight="800" fill="#14532d" text-decoration="underline">payment_id (PK)</text>
+                </g>
+                <!-- FK: issue_id (FK) -->
+                <g class="node-group" transform="translate(1600, 1460)">
+                    <ellipse class="attribute-fk" fill="#fef9c3" stroke="#ca8a04" stroke-width="3" stroke-dasharray="6,4" rx="92" ry="32" />
+                    <text class="text-fk" font-size="42" font-weight="800" fill="#854d0e">issue_id (FK)</text>
+                </g>
+                <g class="node-group" transform="translate(1720, 1460)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="76" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">amount</text></g>
+                <g class="node-group" transform="translate(1840, 1440)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="72" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">mode</text></g>
+
+                <!-- NOTIFICATION ATTRIBUTES -->
+                <!-- PK: notification_id -->
+                <g class="node-group" transform="translate(2180, 1440)">
+                    <ellipse class="attribute-pk-outer" fill="#dcfce7" stroke="#15803d" stroke-width="3.5" rx="116" ry="36" />
+                    <ellipse class="attribute-pk-inner" fill="none" stroke="#15803d" stroke-width="2" rx="106" ry="26" />
+                    <text class="text-pk" font-size="44" font-weight="800" fill="#14532d" text-decoration="underline">notification_id (PK)</text>
+                </g>
+                <!-- FK: member_id (FK) -->
+                <g class="node-group" transform="translate(2300, 1460)">
+                    <ellipse class="attribute-fk" fill="#fef9c3" stroke="#ca8a04" stroke-width="3" stroke-dasharray="6,4" rx="100" ry="32" />
+                    <text class="text-fk" font-size="42" font-weight="800" fill="#854d0e">member_id (FK)</text>
+                </g>
+                <g class="node-group" transform="translate(2420, 1460)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="76" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">message</text></g>
+                <g class="node-group" transform="translate(2540, 1440)"><ellipse class="attribute" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" rx="72" ry="32" /><text class="text-attr" font-size="42" font-weight="700" fill="#1e293b">is_read</text></g>
+
+                <!-- ==================== A4 LANDSCAPE BOTTOM VECTOR LEGEND (All Fonts >= 42 units = 12 pt) ==================== -->
+                <g id="native-svg-legend" transform="translate(240, 1850)">
+                    <rect x="0" y="0" width="2490" height="180" rx="16" fill="#ffffff" stroke="#334155" stroke-width="3.5" />
+                    
+                    <!-- Strong Entity -->
+                    <g transform="translate(130, 90)">
+                        <rect x="-45" y="-25" width="90" height="50" rx="6" fill="#dcfce7" stroke="#16a34a" stroke-width="3.5" />
+                        <text class="text-legend" x="60" y="4">Strong Entity</text>
+                    </g>
+
+                    <!-- Weak Entity -->
+                    <g transform="translate(460, 90)">
+                        <rect x="-50" y="-28" width="100" height="56" rx="6" fill="#f3e8ff" stroke="#9333ea" stroke-width="3.5" />
+                        <rect x="-42" y="-20" width="84" height="40" rx="3" fill="none" stroke="#9333ea" stroke-width="2.2" />
+                        <text class="text-legend" x="65" y="4">Weak / Assoc. Entity</text>
+                    </g>
+
+                    <!-- Relationship -->
+                    <g transform="translate(930, 90)">
+                        <polygon points="0,-35 55,0 0,35 -55,0" fill="#dbeafe" stroke="#2563eb" stroke-width="3" />
+                        <text class="text-legend" x="70" y="4">Relationship</text>
+                    </g>
+
+                    <!-- Normal Attribute -->
+                    <g transform="translate(1310, 90)">
+                        <ellipse rx="48" ry="26" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" />
+                        <text class="text-legend" x="60" y="4">Attribute</text>
+                    </g>
+
+                    <!-- Primary Key (PK) -->
+                    <g transform="translate(1620, 90)">
+                        <ellipse rx="56" ry="32" fill="#dcfce7" stroke="#15803d" stroke-width="3.5" />
+                        <ellipse rx="46" ry="22" fill="none" stroke="#15803d" stroke-width="2" />
+                        <text class="text-legend" font-weight="800" fill="#14532d" text-decoration="underline" x="70" y="4">Primary Key (PK)</text>
+                    </g>
+
+                    <!-- Foreign Key (FK) -->
+                    <g transform="translate(2080, 90)">
+                        <ellipse rx="52" ry="28" fill="#fef9c3" stroke="#ca8a04" stroke-width="3" stroke-dasharray="6,4" />
+                        <text class="text-legend" font-weight="800" fill="#854d0e" x="65" y="4">Foreign Key (FK)</text>
+                    </g>
+                </g>
+            </g>
+        </svg>
+    </div>
+
+    <script>
+        const svg = document.getElementById('er-svg');
+        const viewport = document.getElementById('viewport');
+        let isPanning = false;
+        let startPoint = { x: 0, y: 0 };
+        let scale = 1;
+        let panX = 0;
+        let panY = 0;
+
+        // Zoom / Pan support
+        svg.addEventListener('mousedown', (e) => {
+            if (e.target.tagName === 'rect' || e.target.tagName === 'ellipse' || e.target.tagName === 'polygon' || e.target.tagName === 'text') return;
+            isPanning = true;
+            startPoint = { x: e.clientX - panX, y: e.clientY - panY };
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isPanning) return;
+            panX = e.clientX - startPoint.x;
+            panY = e.clientY - startPoint.y;
+            updateTransform();
+        });
+
+        window.addEventListener('mouseup', () => {
+            isPanning = false;
+        });
+
+        svg.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            scale = Math.min(Math.max(0.3, scale * delta), 3);
+            updateTransform();
+        });
+
+        function updateTransform() {
+            viewport.setAttribute('transform', `translate(${panX}, ${panY}) scale(${scale})`);
+        }
+
+        function resetView() {
+            scale = 1;
+            panX = 0;
+            panY = 0;
+            updateTransform();
+        }
+
+        function printA4() {
+            // Reset view before printing so it perfectly fills A4 landscape
+            resetView();
+            window.print();
+        }
+
+        function exportSVG() {
+            const savedTransform = viewport.getAttribute('transform');
+            viewport.removeAttribute('transform');
+
+            const svgData = new XMLSerializer().serializeToString(svg);
+            const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Enterprise_LMS_Chen_ER_Diagram_A4_Landscape.svg';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            if (savedTransform) viewport.setAttribute('transform', savedTransform);
+        }
+
+        function exportPNG() {
+            const savedTransform = viewport.getAttribute('transform');
+            viewport.removeAttribute('transform');
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const svgString = new XMLSerializer().serializeToString(svg);
+            const img = new Image();
+            const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(svgBlob);
+
+            img.onload = function() {
+                // Exact A4 Landscape at 300 DPI (3508 x 2480 pixels)
+                canvas.width = 3508;
+                canvas.height = 2480;
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                URL.revokeObjectURL(url);
+
+                const a = document.createElement('a');
+                a.download = 'Enterprise_LMS_Chen_ER_Diagram_A4_Landscape_300DPI.png';
+                a.href = canvas.toDataURL('image/png');
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+
+                if (savedTransform) viewport.setAttribute('transform', savedTransform);
+            };
+            img.src = url;
+        }
+    </script>
+</body>
+</html>

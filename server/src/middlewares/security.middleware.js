@@ -7,16 +7,16 @@ const crypto = require('crypto');
 
 // 1. Helmet Configuration (Adds 11 standard security headers + Strict CSP)
 const helmetConfig = helmet({
-    crossOriginResourcePolicy: { policy: "cross-origin" }, // Allows loading images from other origins
+    crossOriginResourcePolicy: { policy: 'cross-origin' }, // Allows loading images from other origins
     contentSecurityPolicy: {
         directives: {
-            defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "'unsafe-inline'"], // Angular requires some inline scripts for prod builds
-            styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-            fontSrc: ["'self'", "data:", "https://fonts.gstatic.com"],
-            imgSrc: ["'self'", "data:", "blob:", "https:"],
-            connectSrc: ["'self'"],
-            objectSrc: ["'none'"],
+            defaultSrc: ['\'self\''],
+            scriptSrc: ['\'self\'', '\'unsafe-inline\''], // Angular requires some inline scripts for prod builds
+            styleSrc: ['\'self\'', '\'unsafe-inline\'', 'https://fonts.googleapis.com'],
+            fontSrc: ['\'self\'', 'data:', 'https://fonts.gstatic.com'],
+            imgSrc: ['\'self\'', 'data:', 'blob:', 'https:'],
+            connectSrc: ['\'self\''],
+            objectSrc: ['\'none\''],
             upgradeInsecureRequests: [],
         },
     }

@@ -53,7 +53,7 @@ const getLibrarians = async (req, res) => {
         const [rows] = await pool.query('CALL proc_get_librarians()');
         res.status(200).json({ success: true, data: rows });
     } catch (err) {
-        console.error("❌ getLibrarians Error:", err);
+        console.error('❌ getLibrarians Error:', err);
         res.status(500).json({ 
             success: false, 
             message: 'Server error',
@@ -93,8 +93,8 @@ const getStats = async (req, res) => {
         
         // 1. Line Chart (Rental rate vs User conversion for 12 months)
         const currentYear = new Date().getFullYear();
-        const [monthlyIssues] = await pool.query(`CALL proc_get_monthly_issue_stats(?)`, [currentYear]);
-        const [monthlyMembers] = await pool.query(`CALL proc_get_monthly_member_stats(?)`, [currentYear]);
+        const [monthlyIssues] = await pool.query('CALL proc_get_monthly_issue_stats(?)', [currentYear]);
+        const [monthlyMembers] = await pool.query('CALL proc_get_monthly_member_stats(?)', [currentYear]);
         
         const lineChartIssues = new Array(12).fill(0);
         const lineChartMembers = new Array(12).fill(0);
@@ -102,7 +102,7 @@ const getStats = async (req, res) => {
         monthlyMembers.forEach(r => lineChartMembers[r.month - 1] = Number(r.count));
 
         // 2. Donut Chart (Books condition)
-        const [donutStats] = await pool.query(`CALL proc_get_book_condition_stats()`);
+        const [donutStats] = await pool.query('CALL proc_get_book_condition_stats()');
         let allCopies = 0, newCopies = 0, damageCopies = 0, lostCopies = 0, issuedCopies = 0;
         donutStats.forEach(r => {
             allCopies += Number(r.count);
@@ -113,16 +113,16 @@ const getStats = async (req, res) => {
         });
 
         // 3. Bar Chart (Borrowed rate by stream)
-        const [streamStats] = await pool.query(`CALL proc_get_borrow_rate_by_stream()`);
+        const [streamStats] = await pool.query('CALL proc_get_borrow_rate_by_stream()');
         const barLabels = streamStats.map(r => r.stream || 'Unknown');
         const barData = streamStats.map(r => Number(r.count));
 
         // 4. Restricted Members Count (for the stat card)
-        const restrictedCountRes = await pool.query(`CALL proc_get_restricted_members_count()`);
+        const restrictedCountRes = await pool.query('CALL proc_get_restricted_members_count()');
         const restrictedMembersCount = Number(restrictedCountRes[0]?.[0]?.count || 0);
 
         // 5. Top 5 Popular Books
-        const [rowsPop] = await pool.query(`CALL proc_get_popular_books()`);
+        const [rowsPop] = await pool.query('CALL proc_get_popular_books()');
         const popularBooks = rowsPop.map(b => ({
             title: b.title,
             author: b.author,
@@ -174,7 +174,7 @@ const generateUniqueLibrarianId = async (req, res) => {
         }
         res.json({ success: true, id: newId });
     } catch (err) {
-        console.error("❌ generateUniqueLibrarianId Error:", err);
+        console.error('❌ generateUniqueLibrarianId Error:', err);
         res.status(500).json({ success: false, message: 'Server error', error: err.message });
     }
 };
@@ -195,7 +195,7 @@ const importBooks = async (req, res) => {
                 try {
                     book = sanitizeObject(book); // Sanitize for CSV Injection safety
                     if (!book.title || !book.isbn) {
-                        errors.push(`Row: Missing title or ISBN`);
+                        errors.push('Row: Missing title or ISBN');
                         continue;
                     }
                     await pool.query(
@@ -228,7 +228,7 @@ const importMembers = async (req, res) => {
                 try {
                     member = sanitizeObject(member); // Sanitize for CSV Injection safety
                     if (!member.name || !member.member_id) {
-                        errors.push(`Row: Missing name or Member ID`);
+                        errors.push('Row: Missing name or Member ID');
                         continue;
                     }
                     await pool.query(
@@ -318,7 +318,7 @@ const getOverviewStats = async (req, res) => {
             }
         });
     } catch (err) {
-        console.error("Overview Stats Error:", err);
+        console.error('Overview Stats Error:', err);
         res.status(500).json({ success: false, message: 'Server error', error: err.message, stack: err.stack });
     }
 };
@@ -386,7 +386,7 @@ const getMonitoringDashboardData = async (req, res) => {
     try {
         // Fix for BigInt serialization issue in MariaDB
         if (typeof BigInt !== 'undefined') {
-            BigInt.prototype.toJSON = function () { return this.toString() };
+            BigInt.prototype.toJSON = function () { return this.toString(); };
         }
 
         const [
@@ -425,7 +425,7 @@ const getMonitoringDashboardData = async (req, res) => {
             }
         });
     } catch (err) {
-        console.error("Monitoring Dashboard Error:", err);
+        console.error('Monitoring Dashboard Error:', err);
         res.status(500).json({ success: false, message: 'Server error', error: err.message, stack: err.stack });
     }
 };
@@ -436,7 +436,7 @@ const getCirculationAuditStatus = async (req, res) => {
         const report = await runFullCirculationAudit();
         res.status(200).json({ success: true, report });
     } catch (err) {
-        console.error("Circulation Audit Error:", err);
+        console.error('Circulation Audit Error:', err);
         res.status(500).json({ success: false, message: 'Failed to inspect circulation integrity' });
     }
 };
@@ -447,7 +447,7 @@ const runCirculationRepair = async (req, res) => {
         const summary = await reconcileCirculationIntegrity();
         res.status(200).json({ success: true, message: 'Circulation integrity reconciled successfully', summary });
     } catch (err) {
-        console.error("Circulation Repair Error:", err);
+        console.error('Circulation Repair Error:', err);
         res.status(500).json({ success: false, message: 'Failed to reconcile circulation records' });
     }
 };

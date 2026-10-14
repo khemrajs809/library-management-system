@@ -11,7 +11,7 @@ const getActiveAnnouncements = async (req, res) => {
             serverTime: new Date()
         });
     } catch (err) {
-        console.error("❌ getActiveAnnouncements Error:", err);
+        console.error('❌ getActiveAnnouncements Error:', err);
         res.status(500).json({ 
             success: false, 
             message: 'Failed to fetch announcements',
@@ -46,7 +46,7 @@ const createAnnouncement = async (req, res) => {
         await invalidateCache('cache:/api/announcements*');
         res.status(201).json({ success: true, message: 'Announcement created successfully' });
     } catch (err) {
-        console.error("Announcement Creation Error:", err);
+        console.error('Announcement Creation Error:', err);
         res.status(500).json({ 
             success: false, 
             message: 'Failed to create announcement',

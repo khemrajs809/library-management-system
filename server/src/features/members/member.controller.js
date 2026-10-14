@@ -163,6 +163,7 @@ const getMember = async (req, res) => {
         res.status(200).json({ success: true, data: member });
     } catch (err) {
         console.error(err);
+        require('fs').appendFileSync('debug_error.log', new Date().toISOString() + ' ' + (err.stack || err) + '\n');
         res.status(500).json({ success: false, message: 'Internal server error' });
     }
 };
@@ -387,7 +388,7 @@ const generateUniqueMemberId = async (req, res) => {
         }
         res.json({ success: true, id: newId });
     } catch (err) {
-        console.error("❌ generateUniqueMemberId Error:", err);
+        console.error('❌ generateUniqueMemberId Error:', err);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 };

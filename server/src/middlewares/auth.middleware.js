@@ -7,7 +7,7 @@ dotenv.config();
 const pool = require('../config/db');
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
-    console.error("FATAL ERROR: JWT_SECRET is not defined.");
+    console.error('FATAL ERROR: JWT_SECRET is not defined.');
     process.exit(1);
 }
 

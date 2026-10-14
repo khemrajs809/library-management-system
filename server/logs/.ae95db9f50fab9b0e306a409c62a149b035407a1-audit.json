@@ -6,54 +6,44 @@
     "auditLog": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\.ae95db9f50fab9b0e306a409c62a149b035407a1-audit.json",
     "files": [
         {
-            "date": 1780398855313,
-            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\fatal-rejections-2026-06-02.log",
-            "hash": "73bca0f238978c3fe66220228d656c5e581b8c2af8beb6f75d4b65c43824ad90"
+            "date": 1782703462979,
+            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\fatal-rejections-2026-06-29.log",
+            "hash": "88378389ce603ff461a43452460e9351d78a40ecd277e3eb6486661b2ab4ad27"
         },
         {
-            "date": 1780447718133,
-            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\fatal-rejections-2026-06-03.log",
-            "hash": "8d2df578767e97685e8634675a9cc466cf6e6c926747d1c8dad4eec3de195b5c"
+            "date": 1782902755936,
+            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\fatal-rejections-2026-07-01.log",
+            "hash": "24d41a5924720f711c7fd43d368c80b64a0395f2df50094fb8cb81767e2a7064"
         },
         {
-            "date": 1780557147684,
-            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\fatal-rejections-2026-06-04.log",
-            "hash": "ac50d16005a09bc7fcabd202b55f919d2088474e82933a8e29f157f67ca0da6b"
+            "date": 1783515466967,
+            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\fatal-rejections-2026-07-08.log",
+            "hash": "a53f67155b0f59b0ca4b4884a1ba73e83ebfe912681bb0dfa69ccaf54f9147a2"
         },
         {
-            "date": 1780619153394,
-            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\fatal-rejections-2026-06-05.log",
-            "hash": "8aed4a4f03ff5a7c9d162235dfd8068c3216f3727c96aa691373e9b7cdf7c72e"
+            "date": 1783575073844,
+            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\fatal-rejections-2026-07-09.log",
+            "hash": "62a7778669cb834694574e65f7638b151c7f9aa89ca6e9fac63b7cfa8464796d"
         },
         {
-            "date": 1780904847137,
-            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\fatal-rejections-2026-06-08.log",
-            "hash": "15ecedac622adb2cb4b99888e142cd4be11f4006414bbf7574280e04cbface7d"
+            "date": 1784078679091,
+            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\fatal-rejections-2026-07-15.log",
+            "hash": "57045299a0372c31f444739f1c776ba06cbea22f157fe269e3ba7603c043dc9e"
         },
         {
-            "date": 1780984132652,
-            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\fatal-rejections-2026-06-09.log",
-            "hash": "3076616744ac914aea4230053b067b08629ffb780c11d732e5310aa0ad732585"
+            "date": 1784203018087,
+            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\fatal-rejections-2026-07-16.log",
+            "hash": "610db7ed2e3d32193a87f02a0fef2540d84a1cd6eecfd79aa5a4bdfdd5428309"
         },
         {
-            "date": 1781070494788,
-            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\fatal-rejections-2026-06-10.log",
-            "hash": "d81b9ba9f0184fe9df9e1cde431d0c8b12ec0562e3ee701146d75e512dbbe1de"
+            "date": 1784279740956,
+            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\fatal-rejections-2026-07-17.log",
+            "hash": "762c4f6435076b16cc91d38da6deaa1578b9cd7dcd3395af03dff9f2e7d187da"
         },
         {
-            "date": 1781325425101,
-            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\fatal-rejections-2026-06-13.log",
-            "hash": "56e2189063389b19211623ee0dbae24a31ae88c336bd514392d0690f2f6e7aa5"
-        },
-        {
-            "date": 1781586655285,
-            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\fatal-rejections-2026-06-16.log",
-            "hash": "95e987f4427cd20932e5174afc46e8903ba795eace835b236856faa3b7a4c7f3"
-        },
-        {
-            "date": 1781759220391,
-            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\fatal-rejections-2026-06-18.log",
-            "hash": "6cf249bf0821055a7f9c3c64f0f8f29441ee071397d23e69d9a4ae65fce695a8"
+            "date": 1784857073431,
+            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\fatal-rejections-2026-07-24.log",
+            "hash": "1daca8df119d2f371c0abfd4bc35e27fb5128ff74fe1e03c34274fdd7c030f50"
         }
     ],
     "hashType": "sha256"

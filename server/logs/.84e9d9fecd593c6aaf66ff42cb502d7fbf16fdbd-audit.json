@@ -6,44 +6,24 @@
     "auditLog": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\.84e9d9fecd593c6aaf66ff42cb502d7fbf16fdbd-audit.json",
     "files": [
         {
-            "date": 1780557147679,
-            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\exceptions-2026-06-04.log",
-            "hash": "396566869e4781d04f38d58e9867e1d7b4475fdd3dd6ecab06f311a8d3f95ed4"
+            "date": 1784078679086,
+            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\exceptions-2026-07-15.log",
+            "hash": "52f8cde3bddbb0be07d27cd74afa7bada1dfeb6602f44a299db97b4757b2dfee"
         },
         {
-            "date": 1780619153389,
-            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\exceptions-2026-06-05.log",
-            "hash": "1cddd721db9e4eb7f3846e6537839cf83ff69d774176f71c42e68bfdb9d091ca"
+            "date": 1784203018080,
+            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\exceptions-2026-07-16.log",
+            "hash": "7d3866da3dbf7db4ba11e0aa448cb6e85ffcd12bee1ee9283d022c3cc34a0052"
         },
         {
-            "date": 1780904847132,
-            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\exceptions-2026-06-08.log",
-            "hash": "d43a88cf13e30414e6825351f0bce33e4b183ceeba0e0b293d88d1cca03ed4f8"
+            "date": 1784279740952,
+            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\exceptions-2026-07-17.log",
+            "hash": "aed9bbce900725f379ad7cc218b330f3228f7e73f4238c303b35cb2b70cbc24b"
         },
         {
-            "date": 1780984132646,
-            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\exceptions-2026-06-09.log",
-            "hash": "befedf2d65c845c9e518d8847cd281654c8d922e62e665acf6ed4fd45e239697"
-        },
-        {
-            "date": 1781070494783,
-            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\exceptions-2026-06-10.log",
-            "hash": "9e6de68ae0fba217ed57af1967824a24d4d1fe80fa96ad591f846b291b404972"
-        },
-        {
-            "date": 1781325425097,
-            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\exceptions-2026-06-13.log",
-            "hash": "6e47a7e15dfa3af491262df5c6ad5d3c21b505c0ae3a063d74291b5bcdf068aa"
-        },
-        {
-            "date": 1781586655280,
-            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\exceptions-2026-06-16.log",
-            "hash": "91d7572d7b670ff718e41135a85c6f783fcd1232c1a39e8af5bf2b6a30d7eb5b"
-        },
-        {
-            "date": 1781759220385,
-            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\exceptions-2026-06-18.log",
-            "hash": "5982b5394958c6668f211de754e02d5cca66a993d18a1ec8955254e3a648165b"
+            "date": 1784857073428,
+            "name": "C:\\Users\\khemr\\OneDrive\\Desktop\\lms\\server\\logs\\exceptions-2026-07-24.log",
+            "hash": "93bc1705e7c8d5348a4b18431b911aa52b0e75123b20d5bffcc07e04428823ff"
         }
     ],
     "hashType": "sha256"

@@ -1,7 +1,7 @@
 const express = require('express');
 
 if (typeof BigInt !== 'undefined') {
-    BigInt.prototype.toJSON = function () { return this.toString() };
+    BigInt.prototype.toJSON = function () { return this.toString(); };
 }
 
 const cookieParser = require('cookie-parser');
@@ -10,8 +10,8 @@ const path = require('path');
 // --- Security & Middleware ---
 const { helmetConfig, corsConfig, hppConfig, csrfProtection } = require('./middlewares/security.middleware');
 const logger = require('./config/logger');
-const { adminLimiter, bookLimiter, memberLimiter, issueLimiter, notesLimiter, publicLimiter, authLimiter } = require('./middlewares/rateLimiter.middleware');
-const { validateResult, loginValidation } = require('./middlewares/validation.middleware');
+const { adminLimiter, bookLimiter, memberLimiter, issueLimiter, notesLimiter, publicLimiter } = require('./middlewares/rateLimiter.middleware');
+
 const caseConverter = require('./middlewares/caseConverter.middleware');
 
 // --- Routes ---
@@ -56,9 +56,9 @@ app.use((req, res, next) => {
         };
         
         if (res.statusCode >= 400) {
-            logger.warn(`API Request Failed`, logData);
+            logger.warn('API Request Failed', logData);
         } else {
-            logger.info(`API Request Successful`, logData);
+            logger.info('API Request Successful', logData);
         }
     });
     next();
@@ -98,7 +98,7 @@ app.use((req, res) => {
 });
 
 // Global error handler (Enterprise Exception Interceptor)
-app.use((err, req, res, next) => {
+app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
     logger.error('Unhandled Exception Caught:', {
         message: err.message,
         stack: err.stack,

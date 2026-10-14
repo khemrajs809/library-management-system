@@ -64,7 +64,7 @@ const getSessions = async (req, res) => {
             };
         });
 
-        console.log("DEBUG FIRST SESSION ROW:", data[0]);
+        console.log('DEBUG FIRST SESSION ROW:', data[0]);
         res.status(200).json({
             success: true,
             data,

@@ -1,4 +1,4 @@
-import { Component, inject, signal, Input, ViewChild, ElementRef, computed, ViewEncapsulation } from '@angular/core';
+import { Component, inject, signal, Input, ViewChild, ElementRef, computed, ViewEncapsulation, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { IssueService } from '../../../services/issue.service';
@@ -8,14 +8,16 @@ import { Issue } from '../../../models/issue.model';
 import { Member } from '../../../models/member.model';
 import { Book } from '../../../models/book.model';
 import { ToastService } from '../../../services/toast.service';
+import { RefreshService } from '../../../services/refresh.service';
 import { ModalService } from '../../../services/modal.service';
-import { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType } from '@zxing/library';
 import { UPLOADS_BASE } from '../../../core/api.config';
+import { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType } from '@zxing/library';
 
+// Shared Components
 import { IssueFormComponent } from './components/issue-form/issue-form.component';
 import { ActiveIssuesTableComponent } from './components/active-issues-table/active-issues-table.component';
-import { ReturnScannerComponent } from './components/return-scanner/return-scanner.component';
 import { ReturnHistoryComponent } from './components/return-history/return-history.component';
+import { ReturnScannerComponent } from './components/return-scanner/return-scanner.component';
 
 @Component({
   selector: 'app-circulation-desk',
@@ -25,8 +27,8 @@ import { ReturnHistoryComponent } from './components/return-history/return-histo
     ReactiveFormsModule,
     IssueFormComponent,
     ActiveIssuesTableComponent,
-    ReturnScannerComponent,
-    ReturnHistoryComponent
+    ReturnHistoryComponent,
+    ReturnScannerComponent
   ],
   templateUrl: './circulation-desk.component.html',
   styleUrl: './circulation-desk.component.css',
@@ -40,6 +42,7 @@ export class CirculationDeskComponent {
   private bookService = inject(BookService);
   private toastService = inject(ToastService);
   private modalService = inject(ModalService);
+  private ngZone = inject(NgZone);
   readonly uploadsBase = UPLOADS_BASE;
 
   @Input() set activeTab(tab: string) {
@@ -565,12 +568,30 @@ export class CirculationDeskComponent {
     });
   }
 
+  private playBeep() {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(600, ctx.currentTime);
+      gain.gain.setValueAtTime(0.05, ctx.currentTime);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.3);
+    } catch (e) {}
+  }
+
   toggleMemberCamera() {
     this.isMemberCameraActive.update(v => !v);
     if (this.isMemberCameraActive()) {
       setTimeout(() => this.startCamera('reader-member', (text) => {
-        this.onScannerMemberEnter({ target: { value: text } });
-        this.toggleMemberCamera();
+        this.ngZone.run(() => {
+          this.playBeep();
+          this.onScannerMemberEnter({ target: { value: text } });
+          this.stopMemberCamera();
+        });
       }), 100);
     } else {
       this.stopMemberCamera();
@@ -586,8 +607,11 @@ export class CirculationDeskComponent {
     this.isBookCameraActive.update(v => !v);
     if (this.isBookCameraActive()) {
       setTimeout(() => this.startCamera('reader-book', (text) => {
-        this.onScannerBookEnter({ target: { value: text } });
-        this.toggleBookCamera();
+        this.ngZone.run(() => {
+          this.playBeep();
+          this.onScannerBookEnter({ target: { value: text } });
+          this.stopBookCamera();
+        });
       }), 100);
     } else {
       this.stopBookCamera();
@@ -604,9 +628,12 @@ export class CirculationDeskComponent {
     if (this.isSideMemberScannerActive()) {
       this.stopSideBookScanner();
       setTimeout(() => this.startCamera('reader-side-member', (text) => {
-        this.issueForm.patchValue({ memberId: text });
-        this.onMemberIdEnter();
-        this.toggleSideMemberScanner();
+        this.ngZone.run(() => {
+          this.playBeep();
+          this.issueForm.patchValue({ memberId: text });
+          this.onMemberIdEnter();
+          this.stopSideMemberScanner();
+        });
       }), 100);
     } else {
       this.stopSideMemberScanner();
@@ -623,8 +650,11 @@ export class CirculationDeskComponent {
     if (this.isSideBookScannerActive()) {
       this.stopSideMemberScanner();
       setTimeout(() => this.startCamera('reader-side-book', (text) => {
-        this.issueForm.patchValue({ bookId: text });
-        this.toggleSideBookScanner();
+        this.ngZone.run(() => {
+          this.playBeep();
+          this.issueForm.patchValue({ bookId: text });
+          this.stopSideBookScanner();
+        });
       }), 100);
     } else {
       this.stopSideBookScanner();

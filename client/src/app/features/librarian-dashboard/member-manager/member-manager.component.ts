@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, Input, Output, EventEmitter, ViewChild, SimpleChanges, OnInit, OnChanges, OnDestroy } from '@angular/core';
+import { Component, inject, signal, computed, Input, Output, EventEmitter, ViewChild, SimpleChanges, OnInit, OnChanges, OnDestroy, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MemberService } from '../../../services/member.service';
@@ -35,6 +35,7 @@ export class MemberManagerComponent implements OnInit, OnChanges, OnDestroy {
   private toastService = inject(ToastService);
   private modalService = inject(ModalService);
   public refreshService = inject(RefreshService);
+  private ngZone = inject(NgZone);
   private refreshSub?: Subscription;
 
   @Input() activeTab = 'member_directory';
@@ -280,6 +281,21 @@ export class MemberManagerComponent implements OnInit, OnChanges, OnDestroy {
     e.target.value = '';
   }
 
+  private playBeep() {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(600, ctx.currentTime);
+      gain.gain.setValueAtTime(0.05, ctx.currentTime);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.3);
+    } catch (e) {}
+  }
+
   toggleScanner() {
     this.isScannerActive.update(v => !v);
     if (this.isScannerActive()) setTimeout(() => this.startScanner(), 100);
@@ -289,15 +305,25 @@ export class MemberManagerComponent implements OnInit, OnChanges, OnDestroy {
   private codeReader = new BrowserMultiFormatReader();
   private startScanner() {
     const hints = new Map();
-    hints.set(DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.QR_CODE, BarcodeFormat.CODE_128]);
-    this.codeReader.decodeFromVideoDevice(null, "member-reader", (result) => {
+    hints.set(DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.QR_CODE, BarcodeFormat.CODE_128, BarcodeFormat.CODE_39, BarcodeFormat.EAN_13, BarcodeFormat.EAN_8]);
+    this.codeReader = new BrowserMultiFormatReader(hints);
+    
+    this.codeReader.decodeFromConstraints({ video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } } }, 'member-reader', (result, err) => {
       if (result) {
-        this.onMemberSearch(result.getText());
-        this.toggleScanner();
+        this.ngZone.run(() => {
+          this.playBeep();
+          this.memberSearch.set(result.getText());
+          this.onMemberSearch(result.getText());
+          this.stopScanner();
+        });
       }
     });
   }
-  private stopScanner() { this.codeReader.reset(); }
+
+  private stopScanner() { 
+    this.codeReader.reset();
+    this.isScannerActive.set(false);
+  }
 
   openEmailSender(email: string) {
     if (!email) {

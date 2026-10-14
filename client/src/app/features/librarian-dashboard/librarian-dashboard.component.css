@@ -1125,8 +1125,8 @@
 }
 
 .book-card {
-    background: linear-gradient(135deg, #f6ecea, #d9cbc5);
-    border: 1px solid #e2e8f0;
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border: 1px solid #8bf5b0;
     border-radius: 10px;
     padding: 1rem;
     transition: all 0.3s ease;
@@ -2263,7 +2263,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 0.75rem; /* Reduced from 2rem to bring buttons closer */
+    gap: 0.75rem;
+    /* Reduced from 2rem to bring buttons closer */
     margin-top: 1.5rem;
     padding: 0.4rem 0.6rem;
     background: #f8fafc;
@@ -2272,7 +2273,7 @@
     margin-left: auto;
     margin-right: auto;
     border: 1.5px solid #e2e8f0;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .pagination-numbers {
@@ -2282,18 +2283,21 @@
 }
 
 .page-number {
-    width: 40px; /* Increased from 32px */
+    width: 40px;
+    /* Increased from 32px */
     height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
     font-weight: 800;
-    font-size: 1rem; /* Increased from 0.85rem */
+    font-size: 1rem;
+    /* Increased from 0.85rem */
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1.5px solid transparent;
-    color: #475569; /* Darker for contrast */
+    color: #475569;
+    /* Darker for contrast */
     background: transparent;
     padding: 0;
 }

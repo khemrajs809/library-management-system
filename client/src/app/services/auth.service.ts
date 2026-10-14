@@ -17,12 +17,12 @@ export class AuthService {
     try {
       const stored = localStorage.getItem('lib_session');
       if (stored) return JSON.parse(stored);
-    } catch(e) {}
+    } catch (e) { }
     return null;
   }
 
-  #sessionData = signal<{role: string, exp: number} | null>(this.getInitialSession());
-  
+  #sessionData = signal<{ role: string, exp: number } | null>(this.getInitialSession());
+
   isLoggedIn = signal<boolean>(!!this.#sessionData());
   userRole = signal<string | null>(this.#sessionData()?.role || null);
   sessionRemaining = signal<string>('');
@@ -47,11 +47,9 @@ export class AuthService {
     sessionStorage.removeItem(this.internalNavKey);
   }
 
-
-
   private startSessionTimer() {
     if (this.sessionTimerInterval) clearInterval(this.sessionTimerInterval);
-    
+
     this.ngZone.runOutsideAngular(() => {
       this.sessionTimerInterval = setInterval(() => {
         const session = this.#sessionData();

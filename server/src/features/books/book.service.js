@@ -137,8 +137,8 @@ class BookService {
     }
 
     async getFilterOptions() {
-        const [streams] = await pool.query("SELECT DISTINCT stream FROM books WHERE is_deleted=0 AND stream IS NOT NULL AND stream != '' ORDER BY stream");
-        const [authors] = await pool.query("SELECT DISTINCT author FROM books WHERE is_deleted=0 AND author IS NOT NULL AND author != '' ORDER BY author");
+        const [streams] = await pool.query('SELECT DISTINCT stream FROM books WHERE is_deleted=0 AND stream IS NOT NULL AND stream != \'\' ORDER BY stream');
+        const [authors] = await pool.query('SELECT DISTINCT author FROM books WHERE is_deleted=0 AND author IS NOT NULL AND author != \'\' ORDER BY author');
         return {
             streams: streams.map(r => r.stream),
             authors: authors.map(r => r.author)

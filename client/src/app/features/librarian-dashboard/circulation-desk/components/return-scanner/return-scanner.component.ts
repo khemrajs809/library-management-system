@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, signal, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, OnDestroy, inject, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType } from '@zxing/library';
 
@@ -10,6 +10,7 @@ import { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType } from '@zxing/
   styleUrl: './return-scanner.component.css'
 })
 export class ReturnScannerComponent implements OnDestroy {
+  private ngZone = inject(NgZone);
   @Input() scannedIssue: any | null = null;
   @Input() uploadsBase = '';
   @Input() isProcessing = false;
@@ -37,16 +38,39 @@ export class ReturnScannerComponent implements OnDestroy {
     return due < today;
   }
 
+  private playBeep() {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(600, ctx.currentTime);
+      gain.gain.setValueAtTime(0.05, ctx.currentTime);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.3);
+    } catch (e) {}
+  }
+
   toggleBookCamera() {
     this.isBookCameraActive = !this.isBookCameraActive;
     if (this.isBookCameraActive) {
       setTimeout(() => this.startCamera('reader-book', (text) => {
-        this.onBookScan.emit(text);
-        this.toggleBookCamera();
+        this.ngZone.run(() => {
+          this.playBeep();
+          this.onBookScan.emit(text);
+          this.stopBookCamera();
+        });
       }), 100);
     } else {
-      this.codeReader.reset();
+      this.stopBookCamera();
     }
+  }
+
+  private stopBookCamera() {
+    this.codeReader.reset();
+    this.isBookCameraActive = false;
   }
 
   private startCamera(videoId: string, onScan: (text: string) => void) {

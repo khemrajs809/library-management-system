@@ -19,10 +19,10 @@ const pool = mariadb.createPool({
 async function getConnection() {
     try {
         const conn = await pool.getConnection();
-        console.log("Connected to MariaDB!");
+        console.log('Connected to MariaDB!');
         conn.release();
     } catch (err) {
-        console.error("Not connected to MariaDB due to error: " + err);
+        console.error('Not connected to MariaDB due to error: ' + err);
     }
 }
 

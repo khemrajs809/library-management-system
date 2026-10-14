@@ -20,7 +20,7 @@ const {
     runCirculationRepair
 } = require('./admin.controller');
 const announcementController = require('../announcements/announcement.controller');
-const { authLimiter } = require('../../middlewares/rateLimiter.middleware');
+
 const cacheMiddleware = require('../../middlewares/cache.middleware');
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });

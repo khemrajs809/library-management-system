@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 30
+    },
+    "auditLog": "D:\\desk top\\lms\\server\\logs\\.c2549b16c319f9bc9e3ab23960b80783847e9a0c-audit.json",
+    "files": [
+        {
+            "date": 1791942422707,
+            "name": "D:\\desk top\\lms\\server\\logs\\fatal-rejections-2026-10-14.log",
+            "hash": "833f0ee5605311464fd5013ad17faf874f6129213a09efb0071f7d1efd209247"
+        }
+    ],
+    "hashType": "sha256"
+}

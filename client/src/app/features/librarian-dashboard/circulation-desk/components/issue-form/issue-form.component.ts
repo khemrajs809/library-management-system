@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, OnDestroy, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, OnDestroy, inject, NgZone } from '@angular/core';
 
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType } from '@zxing/library';
@@ -16,6 +16,7 @@ import { BookService } from '../../../../../services/book.service';
 export class IssueFormComponent implements OnDestroy {
   private memberService = inject(MemberService);
   private bookService = inject(BookService);
+  private ngZone = inject(NgZone);
 
   @Input() recentActivity: any[] = [];
   @Input() members: any[] = [];
@@ -152,7 +153,9 @@ export class IssueFormComponent implements OnDestroy {
 
       await this.codeReader.decodeFromVideoDevice(null, videoId, (result, err) => {
         if (result) {
-          onScan(result.getText());
+          this.ngZone.run(() => {
+            onScan(result.getText());
+          });
         }
       });
     } catch (error) {
@@ -160,19 +163,40 @@ export class IssueFormComponent implements OnDestroy {
     }
   }
 
+  private playBeep() {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(600, ctx.currentTime);
+      gain.gain.setValueAtTime(0.05, ctx.currentTime);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.3);
+    } catch (e) {}
+  }
+
   toggleMemberScanner() {
     this.isScanningMember = !this.isScanningMember;
     if (this.isScanningMember) {
       this.isScanningBook = false;
       this.startCamera('member-reader', (text) => {
+        this.playBeep();
         this.memberId = text;
         this.onMemberIdEnter(text);
-        this.toggleMemberScanner();
+        this.stopMemberScanner();
         setTimeout(() => this.bookInput?.nativeElement.focus(), 200);
       });
     } else {
-      this.codeReader.reset();
+      this.stopMemberScanner();
     }
+  }
+
+  private stopMemberScanner() {
+    this.codeReader.reset();
+    this.isScanningMember = false;
   }
 
   toggleBookScanner() {
@@ -180,13 +204,19 @@ export class IssueFormComponent implements OnDestroy {
     if (this.isScanningBook) {
       this.isScanningMember = false;
       this.startCamera('book-reader', (text) => {
+        this.playBeep();
         this.bookId = text;
         this.onBookIdEnter(text);
-        this.toggleBookScanner();
+        this.stopBookScanner();
       });
     } else {
-      this.codeReader.reset();
+      this.stopBookScanner();
     }
+  }
+
+  private stopBookScanner() {
+    this.codeReader.reset();
+    this.isScanningBook = false;
   }
 
   ngOnDestroy() {
